@@ -1,6 +1,6 @@
 package org.paulg.ispend.main;
 
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.Field;
 import java.nio.file.Paths;
 import java.util.*;
@@ -12,9 +12,9 @@ import javafx.geometry.Insets;
 import javafx.scene.*;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.text.Font;
-import javafx.stage.Stage;
+import javafx.stage.*;
 
 public class ISpend extends Application {
 
@@ -24,45 +24,97 @@ public class ISpend extends Application {
 	private static RecordParser parser;
 
 	public static void main(final String[] args) throws IOException {
-
-		/*
-		 * if (args.length != 1) { System.out.format("Usage: %s %s \n", ISpend.class.getSimpleName(), "<data-dir>");
-		 * System.exit(1); }
-		 */
-
 		launch(args);
 	}
 
 	@Override
 	public void start(final Stage stage) {
 		final Scene scene = new Scene(new Group());
-		stage.setTitle("Table View Sample");
-		stage.setWidth(1400);
-		stage.setHeight(1000);
+		stage.setTitle("ISpend");
 
-		final Label label = new Label("Account Balance");
-		label.setFont(new Font("Arial", 20));
+		final ToolBar toolBar = new ToolBar();
+		final BorderPane borderPane = new BorderPane();
+		borderPane.setTop(toolBar);
+		borderPane.setCenter(makeAppContent(stage));
 
-		table.setEditable(true);
+		((Group) scene.getRoot()).getChildren().addAll(borderPane);
+
+		stage.setScene(scene);
+		stage.centerOnScreen();
+		stage.setResizable(false);
+		stage.show();
+	}
+
+	private GridPane makeAppContent(final Stage stage) {
+		final GridPane gridPane = new GridPane();
+		gridPane.setHgap(5);
+		gridPane.setVgap(5);
+		gridPane.setPadding(new Insets(10, 0, 0, 10));
+		gridPane.autosize();
+		gridPane.setGridLinesVisible(false);
+
+		makeLabel(gridPane);
 
 		for (final Field f : Record.class.getDeclaredFields()) {
 			makeColumns(f.getName());
 		}
 
+		makeTable(gridPane);
+		makeSearchPanel(gridPane);
+
+		final TextField browse = new TextField();
+		browse.setPromptText("Path to data directory");
+		browse.setMinWidth(400);
+		gridPane.add(browse, 0, 1);
+
+		final Button browseButton = new Button("Browse");
+		browseButton.setOnAction(new EventHandler<ActionEvent>() {
+
+			@Override
+			public void handle(final ActionEvent e) {
+				final DirectoryChooser chooser = new DirectoryChooser();
+				final File selectedDirectory = chooser.showDialog(stage);
+				browse.setText(selectedDirectory.getAbsolutePath());
+			}
+		});
+		gridPane.add(browseButton, 1, 1);
+
+		final Button goButton = new Button("Go");
+		goButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(final ActionEvent e) {
+				final String path = browse.getText();
+				try {
+					System.out.println("Path: " + path);
+					parser = new RecordParser(Paths.get(path));
+					data.addAll(parser.getAllRecords());
+					parser.printSummary();
+				} catch (final IOException e1) {
+					// XXX print some nice error
+					e1.printStackTrace();
+				}
+			}
+		});
+		gridPane.add(goButton, 2, 1);
+		return gridPane;
+	}
+
+	private void makeTable(final GridPane gridPane) {
+		table.setEditable(true);
 		table.setItems(data);
 		table.getColumns().addAll(columns.toArray(new TableColumn[0]));
+		gridPane.add(table, 0, 2, 3, 1);
+	}
 
-		final VBox vbox = new VBox();
-		vbox.setSpacing(5);
-		vbox.autosize();
-		vbox.setPadding(new Insets(10, 0, 0, 10));
-
+	private void makeSearchPanel(final GridPane gridPane) {
 		final TextField search = new TextField();
 		search.setPromptText("Search");
-		search.setMaxWidth(200);
+		search.setMinWidth(300);
+		gridPane.add(search, 0, 3);
 
 		final Button searchButton = new Button("Search");
 		searchButton.setOnAction(new EventHandler<ActionEvent>() {
+
 			@Override
 			public void handle(final ActionEvent e) {
 				final List<Record> unfiltered = parser.getAllRecords();
@@ -79,34 +131,13 @@ public class ISpend extends Application {
 
 			}
 		});
+		gridPane.add(searchButton, 1, 3);
+	}
 
-		final TextField browse = new TextField();
-		browse.setPromptText("Path to data directory");
-		browse.setMaxWidth(400);
-
-		final Button browseButton = new Button("Go");
-		browseButton.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(final ActionEvent e) {
-				final String path = browse.getText();
-				try {
-					System.out.println("Path: " + path);
-					parser = new RecordParser(Paths.get(path));
-					data.addAll(parser.getAllRecords());
-					parser.printSummary();
-				} catch (final IOException e1) {
-					// XXX print some nice error
-					e1.printStackTrace();
-				}
-			}
-		});
-
-		vbox.getChildren().addAll(label, browse, browseButton, table, search, searchButton);
-
-		((Group) scene.getRoot()).getChildren().addAll(vbox);
-
-		stage.setScene(scene);
-		stage.show();
+	private void makeLabel(final GridPane gridPane) {
+		final Label label = new Label("Account Balance");
+		label.setFont(new Font("Arial", 20));
+		gridPane.add(label, 0, 0);
 	}
 
 	private void makeColumns(final String... args) {
