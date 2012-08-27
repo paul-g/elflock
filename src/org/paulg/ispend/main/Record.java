@@ -2,10 +2,10 @@ package org.paulg.ispend.main;
 
 public class Record {
 
+	// XXX use a builder for this class maybe
 	private String date;
 	private String type;
 	private String description;
-
 	private String balance;
 	private String accountName;
 	private String accountNumber;

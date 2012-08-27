@@ -1,0 +1,45 @@
+<project name="ispend">
+	<property name="build.dir" value="bin" />
+	<property name="src.dir" value="src" />
+	<property name="store.dir" value="dist" />
+	<property name="lib.dir" value="lib" />
+	
+	<path id="build.classpath">
+	        <fileset dir="${basedir}/">
+	                <include name="${lib.dir}/*.jar"/>
+	        </fileset>
+	</path>
+
+	<pathconvert property="mf.classpath" pathsep=" ">
+	        <path refid="build.classpath"/>
+	        <mapper>
+	                <chainedmapper>
+	                        <flattenmapper/>
+	                        <globmapper from="*.jar" to="lib/*.jar"/>
+	                </chainedmapper>
+	        </mapper>
+	</pathconvert>
+	
+	<path id="jars">
+	    <fileset dir="${lib.dir}" includes="**/*.jar"/>
+	</path>
+
+	<target name="jar">
+		<jar destfile="${store.dir}/ispend.jar" filesetmanifest="skip">
+			<zipgroupfileset dir="lib" includes="*.jar"/>
+			<fileset dir="bin"/>
+	    	<manifest>
+	        	<attribute name="Main-Class" value="org.paulg.ispend.main.ISpend"/>
+	        	<attribute name="Class-Path" value="${mf.classpath}"/>
+	    	</manifest>
+		</jar>
+	</target>
+	
+	<target name="compile">
+	        <mkdir dir="${build.dir}"/>
+	        <javac srcdir="${src.dir}" destdir="${build.dir}" classpathref="jars" debug="on"/>
+	</target>
+
+
+
+</project>

@@ -2,7 +2,7 @@ package org.paulg.ispend.main;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.nio.file.*;
+import java.nio.file.Paths;
 import java.util.*;
 
 import javafx.application.Application;
@@ -18,25 +18,17 @@ import javafx.stage.Stage;
 
 public class ISpend extends Application {
 
-	final List<TableColumn> columns = new ArrayList<TableColumn>();
+	final List<TableColumn<Record, String>> columns = new ArrayList<TableColumn<Record, String>>();
 	private final TableView<Record> table = new TableView<Record>();
 	private static ObservableList<Record> data = FXCollections.observableArrayList();
 	private static RecordParser parser;
 
 	public static void main(final String[] args) throws IOException {
 
-		if (args.length != 1) {
-			System.out.format("Usage: %s %s \n", ISpend.class.getSimpleName(), "<data-dir>");
-			System.exit(1);
-		}
-
-		final Path p = Paths.get(args[0]);
-
-		parser = new RecordParser(p);
-		data.addAll(parser.getRecordsByAccountName("\"'curent\""));
-		data.addAll(parser.getRecordsByAccountName("\"'economii\""));
-		parser.printSummary();
-		// parser.printSummaryByAccount("\"'economii\"");
+		/*
+		 * if (args.length != 1) { System.out.format("Usage: %s %s \n", ISpend.class.getSimpleName(), "<data-dir>");
+		 * System.exit(1); }
+		 */
 
 		launch(args);
 	}
@@ -67,33 +59,49 @@ public class ISpend extends Application {
 
 		final TextField search = new TextField();
 		search.setPromptText("Search");
-		search.setMaxWidth(100);
+		search.setMaxWidth(200);
 
 		final Button searchButton = new Button("Search");
 		searchButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(final ActionEvent e) {
-				try {
-					final List<Record> unfiltered = parser.getRecordsByAccountName("\"'curent\"");
-					unfiltered.addAll(parser.getRecordsByAccountName("\"'economii\""));
-					final List<Record> filtered = new ArrayList<Record>();
-					final String searchText = search.getText();
-					for (final Record r : unfiltered) {
-						if (r.getDescription().toLowerCase().contains(searchText.toLowerCase())) {
-							filtered.add(r);
-						}
+				final List<Record> unfiltered = parser.getAllRecords();
+				final List<Record> filtered = new ArrayList<Record>();
+				final String searchText = search.getText();
+				for (final Record r : unfiltered) {
+					if (r.getDescription().toLowerCase().contains(searchText.toLowerCase())) {
+						filtered.add(r);
 					}
-					data.clear();
-					data.addAll(filtered);
-					search.clear();
-				} catch (final IOException e1) {
-					e1.printStackTrace();
 				}
+				data.clear();
+				data.addAll(filtered);
+				search.clear();
 
 			}
 		});
 
-		vbox.getChildren().addAll(label, table, search, searchButton);
+		final TextField browse = new TextField();
+		browse.setPromptText("Path to data directory");
+		browse.setMaxWidth(400);
+
+		final Button browseButton = new Button("Go");
+		browseButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(final ActionEvent e) {
+				final String path = browse.getText();
+				try {
+					System.out.println("Path: " + path);
+					parser = new RecordParser(Paths.get(path));
+					data.addAll(parser.getAllRecords());
+					parser.printSummary();
+				} catch (final IOException e1) {
+					// XXX print some nice error
+					e1.printStackTrace();
+				}
+			}
+		});
+
+		vbox.getChildren().addAll(label, browse, browseButton, table, search, searchButton);
 
 		((Group) scene.getRoot()).getChildren().addAll(vbox);
 
@@ -108,8 +116,8 @@ public class ISpend extends Application {
 	}
 
 	private void makeColumn(final String name) {
-		final TableColumn column = new TableColumn(name);
-		column.setMinWidth(100);
+		final TableColumn<Record, String> column = new TableColumn<Record, String>(name);
+		column.setMinWidth(150);
 		column.setCellValueFactory(new PropertyValueFactory<Record, String>(name));
 		columns.add(column);
 	}

@@ -16,7 +16,7 @@ public class RecordParser {
 		getRecordsFromHistoryFiles(); // XXX bad idea
 	}
 
-	public synchronized List<Record> getRecordsByAccountName(final String accountName) throws IOException {
+	public synchronized List<Record> getRecordsByAccountName(final String accountName) {
 		return new ArrayList<Record>(recordsByAccountName.get(accountName));
 	}
 
@@ -82,6 +82,7 @@ public class RecordParser {
 			recordFields[fieldCount++] = field;
 		}
 
+		// XXX use a builder here maybe?
 		final Record r = new Record();
 		r.setDate(recordFields[0]);
 		r.setType(recordFields[1]);
@@ -121,5 +122,13 @@ public class RecordParser {
 
 			return FileVisitResult.CONTINUE;
 		}
+	}
+
+	public List<Record> getAllRecords() {
+		final List<Record> allRecords = new ArrayList<Record>();
+		for (final List<Record> rs : recordsByAccountName.values()) {
+			allRecords.addAll(rs);
+		}
+		return allRecords;
 	}
 }
