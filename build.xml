@@ -1,45 +1,52 @@
-<project name="ispend">
+<project name="ISpend" xmlns:fx="javafx:com.sun.javafx.tools.ant" default="build">
 	<property name="build.dir" value="bin" />
 	<property name="src.dir" value="src" />
-	<property name="store.dir" value="dist" />
-	<property name="lib.dir" value="lib" />
-	
-	<path id="build.classpath">
-	        <fileset dir="${basedir}/">
-	                <include name="${lib.dir}/*.jar"/>
-	        </fileset>
+	<property name="dist.dir" value="dist" />
+	<property name="javafx.main.class" value="org.paulg.ispend.main.ISpend" />
+	<property name="application.title" value="ISpend" />
+
+	<!-- Assumes we are using jdk1.7.0_06, which includes javafx runtime and ant task -->
+	<property name="javafx.ant.path" value="${java.home}/../lib/ant-javafx.jar" />
+	<property name="javafx.jar.path" value="${java.home}/lib/jfxrt.jar" />
+
+	<path id="classpath">
+		<fileset file="${javafx.jar.path}" />
 	</path>
 
-	<pathconvert property="mf.classpath" pathsep=" ">
-	        <path refid="build.classpath"/>
-	        <mapper>
-	                <chainedmapper>
-	                        <flattenmapper/>
-	                        <globmapper from="*.jar" to="lib/*.jar"/>
-	                </chainedmapper>
-	        </mapper>
-	</pathconvert>
-	
-	<path id="jars">
-	    <fileset dir="${lib.dir}" includes="**/*.jar"/>
-	</path>
-
-	<target name="jar">
-		<jar destfile="${store.dir}/ispend.jar" filesetmanifest="skip">
-			<zipgroupfileset dir="lib" includes="*.jar"/>
-			<fileset dir="bin"/>
-	    	<manifest>
-	        	<attribute name="Main-Class" value="org.paulg.ispend.main.ISpend"/>
-	        	<attribute name="Class-Path" value="${mf.classpath}"/>
-	    	</manifest>
-		</jar>
-	</target>
-	
-	<target name="compile">
-	        <mkdir dir="${build.dir}"/>
-	        <javac srcdir="${src.dir}" destdir="${build.dir}" classpathref="jars" debug="on"/>
+	<!-- COMPILE target -->
+	<target name="compile" description="Compile application source code.">
+		<mkdir dir="${build.dir}" />
+		<javac srcdir="${src.dir}" destdir="${build.dir}" classpathref="classpath" />
 	</target>
 
+	<!-- JavaFX DEPLOY target -->
+	<target name="deploy" depends="compile" description="Deploy the application in all bundle formats.">
+		<taskdef resource="com/sun/javafx/tools/ant/antlib.xml" uri="javafx:com.sun.javafx.tools.ant" classpath="${javafx.ant.path}" />
 
+		<mkdir dir="${dist.dir}" />
+		<fx:jar destfile="dist/ISpend.jar">
+			<fx:application mainClass="${javafx.main.class}" />
+			<fileset dir="${build.dir}/">
+				<include name="**" />
+			</fileset>
+		</fx:jar>
+
+		<fx:deploy nativeBundles="all" outdir="${dist.dir}" outfile="${application.title}">
+			<fx:application name="${application.title}" mainClass="${javafx.main.class}" />
+			<fx:resources>
+				<fx:fileset dir="${dist.dir}" includes="*.jar" />
+			</fx:resources>
+			<fx:info title="${application.title}" />
+		</fx:deploy>
+	</target>
+
+	<!-- CLEAN target -->
+	<target name="clean" description="Remove build and dist directories.">
+		<delete dir="${build.dir}" />
+		<delete dir="${dist.dir}" />
+	</target>
+
+	<!-- BUILD target -->
+	<target name="build" depends="clean, deploy"/>
 
 </project>
