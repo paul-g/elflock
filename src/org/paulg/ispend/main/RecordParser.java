@@ -11,8 +11,8 @@ public class RecordParser {
 	private final Map<String, List<Record>> recordsByAccountName = new HashMap<String, List<Record>>();
 	private final Path path;
 
-	public RecordParser(final Path path) throws IOException {
-		this.path = path;
+	public RecordParser(final Path rootDirectory) throws IOException {
+		path = rootDirectory;
 		getRecordsFromHistoryFiles(); // XXX bad idea
 	}
 
@@ -130,5 +130,32 @@ public class RecordParser {
 			allRecords.addAll(rs);
 		}
 		return allRecords;
+	}
+
+	public List<Record> filter(final String text) {
+		final List<Record> unfiltered = getAllRecords();
+		final List<Record> filtered = new ArrayList<Record>();
+		for (final Record r : unfiltered) {
+			if (r.getDescription().toLowerCase().contains(text.toLowerCase())) {
+				filtered.add(r);
+			}
+		}
+		return filtered;
+	}
+
+	public List<AggregatedRecord> groupByDescription(final String... groupTags) {
+		final List<AggregatedRecord> tagRecords = new ArrayList<AggregatedRecord>();
+		if ((groupTags != null) && (groupTags.length > 0)) {
+			for (String tag : groupTags) {
+				tag = tag.trim();
+				final AggregatedRecord tagRecord = new AggregatedRecord(tag, 0);
+				for (final Record r : getAllRecords())
+					if (r.getDescription().toLowerCase().contains(tag.toLowerCase())) {
+						tagRecord.addRecord(r);
+					}
+				tagRecords.add(tagRecord);
+			}
+		}
+		return tagRecords;
 	}
 }

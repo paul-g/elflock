@@ -12,20 +12,23 @@ import javafx.geometry.Insets;
 import javafx.scene.*;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.stage.*;
 
 public class ISpend extends Application {
 
-	final List<TableColumn<Record, String>> columns = new ArrayList<TableColumn<Record, String>>();
-	private final TableView<Record> table = new TableView<Record>();
 	private static ObservableList<Record> data = FXCollections.observableArrayList();
+	private static ObservableList<AggregatedRecord> groupData = FXCollections.observableArrayList();
 	private static RecordParser parser;
 
 	public static void main(final String[] args) throws IOException {
 		launch(args);
 	}
+
+	private TextField groupBy;
+	private TextField search;
 
 	@Override
 	public void start(final Stage stage) {
@@ -47,25 +50,67 @@ public class ISpend extends Application {
 
 	private GridPane makeAppContent(final Stage stage) {
 		final GridPane gridPane = new GridPane();
-		gridPane.setHgap(5);
-		gridPane.setVgap(5);
-		gridPane.setPadding(new Insets(10, 0, 0, 10));
+		gridPane.setHgap(10);
+		gridPane.setVgap(10);
+		gridPane.setPadding(new Insets(10, 10, 10, 10));
 		gridPane.autosize();
 		gridPane.setGridLinesVisible(false);
 
-		makeLabel(gridPane);
+		gridPane.add(makeLabel(), 0, 0);
+		gridPane.add(makeSearchPanel(), 1, 1);
+		gridPane.add(makeBrowsePanel(stage), 0, 1);
+		gridPane.add(makeGroupByPanel(), 2, 1);
+		gridPane.add(makeTable(data, Record.class), 0, 2, 2, 1);
+		gridPane.add(makeTable(groupData, AggregatedRecord.class), 2, 2);
 
-		for (final Field f : Record.class.getDeclaredFields()) {
-			makeColumns(f.getName());
-		}
+		return gridPane;
+	}
 
-		makeTable(gridPane);
-		makeSearchPanel(gridPane);
+	private Node makeGroupByPanel() {
+		groupBy = new TextField();
+		groupBy.setPromptText("Group by");
+		groupBy.setMinWidth(300);
+		groupBy.setDisable(true);
 
+		groupBy.setOnKeyReleased(new EventHandler<KeyEvent>() {
+
+			@Override
+			public void handle(final KeyEvent t) {
+				if (t.getCode() == KeyCode.ENTER) {
+					groupData.clear();
+					groupData.addAll(parser.groupByDescription(parseArguments(groupBy.getText())));
+				} else if (t.getCode() == KeyCode.ESCAPE) {
+					groupData.clear();
+				}
+			}
+
+			private String[] parseArguments(final String text) {
+				return text.split(",");
+			}
+
+		});
+
+		final HBox box = new HBox();
+		box.getChildren().addAll(groupBy);
+		return box;
+	}
+
+	@SuppressWarnings("unchecked")
+	private <T> Node makeTable(final ObservableList<T> data, final Class<T> clazz) {
+		final TableView<T> table = new TableView<T>();
+		final List<TableColumn<T, String>> columns = makeColumns(clazz);
+		table.setEditable(true);
+		table.setItems(data);
+		table.getColumns().addAll(columns.toArray(new TableColumn[0]));
+		return table;
+	}
+
+	private Node makeBrowsePanel(final Stage stage) {
 		final TextField browse = new TextField();
 		browse.setPromptText("Path to data directory");
 		browse.setMinWidth(400);
-		gridPane.add(browse, 0, 1);
+		final HBox box = new HBox();
+		box.setSpacing(10);
 
 		final Button browseButton = new Button("Browse");
 		browseButton.setOnAction(new EventHandler<ActionEvent>() {
@@ -74,82 +119,69 @@ public class ISpend extends Application {
 			public void handle(final ActionEvent e) {
 				final DirectoryChooser chooser = new DirectoryChooser();
 				final File selectedDirectory = chooser.showDialog(stage);
-				browse.setText(selectedDirectory.getAbsolutePath());
-			}
-		});
-		gridPane.add(browseButton, 1, 1);
-
-		final Button goButton = new Button("Go");
-		goButton.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(final ActionEvent e) {
-				final String path = browse.getText();
+				final String path = selectedDirectory.getAbsolutePath();
+				browse.setText(path);
 				try {
-					System.out.println("Path: " + path);
 					parser = new RecordParser(Paths.get(path));
-					data.addAll(parser.getAllRecords());
-					parser.printSummary();
+					search.setDisable(false);
+					groupBy.setDisable(false);
 				} catch (final IOException e1) {
 					// XXX print some nice error
 					e1.printStackTrace();
 				}
+				data.addAll(parser.getAllRecords());
+				parser.printSummary();
 			}
 		});
-		gridPane.add(goButton, 2, 1);
-		return gridPane;
+
+		box.getChildren().addAll(browse, browseButton);
+		return box;
 	}
 
-	private void makeTable(final GridPane gridPane) {
-		table.setEditable(true);
-		table.setItems(data);
-		table.getColumns().addAll(columns.toArray(new TableColumn[0]));
-		gridPane.add(table, 0, 2, 3, 1);
-	}
-
-	private void makeSearchPanel(final GridPane gridPane) {
-		final TextField search = new TextField();
+	private Node makeSearchPanel() {
+		search = new TextField();
 		search.setPromptText("Search");
 		search.setMinWidth(300);
-		gridPane.add(search, 0, 3);
-
-		final Button searchButton = new Button("Search");
-		searchButton.setOnAction(new EventHandler<ActionEvent>() {
+		search.setDisable(true);
+		search.setOnKeyReleased(new EventHandler<KeyEvent>() {
 
 			@Override
-			public void handle(final ActionEvent e) {
-				final List<Record> unfiltered = parser.getAllRecords();
-				final List<Record> filtered = new ArrayList<Record>();
-				final String searchText = search.getText();
-				for (final Record r : unfiltered) {
-					if (r.getDescription().toLowerCase().contains(searchText.toLowerCase())) {
-						filtered.add(r);
-					}
+			public void handle(final KeyEvent t) {
+				if (t.getCode() == KeyCode.ENTER) {
+					filterData(search.getText());
+				} else if (t.getCode() == KeyCode.ESCAPE) {
+					search.clear();
+					filterData(search.getText());
 				}
+			}
+
+			private void filterData(final String searchText) {
+				final List<Record> filtered = parser.filter(searchText);
 				data.clear();
 				data.addAll(filtered);
-				search.clear();
-
 			}
+
 		});
-		gridPane.add(searchButton, 1, 3);
+
+		final HBox box = new HBox();
+		box.getChildren().addAll(search);
+		return box;
 	}
 
-	private void makeLabel(final GridPane gridPane) {
+	private Node makeLabel() {
 		final Label label = new Label("Account Balance");
 		label.setFont(new Font("Arial", 20));
-		gridPane.add(label, 0, 0);
+		return label;
 	}
 
-	private void makeColumns(final String... args) {
-		for (final String s : args) {
-			makeColumn(s);
+	private <T> List<TableColumn<T, String>> makeColumns(final Class<T> clazz) {
+		final List<TableColumn<T, String>> columns = new ArrayList<TableColumn<T, String>>();
+		for (final Field f : clazz.getDeclaredFields()) {
+			final TableColumn<T, String> column = new TableColumn<T, String>(f.getName());
+			column.setCellValueFactory(new PropertyValueFactory<T, String>(f.getName()));
+			column.setMinWidth(150);
+			columns.add(column);
 		}
-	}
-
-	private void makeColumn(final String name) {
-		final TableColumn<Record, String> column = new TableColumn<Record, String>(name);
-		column.setMinWidth(150);
-		column.setCellValueFactory(new PropertyValueFactory<Record, String>(name));
-		columns.add(column);
+		return columns;
 	}
 }
