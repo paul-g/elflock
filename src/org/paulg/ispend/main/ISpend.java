@@ -8,7 +8,7 @@ import java.util.*;
 import javafx.application.Application;
 import javafx.collections.*;
 import javafx.event.*;
-import javafx.geometry.Insets;
+import javafx.geometry.*;
 import javafx.scene.*;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -29,31 +29,35 @@ public class ISpend extends Application {
 
 	private TextField groupBy;
 	private TextField search;
+	private Rectangle2D bounds;
 
 	@Override
 	public void start(final Stage stage) {
-		final Scene scene = new Scene(new Group());
 		stage.setTitle("ISpend");
+		bounds = Screen.getPrimary().getVisualBounds();
+		// setMaximized(stage);
 
-		final ToolBar toolBar = new ToolBar();
-		final BorderPane borderPane = new BorderPane();
-		borderPane.setTop(toolBar);
-		borderPane.setCenter(makeAppContent(stage));
-
-		((Group) scene.getRoot()).getChildren().addAll(borderPane);
+		final Scene scene = new Scene(makeAppContent(stage));
 
 		stage.setScene(scene);
 		stage.centerOnScreen();
-		stage.setResizable(false);
+		stage.setResizable(true);
 		stage.show();
 	}
 
-	private GridPane makeAppContent(final Stage stage) {
+	private void setMaximized(final Stage stage) {
+		stage.setX(bounds.getMinX());
+		stage.setY(bounds.getMinY());
+		stage.setWidth(bounds.getWidth());
+		stage.setHeight(bounds.getHeight());
+	}
+
+	private Pane makeAppContent(final Stage stage) {
 		final GridPane gridPane = new GridPane();
 		gridPane.setHgap(10);
 		gridPane.setVgap(10);
 		gridPane.setPadding(new Insets(10, 10, 10, 10));
-		gridPane.autosize();
+		// gridPane.autosize();
 		gridPane.setGridLinesVisible(false);
 
 		gridPane.add(makeLabel(), 0, 0);
@@ -98,11 +102,23 @@ public class ISpend extends Application {
 	@SuppressWarnings("unchecked")
 	private <T> Node makeTable(final ObservableList<T> data, final Class<T> clazz) {
 		final TableView<T> table = new TableView<T>();
+		table.setPrefHeight(bounds.getMaxY());
+		table.setPrefWidth(bounds.getMaxX());
 		final List<TableColumn<T, String>> columns = makeColumns(clazz);
 		table.setEditable(true);
 		table.setItems(data);
 		table.getColumns().addAll(columns.toArray(new TableColumn[0]));
 		return table;
+	}
+
+	private <T> List<TableColumn<T, String>> makeColumns(final Class<T> clazz) {
+		final List<TableColumn<T, String>> columns = new ArrayList<TableColumn<T, String>>();
+		for (final Field f : clazz.getDeclaredFields()) {
+			final TableColumn<T, String> column = new TableColumn<T, String>(f.getName());
+			column.setCellValueFactory(new PropertyValueFactory<T, String>(f.getName()));
+			columns.add(column);
+		}
+		return columns;
 	}
 
 	private Node makeBrowsePanel(final Stage stage) {
@@ -119,18 +135,20 @@ public class ISpend extends Application {
 			public void handle(final ActionEvent e) {
 				final DirectoryChooser chooser = new DirectoryChooser();
 				final File selectedDirectory = chooser.showDialog(stage);
-				final String path = selectedDirectory.getAbsolutePath();
-				browse.setText(path);
-				try {
-					parser = new RecordParser(Paths.get(path));
-					search.setDisable(false);
-					groupBy.setDisable(false);
-				} catch (final IOException e1) {
-					// XXX print some nice error
-					e1.printStackTrace();
+				if (selectedDirectory != null) {
+					final String path = selectedDirectory.getAbsolutePath();
+					browse.setText(path);
+					try {
+						parser = new RecordParser(Paths.get(path));
+						search.setDisable(false);
+						groupBy.setDisable(false);
+					} catch (final IOException e1) {
+						// XXX print some nice error
+						e1.printStackTrace();
+					}
+					data.addAll(parser.getAllRecords());
+					parser.printSummary();
 				}
-				data.addAll(parser.getAllRecords());
-				parser.printSummary();
 			}
 		});
 
@@ -164,6 +182,7 @@ public class ISpend extends Application {
 		});
 
 		final HBox box = new HBox();
+		box.setAlignment(Pos.CENTER_RIGHT);
 		box.getChildren().addAll(search);
 		return box;
 	}
@@ -174,14 +193,4 @@ public class ISpend extends Application {
 		return label;
 	}
 
-	private <T> List<TableColumn<T, String>> makeColumns(final Class<T> clazz) {
-		final List<TableColumn<T, String>> columns = new ArrayList<TableColumn<T, String>>();
-		for (final Field f : clazz.getDeclaredFields()) {
-			final TableColumn<T, String> column = new TableColumn<T, String>(f.getName());
-			column.setCellValueFactory(new PropertyValueFactory<T, String>(f.getName()));
-			column.setMinWidth(150);
-			columns.add(column);
-		}
-		return columns;
-	}
 }
