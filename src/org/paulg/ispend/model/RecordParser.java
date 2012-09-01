@@ -1,14 +1,15 @@
-package org.paulg.ispend.main;
+package org.paulg.ispend.model;
 
-import java.io.*;
-import java.nio.charset.Charset;
+import java.io.IOException;
 import java.nio.file.*;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
+
+import org.paulg.ispend.main.HistoryFileVisitor;
+import org.paulg.ispend.utils.StringUtils;
 
 public class RecordParser {
 
-	private final Map<String, List<Record>> recordsByAccountName = new HashMap<String, List<Record>>();
+	final Map<String, List<Record>> recordsByAccountName = new HashMap<String, List<Record>>();
 	private final Path path;
 
 	public RecordParser(final Path rootDirectory) throws IOException {
@@ -62,10 +63,10 @@ public class RecordParser {
 	}
 
 	private void getRecordsFromHistoryFiles() throws IOException {
-		Files.walkFileTree(path, new HistoryFileVisitor());
+		Files.walkFileTree(path, new HistoryFileVisitor(this));
 	}
 
-	private static Record parseRecord(final String line) {
+	public static Record parseRecord(final String line) {
 
 		final String[] oldFields = line.split(",");
 		final String[] recordFields = new String[7];
@@ -95,35 +96,6 @@ public class RecordParser {
 		return r;
 	}
 
-	private final class HistoryFileVisitor extends SimpleFileVisitor<Path> {
-		@Override
-		public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
-			final BufferedReader br = Files.newBufferedReader(file, Charset.defaultCharset());
-			String line = null;
-			System.out.println("File: " + file.toString());
-
-			while ((line = br.readLine()) != null) {
-				// /System.out.println(line);
-				line = line.trim();
-				if (line.startsWith("Date")) {
-					// TODO parse header
-				} else if (!line.isEmpty()) {
-					final Record r = parseRecord(line);
-					if (r != null) {
-						List<Record> records = recordsByAccountName.get(r.getAccountName());
-						if (records == null) {
-							records = new ArrayList<Record>();
-							recordsByAccountName.put(r.getAccountName(), records);
-						}
-						records.add(r);
-					}
-				}
-			}
-
-			return FileVisitResult.CONTINUE;
-		}
-	}
-
 	public List<Record> getAllRecords() {
 		final List<Record> allRecords = new ArrayList<Record>();
 		for (final List<Record> rs : recordsByAccountName.values()) {
@@ -135,11 +107,10 @@ public class RecordParser {
 	public List<Record> filter(final String text) {
 		final List<Record> unfiltered = getAllRecords();
 		final List<Record> filtered = new ArrayList<Record>();
-		for (final Record r : unfiltered) {
-			if (r.getDescription().toLowerCase().contains(text.toLowerCase())) {
+		for (final Record r : unfiltered)
+			if (StringUtils.containsIgnoreCase(r.getDescription(), text)) {
 				filtered.add(r);
 			}
-		}
 		return filtered;
 	}
 
@@ -150,12 +121,16 @@ public class RecordParser {
 				tag = tag.trim();
 				final AggregatedRecord tagRecord = new AggregatedRecord(tag, 0);
 				for (final Record r : getAllRecords())
-					if (r.getDescription().toLowerCase().contains(tag.toLowerCase())) {
+					if (StringUtils.containsIgnoreCase(r.getDescription(), tag)) {
 						tagRecord.addRecord(r);
 					}
 				tagRecords.add(tagRecord);
 			}
 		}
 		return tagRecords;
+	}
+
+	public void addRecord(final String accountName, final List<Record> records) {
+		recordsByAccountName.put(accountName, records);
 	}
 }

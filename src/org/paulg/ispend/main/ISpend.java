@@ -1,9 +1,8 @@
 package org.paulg.ispend.main;
 
 import java.io.*;
-import java.lang.reflect.Field;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.List;
 
 import javafx.application.Application;
 import javafx.collections.*;
@@ -11,11 +10,13 @@ import javafx.event.*;
 import javafx.geometry.*;
 import javafx.scene.*;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.stage.*;
+
+import org.paulg.ispend.model.*;
+import org.paulg.ispend.view.CompleteTableView;
 
 public class ISpend extends Application {
 
@@ -23,33 +24,21 @@ public class ISpend extends Application {
 	private static ObservableList<AggregatedRecord> groupData = FXCollections.observableArrayList();
 	private static RecordParser parser;
 
+	private TextField groupBy;
+	private TextField search;
+
 	public static void main(final String[] args) throws IOException {
 		launch(args);
 	}
 
-	private TextField groupBy;
-	private TextField search;
-	private Rectangle2D bounds;
-
 	@Override
 	public void start(final Stage stage) {
 		stage.setTitle("ISpend");
-		bounds = Screen.getPrimary().getVisualBounds();
-		// setMaximized(stage);
-
 		final Scene scene = new Scene(makeAppContent(stage));
-
 		stage.setScene(scene);
 		stage.centerOnScreen();
 		stage.setResizable(true);
 		stage.show();
-	}
-
-	private void setMaximized(final Stage stage) {
-		stage.setX(bounds.getMinX());
-		stage.setY(bounds.getMinY());
-		stage.setWidth(bounds.getWidth());
-		stage.setHeight(bounds.getHeight());
 	}
 
 	private Pane makeAppContent(final Stage stage) {
@@ -57,15 +46,25 @@ public class ISpend extends Application {
 		gridPane.setHgap(10);
 		gridPane.setVgap(10);
 		gridPane.setPadding(new Insets(10, 10, 10, 10));
-		// gridPane.autosize();
 		gridPane.setGridLinesVisible(false);
 
 		gridPane.add(makeLabel(), 0, 0);
-		gridPane.add(makeSearchPanel(), 1, 1);
+		gridPane.add(makeSearchPanel(), 0, 1);
 		gridPane.add(makeBrowsePanel(stage), 0, 1);
-		gridPane.add(makeGroupByPanel(), 2, 1);
-		gridPane.add(makeTable(data, Record.class), 0, 2, 2, 1);
-		gridPane.add(makeTable(groupData, AggregatedRecord.class), 2, 2);
+		gridPane.add(makeGroupByPanel(), 1, 1);
+
+		final TableView<Record> recordView = makeTable(data, Record.class);
+		gridPane.add(recordView, 0, 2);
+		GridPane.setConstraints(recordView, 0, 2, 1, 1, HPos.CENTER, VPos.CENTER, Priority.ALWAYS, Priority.ALWAYS);
+
+		final TableView<AggregatedRecord> aggregatedRecordView = makeTable(groupData, AggregatedRecord.class);
+		gridPane.add(aggregatedRecordView, 1, 2);
+
+		final ColumnConstraints column1 = new ColumnConstraints();
+		column1.setPercentWidth(60);
+		final ColumnConstraints column2 = new ColumnConstraints();
+		column2.setPercentWidth(40);
+		gridPane.getColumnConstraints().addAll(column1, column2);
 
 		return gridPane;
 	}
@@ -73,11 +72,8 @@ public class ISpend extends Application {
 	private Node makeGroupByPanel() {
 		groupBy = new TextField();
 		groupBy.setPromptText("Group by");
-		groupBy.setMinWidth(300);
 		groupBy.setDisable(true);
-
 		groupBy.setOnKeyReleased(new EventHandler<KeyEvent>() {
-
 			@Override
 			public void handle(final KeyEvent t) {
 				if (t.getCode() == KeyCode.ENTER) {
@@ -91,42 +87,22 @@ public class ISpend extends Application {
 			private String[] parseArguments(final String text) {
 				return text.split(",");
 			}
-
 		});
-
 		final HBox box = new HBox();
 		box.getChildren().addAll(groupBy);
 		return box;
 	}
 
-	@SuppressWarnings("unchecked")
-	private <T> Node makeTable(final ObservableList<T> data, final Class<T> clazz) {
-		final TableView<T> table = new TableView<T>();
-		table.setPrefHeight(bounds.getMaxY());
-		table.setPrefWidth(bounds.getMaxX());
-		final List<TableColumn<T, String>> columns = makeColumns(clazz);
+	private <T> TableView<T> makeTable(final ObservableList<T> data, final Class<T> clazz) {
+		final TableView<T> table = new CompleteTableView<T>(clazz);
 		table.setEditable(true);
 		table.setItems(data);
-		table.getColumns().addAll(columns.toArray(new TableColumn[0]));
 		return table;
-	}
-
-	private <T> List<TableColumn<T, String>> makeColumns(final Class<T> clazz) {
-		final List<TableColumn<T, String>> columns = new ArrayList<TableColumn<T, String>>();
-		for (final Field f : clazz.getDeclaredFields()) {
-			final TableColumn<T, String> column = new TableColumn<T, String>(f.getName());
-			column.setCellValueFactory(new PropertyValueFactory<T, String>(f.getName()));
-			columns.add(column);
-		}
-		return columns;
 	}
 
 	private Node makeBrowsePanel(final Stage stage) {
 		final TextField browse = new TextField();
 		browse.setPromptText("Path to data directory");
-		browse.setMinWidth(400);
-		final HBox box = new HBox();
-		box.setSpacing(10);
 
 		final Button browseButton = new Button("Browse");
 		browseButton.setOnAction(new EventHandler<ActionEvent>() {
@@ -152,6 +128,8 @@ public class ISpend extends Application {
 			}
 		});
 
+		final HBox box = new HBox();
+		box.setSpacing(10);
 		box.getChildren().addAll(browse, browseButton);
 		return box;
 	}
@@ -159,7 +137,6 @@ public class ISpend extends Application {
 	private Node makeSearchPanel() {
 		search = new TextField();
 		search.setPromptText("Search");
-		search.setMinWidth(300);
 		search.setDisable(true);
 		search.setOnKeyReleased(new EventHandler<KeyEvent>() {
 

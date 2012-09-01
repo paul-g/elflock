@@ -1,4 +1,5 @@
-package org.paulg.ispend.main;
+package org.paulg.ispend.model;
+
 
 public class AggregatedRecord {
 
