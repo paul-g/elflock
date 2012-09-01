@@ -1,3 +1,5 @@
+cobertura.ser
+build/
 dist
 lib
 .classpath
