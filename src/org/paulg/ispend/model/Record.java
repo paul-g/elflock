@@ -2,7 +2,6 @@ package org.paulg.ispend.model;
 
 public class Record {
 
-	// XXX use a builder for this class maybe
 	private String date;
 	private String type;
 	private String description;
@@ -12,6 +11,7 @@ public class Record {
 	private double value;
 
 	public Record() {
+		// XXX should probably use a builder
 	}
 
 	public Record(final String date, final String type, final String description, final String balance,
@@ -86,5 +86,22 @@ public class Record {
 	public String toString() {
 		return String.format("date: %s, type: %s, description: %s, value: %f", getDate(), getType(), getDescription(),
 				getValue());
+	}
+
+	@Override
+	public boolean equals(final Object o) {
+		if ((o == null) || !(o instanceof Record)) {
+			return false;
+		}
+		final Record r = (Record) o;
+		return r.getAccountName().equals(accountName) && r.getAccountNumber().equals(accountNumber)
+				&& r.getBalance().equals(balance) && r.getDate().equals(date) && r.getDescription().equals(description)
+				&& r.getType().equals(type) && (r.getValue() == value);
+	}
+
+	@Override
+	public int hashCode() {
+		// TODO this could probably be improved
+		return date.hashCode();
 	}
 }

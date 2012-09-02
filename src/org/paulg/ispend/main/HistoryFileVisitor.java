@@ -4,16 +4,20 @@ import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.*;
 
 import org.paulg.ispend.model.*;
 
 public final class HistoryFileVisitor extends SimpleFileVisitor<Path> {
 
-	private final RecordParser recordParser;
+	private final RecordStore recordStore;
+	private RecordParser recordParser;
 
-	public HistoryFileVisitor(final RecordParser recordParser) {
-		this.recordParser = recordParser;
+	public HistoryFileVisitor() {
+		recordStore = new RecordStore();
+	}
+
+	public RecordStore getRecordStore() {
+		return recordStore;
 	}
 
 	@Override
@@ -26,17 +30,10 @@ public final class HistoryFileVisitor extends SimpleFileVisitor<Path> {
 			// /System.out.println(line);
 			line = line.trim();
 			if (line.startsWith("Date")) {
-				// TODO parse header
+				// TODO parse header - assume nat west for now
+				recordParser = new NatWestRecordParser();
 			} else if (!line.isEmpty()) {
-				final Record r = RecordParser.parseRecord(line);
-				if (r != null) {
-					List<Record> records = recordParser.getRecordsByAccountName(r.getAccountName());
-					if (records == null) {
-						records = new ArrayList<Record>();
-						recordParser.addRecord(r.getAccountName(), records);
-					}
-					records.add(r);
-				}
+				recordStore.addRecord(recordParser.parseRecord(line));
 			}
 		}
 
