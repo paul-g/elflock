@@ -102,7 +102,7 @@
 		                 uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path"/>
 	</target>
 
-	<target name="resolve" description="--> retrieve dependencies with ivy">
+	<target name="resolve" depends="init-ivy" description="Retrieve dependencies with ivy.">
 		<ivy:retrieve pattern="lib/[artifact].[ext]" type="jar,bundle"/>
 	</target>
 		
@@ -155,14 +155,6 @@
 	</target>
 
 	<target name="coverage-unit-tests" depends="clean, instrument, unit-tests">
-		<cobertura-report destdir="${coverage.report.dir}">
-			<fileset dir="${src.dir}">
-			</fileset>
-			<include name="**/*.java" />
-		</cobertura-report>
-	</target>
-
-	<target name="coverage-system-tests" depends="clean, instrument, unit-tests">
 		<cobertura-report destdir="${coverage.report.dir}">
 			<fileset dir="${src.dir}">
 			</fileset>
