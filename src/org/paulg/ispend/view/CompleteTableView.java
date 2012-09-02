@@ -11,10 +11,9 @@ import javafx.scene.control.cell.PropertyValueFactory;
  **/
 public class CompleteTableView<T> extends TableView<T> {
 
-	@SuppressWarnings("unchecked")
 	public CompleteTableView(final Class<T> classToBind) {
 		final List<TableColumn<T, String>> columns = makeColumns(classToBind);
-		getColumns().addAll(columns.toArray(new TableColumn[0]));
+		getColumns().addAll(columns);
 	}
 
 	/** Bind to all declared fields of the provided class. **/
