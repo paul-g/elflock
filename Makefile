@@ -1,11 +1,9 @@
-LOGGER=org.apache.tools.ant.listener.AnsiColorLogger
+LOGGER:=org.apache.tools.ant.listener.AnsiColorLogger
+ANT:=ant -logger $(LOGGER)
 
-all:
-	ant -logger $(LOGGER) all
-	
-compile:
-	ant -logger $(LOGGER) compile
+build: clean
+	$(ANT) build
 
 clean:
-	ant clean
+	$(ANT) clean
 	rm -f *.log

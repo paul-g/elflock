@@ -11,7 +11,7 @@
 	<property name="build.prod.dir" value="${build.dir}/prod" />
 	<property name="build.test.dir" value="${build.dir}/test" />
 	<property name="unit.test.dir" value="tests-unit" />
-	<property name="instrumented.dir" value="build/instrumented-classes" />
+	<property name="instrumented.dir" value="${build.dir}/instrumented-classes" />
 	
 	<!-- JFX Properties -->
 	<!-- Assumes we are using jdk1.7.0_06, which includes javafx runtime and ant task -->
@@ -40,52 +40,31 @@
 	<property name="build.agent" value="git" />
 
 	<path id="classpath">
-		<fileset file="${javafx.jar.path}" />
 		<pathelement location="${build.prod.dir}" />
 		<pathelement location="${build.test.dir}" />
+		<fileset file="${javafx.jar.path}" />
 		<fileset dir="${lib.dir}" includes="*.jar"/>
 	</path>
+	
+	<path id="instrument-classpath">
+			<pathelement location="${instrumented.dir}" />
+			<pathelement location="${build.test.dir}" />
+			<fileset file="${javafx.jar.path}" />
+			<fileset dir="${lib.dir}" includes="*.jar"/>
+	</path>
 
-	<!-- COMPILE target -->
-	<target name="compile" depends="resolve" description="Compile application source code.">
+	<target name="prepare">
+		<mkdir dir="${lib.dir}" />
 		<mkdir dir="${build.dir}" />
 		<mkdir dir="${build.prod.dir}" />
-		<javac srcdir="${src.dir}" destdir="${build.prod.dir}" classpathref="classpath" debug="true" debuglevel="vars,lines,source"/>
-	</target>
-
-	<!-- JavaFX DEPLOY target -->
-	<target name="deploy" depends="compile" description="Deploy the application in all bundle formats.">
-		<taskdef resource="com/sun/javafx/tools/ant/antlib.xml" uri="javafx:com.sun.javafx.tools.ant" classpath="${javafx.ant.path}" />
-
+		<mkdir dir="${build.test.dir}" />
 		<mkdir dir="${dist.dir}" />
-		<fx:jar destfile="dist/ISpend.jar">
-			<fx:application mainClass="${javafx.main.class}" />
-			<fileset dir="${build.dir}/">
-				<include name="**" />
-			</fileset>
-		</fx:jar>
-
-		<fx:deploy nativeBundles="all" outdir="${dist.dir}" outfile="${application.title}">
-			<fx:application name="${application.title}" mainClass="${javafx.main.class}" />
-			<fx:resources>
-				<fx:fileset dir="${dist.dir}" includes="*.jar" />
-			</fx:resources>
-			<fx:info title="${application.title}" />
-		</fx:deploy>
-	</target>
-
-	<!-- CLEAN target -->
-	<target name="clean" description="Remove build and dist directories.">
-		<delete dir="${build.dir}" />
-		<delete dir="${dist.dir}" />
-		<delete dir="${coverage.report.dir}" />
-		<delete file="cobertura.ser" />
+		<mkdir dir="${unit.test.report.dir}" />
 	</target>
 
 	<!-- BUILD target -->
 	<target name="build" depends="clean, deploy"/>
 
-	
 	<!-- IVY targets -->
 	<target name="download-ivy" unless="offline">
 		<mkdir dir="${ivy.jar.dir}"/>
@@ -102,19 +81,64 @@
 		                 uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path"/>
 	</target>
 
-	<target name="resolve" depends="init-ivy" description="Retrieve dependencies with ivy.">
+	<target name="resolve" depends="init-ivy, prepare" description="Retrieve dependencies with ivy.">
 		<ivy:retrieve pattern="lib/[artifact].[ext]" type="jar,bundle"/>
 	</target>
-		
-	<!-- COMPILE all tests -->
-	<target name="compile-tests" depends="compile">
-		<mkdir dir="${build.test.dir}"/>
-		<javac srcdir="${unit.test.dir}" destdir="${build.test.dir}" classpathref="classpath" />
+
+	<!-- COMPILATION targets -->
+	<target name="compile" depends="resolve" description="Compile application source code.">
+		<javac srcdir="${src.dir}" destdir="${build.prod.dir}" classpathref="classpath" debug="true" debuglevel="vars,lines,source"/>
 	</target>
 
-	<!-- ALL task -->
-	<target name="all" depends="coverage, pmd" />
+	<target name="compile-tests" depends="compile">
+		<javac srcdir="${unit.test.dir}" destdir="${build.test.dir}" classpathref="classpath" />
+	</target>
 	
+	<!-- RUN unit tests -->
+	<target name="unit-tests" depends="compile-tests">
+		<junit printsummary="yes" errorProperty="test.failed" failureProperty="test.failed">
+			<classpath refid="classpath" />
+			<formatter type="brief" usefile="false" />
+			<formatter type="xml" />
+			<batchtest fork="yes" todir="${unit.test.report.dir}">
+				<fileset dir="${unit.test.dir}" includes="**/*Test.java" />
+			</batchtest>
+		</junit>
+		<junitreport todir="${unit.test.report.dir}">
+			<fileset dir="${unit.test.report.dir}" includes="TEST-*.xml" />
+			<report todir="${unit.test.report.dir}" />
+		</junitreport>
+	</target>
+	
+	<!-- JavaFX DEPLOY target -->
+	<target name="deploy" depends="compile, coverage, pmd" description="Deploy the application in all bundle formats.">
+		<taskdef resource="com/sun/javafx/tools/ant/antlib.xml" uri="javafx:com.sun.javafx.tools.ant" classpath="${javafx.ant.path}" />
+
+		<fx:jar destfile="dist/ISpend.jar">
+			<fx:application mainClass="${javafx.main.class}" />
+			<fileset dir="${build.prod.dir}/">
+				<include name="**" />
+			</fileset>
+		</fx:jar>
+
+		<fx:deploy nativeBundles="all" outdir="${dist.dir}" outfile="${application.title}">
+			<fx:application name="${application.title}" mainClass="${javafx.main.class}" />
+			<fx:resources>
+				<fx:fileset dir="${dist.dir}" includes="*.jar" />
+			</fx:resources>
+			<fx:info title="${application.title}" />
+		</fx:deploy>
+	</target>
+
+	<!-- CLEAN target -->
+	<target name="clean" description="Remove build and dist directories.">
+		<delete dir="${lib.dir}" />
+		<delete dir="${build.dir}" />
+		<delete dir="${dist.dir}" />
+		<delete dir="${coverage.report.dir}" />
+		<delete file="cobertura.ser" />
+	</target>
+
 	<!-- PMD task -->
 	<target name="pmd">
 		<taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask" classpathref="classpath" />
@@ -135,51 +159,22 @@
 	</target>
 
 	<!-- Coverage tasks -->
-	<taskdef classpathref="classpath" resource="tasks.properties" />
-
 	<target name="instrument" depends="compile">
-		<cobertura-instrument todir="${instrumented.dir}">
-			<fileset dir="bin">
+		<taskdef classpathref="classpath" resource="tasks.properties" />
+		<cobertura-instrument>
+			<fileset dir="${build.prod.dir}">
 				<include name="**/*.class" />
-				<exclude name="**/*Test.class"/>
 			</fileset>
 		</cobertura-instrument>
-	</target>
+	</target> 
 
-	<target name="coverage" depends="clean, instrument, unit-tests">
+	<target name="coverage" depends="instrument, unit-tests">
+		<taskdef classpathref="classpath" resource="tasks.properties" />
 		<cobertura-report destdir="${coverage.report.dir}">
 			<fileset dir="${src.dir}">
 			</fileset>
 			<include name="**/*.java" />
 		</cobertura-report>
 	</target>
-
-	<target name="coverage-unit-tests" depends="clean, instrument, unit-tests">
-		<cobertura-report destdir="${coverage.report.dir}">
-			<fileset dir="${src.dir}">
-			</fileset>
-			<include name="**/*.java" />
-		</cobertura-report>
-	</target>
-
-	<!-- RUN unit tests -->
-	<target name="unit-tests" depends="compile,compile-tests">
-		<mkdir dir="${unit.test.report.dir}" />
-		<junit printsummary="yes" errorProperty="test.failed" failureProperty="test.failed">
-			<classpath location="${instrumented.dir}" />
-			<classpath refid="classpath" />
-			<formatter type="brief" usefile="false" />
-			<formatter type="xml" />
-			<batchtest fork="yes" todir="${unit.test.report.dir}">
-				<fileset dir="${unit.test.dir}" includes="**/*Test.java" />
-			</batchtest>
-		</junit>
-		<junitreport todir="${unit.test.report.dir}">
-			<fileset dir="${unit.test.report.dir}" includes="TEST-*.xml" />
-			<report todir="${unit.test.report.dir}" />
-		</junitreport>
-	</target>
-	
-	<target name="test" depends="coverage-unit-tests"/>
 
 </project>
