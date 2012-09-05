@@ -1,8 +1,0 @@
-<ivy-module version="2.0">
-    <info organisation="protrade" module="protrade-data"/>
-    <dependencies>
-        <dependency org="junit" name="junit" rev="4.10"/>
-        <dependency org="pmd" name="pmd" rev="4.3"/>
-        <dependency org="net.sourceforge.cobertura" name="cobertura" rev="1.9.4.1"/>
-    </dependencies>
-</ivy-module>
