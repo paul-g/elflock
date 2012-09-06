@@ -1,9 +1,6 @@
-cobertura.ser
-build/
-dist
-lib
 .classpath
 .project
+.settings
 bin/
+target/
 historical-data
-*.class
