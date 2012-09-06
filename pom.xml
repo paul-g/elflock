@@ -6,17 +6,14 @@
 	<groupId>org.paulg</groupId>
 	<artifactId>ispend</artifactId>
 	<version>0.1-SNAPSHOT</version>
-	<packaging>jar</packaging>
 
 	<name>ispend</name>
-	<url>http://maven.apache.org</url>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<application.title>ispend</application.title>
-		<javafx.main.class>org.paulg.ispend.main.ISpend</javafx.main.class>
+		<jfx.main.class>org.paulg.ispend.main.ISpend</jfx.main.class>
 		<dist.dir>${project.build.directory}/dist</dist.dir>
-
+		<coverage.limit>80</coverage.limit>
 		<javafx.jar.path>${java.home}/lib/jfxrt.jar</javafx.jar.path>
 		<ant.javafx.jar>${java.home}/../lib/ant-javafx.jar</ant.javafx.jar>
 	</properties>
@@ -95,13 +92,13 @@
 				<version>2.5.1</version>
 				<configuration>
 					<check>
-						<branchRate>85</branchRate>
-						<lineRate>85</lineRate>
-						<haltOnFailure>true</haltOnFailure>
-						<totalBranchRate>85</totalBranchRate>
-						<totalLineRate>85</totalLineRate>
-						<packageLineRate>85</packageLineRate>
-						<packageBranchRate>85</packageBranchRate>
+						<haltOnFailure>false</haltOnFailure>
+						<branchRate>${coverage.limit}</branchRate>
+						<lineRate>${coverage.limit}</lineRate>
+						<totalBranchRate>${coverage.limit}</totalBranchRate>
+						<totalLineRate>${coverage.limit}</totalLineRate>
+						<packageLineRate>${coverage.limit}</packageLineRate>
+						<packageBranchRate>${coverage.limit}</packageBranchRate>
 					</check>
 					<formats>
 						<format>xml</format>
@@ -109,6 +106,7 @@
 				</configuration>
 				<executions>
 					<execution>
+						<phase>package</phase>
 						<goals>
 							<goal>clean</goal>
 							<goal>check</goal>
@@ -131,20 +129,19 @@
 								<taskdef name="jfxjar" classname="com.sun.javafx.tools.ant.FXJar"
 									classpathref="maven.compile.classpath" />
 
-								<jfxjar destfile="${dist.dir}/${application.title}-${version}.jar">
-									<application mainClass="${javafx.main.class}" />
+								<jfxjar destfile="${dist.dir}/${project.name}-${version}.jar">
+									<application mainClass="${jfx.main.class}" />
 									<fileset dir="${project.build.outputDirectory}">
 										<include name="**" />
 									</fileset>
 								</jfxjar>
 
 								<mkdir dir="${dist.dir}" />
-								<jfxdeploy nativeBundles="all" outdir="${dist.dir}" outfile="${application.title}">
-									<application name="${application.title}" mainClass="${javafx.main.class}" />
+								<jfxdeploy nativeBundles="all" outdir="${dist.dir}" outfile="${project.name}">
+									<application name="${project.name}" mainClass="${jfx.main.class}" />
 									<resources>
 										<fileset dir="${dist.dir}" includes="*.jar" />
 									</resources>
-									<info title="${application.title}" />
 								</jfxdeploy>
 
 							</target>
