@@ -105,4 +105,28 @@ public class RecordStore {
 	public void addRecord(final String accountName, final List<Record> records) {
 		recordsByAccountName.put(accountName, records);
 	}
+
+	public double getTotalIncome() {
+		double income = 0;
+		for (List<Record> recs : recordsByAccountName.values()) {
+			for (Record r : recs) {
+				if (r.getValue() > 0) {
+					income += r.getValue();
+				}
+			}
+		}
+		return income;
+	}
+
+	public double getTotalSpent() {
+		double spent = 0;
+		for (List<Record> recs : recordsByAccountName.values()) {
+			for (Record r : recs) {
+				if (r.getValue() < 0) {
+					spent += Math.abs(r.getValue());
+				}
+			}
+		}
+		return spent;
+	}
 }

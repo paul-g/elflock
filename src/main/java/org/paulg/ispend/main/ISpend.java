@@ -9,6 +9,8 @@ import javafx.collections.*;
 import javafx.event.*;
 import javafx.geometry.*;
 import javafx.scene.*;
+import javafx.scene.chart.*;
+import javafx.scene.chart.PieChart.Data;
 import javafx.scene.control.*;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
@@ -20,12 +22,16 @@ import org.paulg.ispend.view.CompleteTableView;
 
 public class ISpend extends Application {
 
-	private static ObservableList<Record> data = FXCollections.observableArrayList();
-	private static ObservableList<AggregatedRecord> groupData = FXCollections.observableArrayList();
+	private static final ObservableList<Record> data = FXCollections.observableArrayList();
+	private static final ObservableList<AggregatedRecord> groupData = FXCollections.observableArrayList();
+	private static ObservableList<PieChart.Data> pieChartPosData = FXCollections.observableArrayList();
+	private static ObservableList<PieChart.Data> pieChartNegData = FXCollections.observableArrayList();
 	private static RecordStore parser;
 
 	private TextField groupBy;
 	private TextField search;
+	private Integer totalSpent;
+	private Integer totalIncome;
 
 	public static void main(final String[] args) throws IOException {
 		launch(args);
@@ -53,20 +59,72 @@ public class ISpend extends Application {
 		gridPane.add(makeBrowsePanel(stage), 0, 1);
 		gridPane.add(makeGroupByPanel(), 1, 2);
 
+		Node posChart = makePositivePieChart();
+		gridPane.add(posChart, 1, 4);
+		GridPane.setConstraints(posChart, 1, 4, 1, 1, HPos.CENTER, VPos.CENTER, Priority.ALWAYS, Priority.ALWAYS);
+
+		Node pieChart = makeNegativePieChart();
+		gridPane.add(pieChart, 2, 4);
+		GridPane.setConstraints(pieChart, 2, 4, 1, 1, HPos.CENTER, VPos.CENTER, Priority.ALWAYS, Priority.ALWAYS);
+
 		final TableView<Record> recordView = makeTable(data, Record.class);
 		gridPane.add(recordView, 0, 3);
-		GridPane.setConstraints(recordView, 0, 3, 1, 1, HPos.CENTER, VPos.CENTER, Priority.ALWAYS, Priority.ALWAYS);
+		GridPane.setConstraints(recordView, 0, 3, 1, 3, HPos.CENTER, VPos.CENTER, Priority.ALWAYS, Priority.ALWAYS);
 
 		final TableView<AggregatedRecord> aggregatedRecordView = makeTable(groupData, AggregatedRecord.class);
 		gridPane.add(aggregatedRecordView, 1, 3);
+		GridPane.setConstraints(aggregatedRecordView, 1, 3, 2, 1, HPos.CENTER, VPos.CENTER, Priority.ALWAYS,
+				Priority.ALWAYS);
 
 		final ColumnConstraints column1 = new ColumnConstraints();
-		column1.setPercentWidth(60);
+		column1.setPercentWidth(50);
 		final ColumnConstraints column2 = new ColumnConstraints();
-		column2.setPercentWidth(40);
-		gridPane.getColumnConstraints().addAll(column1, column2);
+		column2.setPercentWidth(25);
+		final ColumnConstraints column3 = new ColumnConstraints();
+		column3.setPercentWidth(25);
+
+		gridPane.getColumnConstraints().addAll(column1, column2, column3);
 
 		return gridPane;
+	}
+
+	private Node makeNegativePieChart() {
+		pieChartNegData = toNegativePieChartData();
+		final PieChart chart = new PieChart(pieChartNegData);
+		chart.setTitle("Expenses");
+		return chart;
+	}
+
+	private Node makePositivePieChart() {
+		pieChartPosData = toPositivePieChartData();
+		final PieChart chart = new PieChart(pieChartPosData);
+		chart.setTitle("Income");
+		return chart;
+	}
+
+	private ObservableList<Data> toNegativePieChartData() {
+		double total = (totalSpent == null ? 7500 : totalSpent);
+		double leftTotal = total;
+		pieChartNegData.clear();
+		for (AggregatedRecord record : groupData) {
+			pieChartNegData.add(new PieChart.Data(record.getDescription(),
+					(Math.abs(record.getNegative()) / total) * 100));
+			leftTotal -= record.getNegative();
+		}
+		pieChartNegData.add(new PieChart.Data("Other", (leftTotal / total) * 100));
+		return pieChartNegData;
+	}
+
+	private ObservableList<PieChart.Data> toPositivePieChartData() {
+		double total = (totalIncome == null ? 7500 : totalIncome);
+		double leftTotal = total;
+		pieChartPosData.clear();
+		for (AggregatedRecord record : groupData) {
+			pieChartPosData.add(new PieChart.Data(record.getDescription(), (record.getPositive() / total) * 100));
+			leftTotal -= record.getPositive();
+		}
+		pieChartPosData.add(new PieChart.Data("Other", (leftTotal / total) * 100));
+		return pieChartPosData;
 	}
 
 	private Node makeGroupByPanel() {
@@ -79,6 +137,8 @@ public class ISpend extends Application {
 				if (t.getCode() == KeyCode.ENTER) {
 					groupData.clear();
 					groupData.addAll(parser.groupByDescription(parseArguments(groupBy.getText())));
+					toPositivePieChartData();
+					toNegativePieChartData();
 				} else if (t.getCode() == KeyCode.ESCAPE) {
 					groupData.clear();
 				}
@@ -121,6 +181,8 @@ public class ISpend extends Application {
 						parser = fileVisitor.getRecordStore();
 						groupBy.setDisable(false);
 						search.setDisable(false);
+						totalSpent = (int) parser.getTotalSpent();
+						totalIncome = (int) parser.getTotalIncome();
 					} catch (final IOException e1) {
 						// XXX print some nice error
 						e1.printStackTrace();

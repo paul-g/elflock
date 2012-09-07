@@ -1,6 +1,5 @@
 package org.paulg.ispend.model;
 
-
 public class AggregatedRecord {
 
 	private String description;
