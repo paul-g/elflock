@@ -22,8 +22,8 @@ public class ISpendPane {
 
 	private final ObservableList<Record> data = FXCollections.observableArrayList();
 	private final ObservableList<AggregatedRecord> groupData = FXCollections.observableArrayList();
-	private ObservableList<PieChart.Data> pieChartPosData = FXCollections.observableArrayList();
-	private ObservableList<PieChart.Data> pieChartNegData = FXCollections.observableArrayList();
+	private final ObservableList<PieChart.Data> pieChartPosData = FXCollections.observableArrayList();
+	private final ObservableList<PieChart.Data> pieChartNegData = FXCollections.observableArrayList();
 	private RecordStore recordStore;
 
 	private TextField groupBy;
@@ -67,46 +67,30 @@ public class ISpendPane {
 		gridPane.add(makeSearchPanel(), 0, 1);
 		gridPane.add(makeGroupByPanel(), 1, 1);
 
-		Node posChart = makePositivePieChart();
-		gridPane.add(posChart, 1, 4);
-		GridPane.setConstraints(posChart, 1, 4, 1, 1, HPos.CENTER, VPos.CENTER, Priority.ALWAYS, Priority.ALWAYS);
+		Node posChart = pieChart("Income", pieChartPosData, 1, 3);
+		Node negChart = pieChart("Expenses", pieChartNegData, 2, 3);
 
-		Node pieChart = makeNegativePieChart();
-		gridPane.add(pieChart, 2, 4);
-		GridPane.setConstraints(pieChart, 2, 4, 1, 1, HPos.CENTER, VPos.CENTER, Priority.ALWAYS, Priority.ALWAYS);
+		final TableView<Record> recordView = makeTable(data, Record.class, 0, 2, 1, 2);
+		final TableView<AggregatedRecord> aggregatedRecordView = makeTable(groupData, AggregatedRecord.class, 1, 2, 2,
+				1);
 
-		final TableView<Record> recordView = makeTable(data, Record.class);
-		gridPane.add(recordView, 0, 3);
-		GridPane.setConstraints(recordView, 0, 3, 1, 3, HPos.CENTER, VPos.CENTER, Priority.ALWAYS, Priority.ALWAYS);
-
-		final TableView<AggregatedRecord> aggregatedRecordView = makeTable(groupData, AggregatedRecord.class);
-		gridPane.add(aggregatedRecordView, 1, 3);
-		GridPane.setConstraints(aggregatedRecordView, 1, 3, 2, 1, HPos.CENTER, VPos.CENTER, Priority.ALWAYS,
-				Priority.ALWAYS);
-
-		final ColumnConstraints column1 = new ColumnConstraints();
-		column1.setPercentWidth(50);
-		final ColumnConstraints column2 = new ColumnConstraints();
-		column2.setPercentWidth(25);
-		final ColumnConstraints column3 = new ColumnConstraints();
-		column3.setPercentWidth(25);
-
-		gridPane.getColumnConstraints().addAll(column1, column2, column3);
-
+		setColumnConstraints(gridPane, 50, 25, 25);
+		gridPane.getChildren().addAll(posChart, negChart, recordView, aggregatedRecordView);
 		return gridPane;
 	}
 
-	private Node makeNegativePieChart() {
-		pieChartNegData = toNegativePieChartData();
-		final PieChart chart = new PieChart(pieChartNegData);
-		chart.setTitle("Expenses");
-		return chart;
+	private void setColumnConstraints(final GridPane gridPane, final Integer... widths) {
+		for (int i : widths) {
+			ColumnConstraints col = new ColumnConstraints();
+			col.setPercentWidth(i);
+			gridPane.getColumnConstraints().add(col);
+		}
 	}
 
-	private Node makePositivePieChart() {
-		pieChartPosData = toPositivePieChartData();
-		final PieChart chart = new PieChart(pieChartPosData);
-		chart.setTitle("Income");
+	private Node pieChart(final String title, final ObservableList<PieChart.Data> data, final int row, final int col) {
+		final PieChart chart = new PieChart(data);
+		GridPane.setConstraints(chart, row, col, 1, 1, HPos.CENTER, VPos.CENTER, Priority.ALWAYS, Priority.ALWAYS);
+		chart.setTitle(title);
 		return chart;
 	}
 
@@ -123,7 +107,7 @@ public class ISpendPane {
 		return pieChartNegData;
 	}
 
-	private ObservableList<PieChart.Data> toPositivePieChartData() {
+	private ObservableList<Data> toPositivePieChartData() {
 		double total = (totalIncome == null ? 7500 : totalIncome);
 		double leftTotal = total;
 		pieChartPosData.clear();
@@ -161,10 +145,13 @@ public class ISpendPane {
 		return box;
 	}
 
-	private <T> TableView<T> makeTable(final ObservableList<T> data, final Class<T> clazz) {
+	private <T> TableView<T> makeTable(final ObservableList<T> data, final Class<T> clazz, final int row,
+			final int col, final int hSpan, final int vSpan) {
 		final TableView<T> table = new CompleteTableView<T>(clazz);
 		table.setEditable(true);
 		table.setItems(data);
+		GridPane.setConstraints(table, row, col, hSpan, vSpan, HPos.CENTER, VPos.CENTER, Priority.ALWAYS,
+				Priority.ALWAYS);
 		return table;
 	}
 
