@@ -14,6 +14,7 @@ import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.stage.*;
+import javafx.util.Callback;
 
 import org.paulg.ispend.controller.OpenHistoryHandler;
 import org.paulg.ispend.model.*;
@@ -24,6 +25,7 @@ public class ISpendPane {
 	private final ObservableList<AggregatedRecord> groupData = FXCollections.observableArrayList();
 	private final ObservableList<PieChart.Data> pieChartPosData = FXCollections.observableArrayList();
 	private final ObservableList<PieChart.Data> pieChartNegData = FXCollections.observableArrayList();
+	private final ObservableList<Account> accountsData = FXCollections.observableArrayList();
 	private RecordStore recordStore;
 
 	private TextField groupBy;
@@ -31,13 +33,14 @@ public class ISpendPane {
 	private Integer totalSpent;
 	private Integer totalIncome;
 	private final Stage stage;
+	private GridPane gridPane;
 
 	public ISpendPane(final Stage stage) {
 		this.stage = stage;
 		stage.setTitle("ISpend");
 
 		BorderPane pane = new BorderPane();
-		pane.setCenter(makeAppContent(stage));
+		pane.setCenter(makeAppContent());
 
 		MenuBar menuBar = new MenuBar();
 		Menu menu = new Menu("File");
@@ -56,14 +59,14 @@ public class ISpendPane {
 		stage.show();
 	}
 
-	private Pane makeAppContent(final Stage stage) {
-		final GridPane gridPane = new GridPane();
+	private Pane makeAppContent() {
+		gridPane = new GridPane();
 		gridPane.setHgap(10);
 		gridPane.setVgap(10);
 		gridPane.setPadding(new Insets(10, 10, 10, 10));
 		gridPane.setGridLinesVisible(false);
 
-		gridPane.add(makeLabel(), 0, 0);
+		gridPane.add(accountSummary(), 0, 0, 3, 1);
 		gridPane.add(makeSearchPanel(), 0, 1);
 		gridPane.add(makeGroupByPanel(), 1, 1);
 
@@ -129,6 +132,8 @@ public class ISpendPane {
 				if (t.getCode() == KeyCode.ENTER) {
 					groupData.clear();
 					groupData.addAll(recordStore.groupByDescription(parseArguments(groupBy.getText())));
+					accountsData.clear();
+					accountsData.addAll(recordStore.getAccounts());
 					toPositivePieChartData();
 					toNegativePieChartData();
 				} else if (t.getCode() == KeyCode.ESCAPE) {
@@ -185,10 +190,29 @@ public class ISpendPane {
 		return box;
 	}
 
-	private Node makeLabel() {
-		final Label label = new Label("Account Balance");
+	private Node accountSummary() {
+		final Label label = new Label("Accounts");
 		label.setFont(new Font("Arial", 20));
-		return label;
+
+		ListView<Account> accounts = new ListView<Account>(accountsData);
+
+		accounts.setCellFactory(new Callback<ListView<Account>, ListCell<Account>>() {
+			@Override
+			public ListCell<Account> call(final ListView<Account> arg0) {
+				return new AccountCell();
+			}
+		});
+
+		accounts.setPrefHeight(50);
+
+		HBox box = new HBox();
+		box.setAlignment(Pos.CENTER);
+		box.getChildren().addAll(label, accounts);
+		box.setPadding(new Insets(10, 10, 10, 10));
+		box.setSpacing(10);
+		HBox.setHgrow(accounts, Priority.ALWAYS);
+
+		return box;
 	}
 
 	public void fileSelected(final RecordStore recordStore) {
@@ -197,7 +221,10 @@ public class ISpendPane {
 		search.setDisable(false);
 		totalSpent = (int) recordStore.getTotalSpent();
 		totalIncome = (int) recordStore.getTotalIncome();
+		data.clear();
 		data.addAll(recordStore.getAllRecords());
+		accountsData.clear();
+		accountsData.addAll(recordStore.getAccounts());
 		recordStore.printSummary();
 	}
 

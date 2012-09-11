@@ -6,70 +6,34 @@ import org.paulg.ispend.utils.StringUtils;
 
 public class RecordStore {
 
-	final Map<String, List<Record>> recordsByAccountName = new HashMap<String, List<Record>>();
+	final Map<String, Account> accounts = new HashMap<String, Account>();
 
-	public List<Record> getRecordsByAccountName(final String accountName) {
-		if (recordsByAccountName.get(accountName) != null) {
-			return new ArrayList<Record>(recordsByAccountName.get(accountName));
+	public List<Record> getRecordsByAccountNumber(final String number) {
+		if (accounts.get(number) != null) {
+			return new ArrayList<Record>(accounts.get(number).getRecords());
 		}
 		return new ArrayList<Record>();
 	}
 
 	public void addRecord(final Record r) {
-		List<Record> records = recordsByAccountName.get(r.getAccountName());
-		if (records == null) {
-			records = new ArrayList<Record>();
-			addRecord(r.getAccountName(), records);
+		Account acc;
+		if ((acc = accounts.get(r.getAccountNumber())) == null) {
+			acc = new Account(r.getAccountNumber(), r.getAccountName());
+			accounts.put(r.getAccountNumber(), acc);
 		}
-		records.add(r);
+		acc.addRecord(r);
 	}
 
 	public void printSummary() {
-		for (final String s : recordsByAccountName.keySet()) {
-			printSummaryByAccount(s);
+		for (final Account a : accounts.values()) {
+			a.printSummary();
 		}
-	}
-
-	public void printSummaryByAccount(final String accountName) {
-		double maxNegative = Double.MAX_VALUE;
-		Record maxNegativeRecord = null;
-		final List<Record> records = recordsByAccountName.get(accountName);
-		if (records == null) {
-			return;
-		}
-		double totalNegative = 0;
-		double totalPositive = 0;
-		int negatives = 0;
-		int positives = 0;
-		for (final Record r : records) {
-			if (r.getValue() < 0) {
-				totalNegative += r.getValue();
-				negatives++;
-
-				if (r.getValue() < maxNegative) {
-					maxNegative = r.getValue();
-					maxNegativeRecord = r;
-				}
-
-			} else {
-				totalPositive += r.getValue();
-				positives++;
-			}
-
-		}
-
-		System.out.println("For account " + accountName);
-		System.out.println("\tTotal records: " + records.size());
-		System.out.println("\tTotal negative:" + totalNegative + " avg: " + (totalNegative / negatives));
-		System.out.println("\tTotal positive:" + totalPositive + " avg: " + (totalPositive / positives));
-		System.out.println("\tMaximum negative record: " + maxNegativeRecord);
-		System.out.println("\tFlow: " + (totalPositive + totalNegative));
 	}
 
 	public List<Record> getAllRecords() {
 		final List<Record> allRecords = new ArrayList<Record>();
-		for (final List<Record> rs : recordsByAccountName.values()) {
-			allRecords.addAll(rs);
+		for (final Account a : accounts.values()) {
+			allRecords.addAll(a.getRecords());
 		}
 		return allRecords;
 	}
@@ -88,12 +52,23 @@ public class RecordStore {
 	public List<AggregatedRecord> groupByDescription(final String... groupTags) {
 		final List<AggregatedRecord> tagRecords = new ArrayList<AggregatedRecord>();
 		if ((groupTags != null) && (groupTags.length > 0)) {
+
+			for (Account a : accounts.values()) {
+				a.setCovered(0);
+			}
+
 			for (String tag : groupTags) {
 				tag = tag.trim();
 				final AggregatedRecord tagRecord = new AggregatedRecord(tag, 0);
-				for (final Record r : getAllRecords()) {
-					if (StringUtils.containsIgnoreCase(r.getDescription(), tag)) {
-						tagRecord.addRecord(r);
+				for (Account a : accounts.values()) {
+					for (final Record r : a.getRecords()) {
+						if (StringUtils.containsIgnoreCase(r.getDescription(), tag)) {
+							tagRecord.addRecord(r);
+							r.setCovered(true);
+							a.setCovered(a.getCovered() + 1);
+						} else {
+							r.setCovered(false);
+						}
 					}
 				}
 				tagRecords.add(tagRecord);
@@ -102,14 +77,10 @@ public class RecordStore {
 		return tagRecords;
 	}
 
-	public void addRecord(final String accountName, final List<Record> records) {
-		recordsByAccountName.put(accountName, records);
-	}
-
 	public double getTotalIncome() {
 		double income = 0;
-		for (List<Record> recs : recordsByAccountName.values()) {
-			for (Record r : recs) {
+		for (Account a : accounts.values()) {
+			for (Record r : a.getRecords()) {
 				if (r.getValue() > 0) {
 					income += r.getValue();
 				}
@@ -120,13 +91,17 @@ public class RecordStore {
 
 	public double getTotalSpent() {
 		double spent = 0;
-		for (List<Record> recs : recordsByAccountName.values()) {
-			for (Record r : recs) {
+		for (Account a : accounts.values()) {
+			for (Record r : a.getRecords()) {
 				if (r.getValue() < 0) {
 					spent += Math.abs(r.getValue());
 				}
 			}
 		}
 		return spent;
+	}
+
+	public Collection<Account> getAccounts() {
+		return accounts.values();
 	}
 }

@@ -9,6 +9,7 @@ public class Record {
 	private String accountName;
 	private String accountNumber;
 	private double value;
+	private boolean covered;
 
 	public Record() {
 		// XXX should probably use a builder
@@ -103,5 +104,13 @@ public class Record {
 	public int hashCode() {
 		// TODO this could probably be improved
 		return date.hashCode();
+	}
+
+	public void setCovered(final boolean covered) {
+		this.covered = covered;
+	}
+
+	public boolean isCovered() {
+		return covered;
 	}
 }
