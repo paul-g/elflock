@@ -22,15 +22,18 @@ public final class HistoryFileVisitor extends SimpleFileVisitor<Path> {
 
 	@Override
 	public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
-		final BufferedReader br = Files.newBufferedReader(file, Charset.defaultCharset());
-		String line = null;
-		System.out.println("File: " + file.toString());
 
+		if (!file.toString().endsWith("csv")) {
+			return FileVisitResult.CONTINUE;
+		}
+
+		final BufferedReader br = Files.newBufferedReader(file, Charset.defaultCharset());
+
+		String line = null;
 		while ((line = br.readLine()) != null) {
-			// /System.out.println(line);
 			line = line.trim();
 			if (line.startsWith("Date")) {
-				// TODO parse header - assume nat west for now
+				// TODO parse header and check record type - assume nat west for now
 				recordParser = new NatWestRecordParser();
 			} else if (!line.isEmpty()) {
 				recordStore.addRecord(recordParser.parseRecord(line));
