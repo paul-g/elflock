@@ -49,6 +49,14 @@ public class RecordStore {
 		return filtered;
 	}
 
+	private String[] parseArguments(final String text) {
+		return text.split(",");
+	}
+
+	public List<AggregatedRecord> groupByDescription(final String query) {
+		return groupByDescription(parseArguments(query));
+	}
+
 	public List<AggregatedRecord> groupByDescription(final String... groupTags) {
 		final List<AggregatedRecord> tagRecords = new ArrayList<AggregatedRecord>();
 		if ((groupTags != null) && (groupTags.length > 0)) {

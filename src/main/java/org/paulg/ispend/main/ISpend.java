@@ -5,7 +5,7 @@ import java.io.IOException;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
-import org.paulg.ispend.view.ISpendPane;
+import org.paulg.ispend.view.*;
 
 public class ISpend extends Application {
 
@@ -15,7 +15,8 @@ public class ISpend extends Application {
 
 	@Override
 	public void start(final Stage stage) {
-		ISpendPane pane = new ISpendPane(stage);
+		PreferencesStore store = new PreferencesStore();
+		ISpendPane pane = new ISpendPane(stage, store);
 		pane.show();
 	}
 

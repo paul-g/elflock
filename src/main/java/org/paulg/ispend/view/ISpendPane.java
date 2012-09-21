@@ -1,10 +1,11 @@
 package org.paulg.ispend.view;
 
-import java.io.File;
+import java.io.*;
+import java.nio.file.*;
 import java.util.List;
 
 import javafx.collections.*;
-import javafx.event.EventHandler;
+import javafx.event.*;
 import javafx.geometry.*;
 import javafx.scene.*;
 import javafx.scene.chart.*;
@@ -17,6 +18,7 @@ import javafx.stage.*;
 import javafx.util.Callback;
 
 import org.paulg.ispend.controller.OpenHistoryHandler;
+import org.paulg.ispend.main.HistoryFileVisitor;
 import org.paulg.ispend.model.*;
 
 public class ISpendPane {
@@ -35,8 +37,11 @@ public class ISpendPane {
 	private final Stage stage;
 	private GridPane gridPane;
 
-	public ISpendPane(final Stage stage) {
+	private final PreferencesStore preferencesStore;
+
+	public ISpendPane(final Stage stage, final PreferencesStore preferencesStore) {
 		this.stage = stage;
+		this.preferencesStore = preferencesStore;
 		stage.setTitle("ISpend");
 
 		BorderPane pane = new BorderPane();
@@ -79,6 +84,7 @@ public class ISpendPane {
 
 		setColumnConstraints(gridPane, 50, 25, 25);
 		gridPane.getChildren().addAll(posChart, negChart, recordView, aggregatedRecordView);
+		// gridPane.setGridLinesVisible(true);
 		return gridPane;
 	}
 
@@ -130,23 +136,25 @@ public class ISpendPane {
 			@Override
 			public void handle(final KeyEvent t) {
 				if (t.getCode() == KeyCode.ENTER) {
-					groupData.clear();
-					groupData.addAll(recordStore.groupByDescription(parseArguments(groupBy.getText())));
-					accountsData.clear();
-					accountsData.addAll(recordStore.getAccounts());
-					toPositivePieChartData();
-					toNegativePieChartData();
+					setQuery(groupBy.getText());
 				} else if (t.getCode() == KeyCode.ESCAPE) {
-					groupData.clear();
+					clearQuery();
 				}
 			}
 
-			private String[] parseArguments(final String text) {
-				return text.split(",");
+		});
+		Button save = new Button();
+		save.setText("Save");
+		save.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(final ActionEvent arg0) {
+				preferencesStore.saveQuery(groupBy.getText());
 			}
 		});
 		final HBox box = new HBox();
-		box.getChildren().addAll(groupBy);
+		box.getChildren().addAll(groupBy, save);
+		box.setAlignment(Pos.CENTER);
+		HBox.setHgrow(groupBy, Priority.ALWAYS);
 		return box;
 	}
 
@@ -215,8 +223,11 @@ public class ISpendPane {
 		return box;
 	}
 
-	public void fileSelected(final RecordStore recordStore) {
-		this.recordStore = recordStore;
+	public void fileSelected(final String path) throws IOException {
+		final HistoryFileVisitor fileVisitor = new HistoryFileVisitor();
+		recordStore = fileVisitor.getRecordStore();
+
+		Files.walkFileTree(Paths.get(path), fileVisitor);
 		groupBy.setDisable(false);
 		search.setDisable(false);
 		totalSpent = (int) recordStore.getTotalSpent();
@@ -230,11 +241,43 @@ public class ISpendPane {
 
 	public File showDialog() {
 		final DirectoryChooser chooser = new DirectoryChooser();
-		return chooser.showDialog(stage);
+		File f = chooser.showDialog(stage);
+
+		if (f != null) {
+			preferencesStore.saveLoadedFile(f.getAbsolutePath());
+		}
+
+		return f;
 	}
 
 	public void show() {
+		if (preferencesStore.hasLoadedFile()) {
+			try {
+				fileSelected(preferencesStore.getLoadedFile());
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		if (preferencesStore.hasQuery()) {
+			String query = preferencesStore.getQuery();
+			setQuery(query);
+			groupBy.setText(query);
+		}
 		stage.show();
+	}
+
+	private void clearQuery() {
+		groupData.clear();
+	}
+
+	private void setQuery(final String query) {
+		clearQuery();
+		groupData.addAll(recordStore.groupByDescription(query));
+		accountsData.clear();
+		accountsData.addAll(recordStore.getAccounts());
+		toPositivePieChartData();
+		toNegativePieChartData();
 	}
 
 }
