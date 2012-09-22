@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>AggregatedRecord.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="right"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ispend</a> &gt; <a href="index.html" class="el_package">org.paulg.ispend.model</a> &gt; <span class="el_source">AggregatedRecord.java</span></div><h1>AggregatedRecord.java</h1><pre class="source lang-java linenums">package org.paulg.ispend.model;
+
+public class AggregatedRecord {
+
+	private String description;
+	private double value;
+	private int count;
+	private double positive;
+	private double negative;
+
+	// XXX dumb!
+	public AggregatedRecord(final Record r) {
+<span class="nc" id="L13">		super();</span>
+<span class="nc" id="L14">		description = r.getDescription();</span>
+<span class="nc" id="L15">		value = r.getValue();</span>
+<span class="nc" id="L16">		count = 0;</span>
+<span class="nc" id="L17">		addRecord(r);</span>
+<span class="nc" id="L18">	}</span>
+
+<span class="fc" id="L20">	public AggregatedRecord(final String description, final double value) {</span>
+<span class="fc" id="L21">		this.description = description;</span>
+<span class="fc" id="L22">		this.value = value;</span>
+<span class="fc" id="L23">		count = 0;</span>
+<span class="fc" id="L24">	}</span>
+
+	public String getDescription() {
+<span class="fc" id="L27">		return description;</span>
+	}
+
+	public void setDescription(final String description) {
+<span class="nc" id="L31">		this.description = description;</span>
+<span class="nc" id="L32">	}</span>
+
+	public Double getValue() {
+<span class="fc" id="L35">		return value;</span>
+	}
+
+	public void setValue(final Double value) {
+<span class="nc" id="L39">		this.value = value;</span>
+<span class="nc" id="L40">	}</span>
+
+	public void addRecord(final Record r) {
+<span class="fc" id="L43">		value += r.getValue();</span>
+<span class="fc" id="L44">		count++;</span>
+<span class="pc bpc" id="L45" title="1 of 2 branches missed.">		if (r.getValue() &lt; 0) {</span>
+<span class="nc" id="L46">			negative += r.getValue();</span>
+		} else {
+<span class="fc" id="L48">			positive += r.getValue();</span>
+		}
+<span class="fc" id="L50">	}</span>
+
+	public int getCount() {
+<span class="fc" id="L53">		return count;</span>
+	}
+
+	public void setCount(final int count) {
+<span class="nc" id="L57">		this.count = count;</span>
+<span class="nc" id="L58">	}</span>
+
+	public double getPositive() {
+<span class="fc" id="L61">		return positive;</span>
+	}
+
+	public void setPositive(final double positive) {
+<span class="nc" id="L65">		this.positive = positive;</span>
+<span class="nc" id="L66">	}</span>
+
+	public double getNegative() {
+<span class="fc" id="L69">		return negative;</span>
+	}
+
+	public void setNegative(final double negative) {
+<span class="nc" id="L73">		this.negative = negative;</span>
+<span class="nc" id="L74">	}</span>
+
+	@Override
+	public boolean equals(final Object o) {
+<span class="pc bpc" id="L78" title="2 of 4 branches missed.">		if ((o == null) || !(o instanceof AggregatedRecord)) {</span>
+<span class="nc" id="L79">			return false;</span>
+		}
+<span class="fc" id="L81">		AggregatedRecord ar = (AggregatedRecord) o;</span>
+<span class="pc bpc" id="L82" title="5 of 10 branches missed.">		return (description.equals(ar.getDescription()) &amp;&amp; (count == ar.getCount())</span>
+				&amp;&amp; (positive == ar.getPositive()) &amp;&amp; (negative == ar.getNegative()) &amp;&amp; (value == ar
+					.getValue()));
+	}
+
+	@Override
+	public int hashCode() {
+<span class="nc" id="L89">		return description.hashCode();</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.5.10.201208310627</span></div></body></html>

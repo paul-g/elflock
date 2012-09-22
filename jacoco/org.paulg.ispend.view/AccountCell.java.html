@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>AccountCell.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="right"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ispend</a> &gt; <a href="index.html" class="el_package">org.paulg.ispend.view</a> &gt; <span class="el_source">AccountCell.java</span></div><h1>AccountCell.java</h1><pre class="source lang-java linenums">package org.paulg.ispend.view;
+
+import javafx.scene.control.ListCell;
+
+import org.paulg.ispend.model.Account;
+
+<span class="nc" id="L7">public class AccountCell extends ListCell&lt;Account&gt; {</span>
+
+	@Override
+	protected void updateItem(final Account account, final boolean empty) {
+<span class="nc" id="L11">		super.updateItem(account, empty);</span>
+
+<span class="nc bnc" id="L13" title="All 2 branches missed.">		if (account != null) {</span>
+<span class="nc" id="L14">			setText(&quot;name: &quot; + account.getName() + &quot;, number: &quot; + account.getNumber() + &quot;, total records: &quot;</span>
+					+ account.getTotal() + &quot;, total covered: &quot; + account.getCovered() + &quot; (&quot;
+					+ ((account.getCovered() * 100) / account.getTotal()) + &quot;%)&quot;);
+		}
+<span class="nc" id="L18">	}</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.5.10.201208310627</span></div></body></html>

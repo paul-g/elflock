@@ -1,0 +1,18 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+ispend,org.paulg.ispend.model,Record,36,133,9,9,4,37,12,18,3,18
+ispend,org.paulg.ispend.model,AggregatedRecord,53,95,8,8,19,18,15,8,7,8
+ispend,org.paulg.ispend.model,RecordStore,24,293,5,33,6,59,6,24,2,9
+ispend,org.paulg.ispend.model,PreferencesStore,0,66,0,4,0,16,0,10,0,8
+ispend,org.paulg.ispend.model,NatWestRecordParser,0,116,0,6,0,22,0,5,0,2
+ispend,org.paulg.ispend.model,Account,191,33,18,0,35,12,17,5,8,5
+ispend,org.paulg.ispend.utils,StringUtils,3,52,0,10,2,10,1,7,1,2
+ispend,org.paulg.ispend.view,AccountCell,48,0,2,0,5,0,3,0,2,0
+ispend,org.paulg.ispend.view,ISpendPane.new EventHandler() {...},26,0,4,0,6,0,4,0,2,0
+ispend,org.paulg.ispend.view,ISpendPane.new EventHandler() {...},15,0,0,0,3,0,2,0,2,0
+ispend,org.paulg.ispend.view,ISpendPane.new EventHandler() {...},49,0,4,0,11,0,5,0,3,0
+ispend,org.paulg.ispend.view,ISpendPane.new Callback() {...},10,0,0,0,2,0,2,0,2,0
+ispend,org.paulg.ispend.view,CompleteTableView,52,0,2,0,10,0,3,0,2,0
+ispend,org.paulg.ispend.view,ISpendPane,736,0,16,0,141,0,23,0,15,0
+ispend,org.paulg.ispend.controller,OpenHistoryHandler,27,0,2,0,13,0,4,0,3,0
+ispend,org.paulg.ispend.main,ISpend,19,0,0,0,7,0,3,0,3,0
+ispend,org.paulg.ispend.main,HistoryFileVisitor,55,0,8,0,15,0,7,0,3,0

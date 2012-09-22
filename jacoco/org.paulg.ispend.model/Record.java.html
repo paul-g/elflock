@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>Record.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="right"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ispend</a> &gt; <a href="index.html" class="el_package">org.paulg.ispend.model</a> &gt; <span class="el_source">Record.java</span></div><h1>Record.java</h1><pre class="source lang-java linenums">package org.paulg.ispend.model;
+
+public class Record {
+
+	private String date;
+	private String type;
+	private String description;
+	private String balance;
+	private String accountName;
+	private String accountNumber;
+	private double value;
+	private boolean covered;
+
+<span class="fc" id="L14">	public Record() {</span>
+		// XXX should probably use a builder
+<span class="fc" id="L16">	}</span>
+
+	public Record(final String date, final String type, final String description, final String balance,
+			final String accountName, final String accountNumber, final double value) {
+<span class="fc" id="L20">		super();</span>
+<span class="fc" id="L21">		this.date = date;</span>
+<span class="fc" id="L22">		this.type = type;</span>
+<span class="fc" id="L23">		this.description = description;</span>
+<span class="fc" id="L24">		this.balance = balance;</span>
+<span class="fc" id="L25">		this.accountName = accountName;</span>
+<span class="fc" id="L26">		this.accountNumber = accountNumber;</span>
+<span class="fc" id="L27">		this.value = value;</span>
+<span class="fc" id="L28">	}</span>
+
+	public String getType() {
+<span class="fc" id="L31">		return type;</span>
+	}
+
+	public void setType(final String type) {
+<span class="fc" id="L35">		this.type = type;</span>
+<span class="fc" id="L36">	}</span>
+
+	public String getDescription() {
+<span class="fc" id="L39">		return description;</span>
+	}
+
+	public void setDescription(final String description) {
+<span class="fc" id="L43">		this.description = description;</span>
+<span class="fc" id="L44">	}</span>
+
+	public String getBalance() {
+<span class="fc" id="L47">		return balance;</span>
+	}
+
+	public void setBalance(final String balance) {
+<span class="fc" id="L51">		this.balance = balance;</span>
+<span class="fc" id="L52">	}</span>
+
+	public String getAccountName() {
+<span class="fc" id="L55">		return accountName;</span>
+	}
+
+	public void setAccountName(final String accountName) {
+<span class="fc" id="L59">		this.accountName = accountName;</span>
+<span class="fc" id="L60">	}</span>
+
+	public String getAccountNumber() {
+<span class="fc" id="L63">		return accountNumber;</span>
+	}
+
+	public void setAccountNumber(final String accountNumber) {
+<span class="fc" id="L67">		this.accountNumber = accountNumber;</span>
+<span class="fc" id="L68">	}</span>
+
+	public double getValue() {
+<span class="fc" id="L71">		return value;</span>
+	}
+
+	public void setValue(final double value) {
+<span class="fc" id="L75">		this.value = value;</span>
+<span class="fc" id="L76">	}</span>
+
+	public String getDate() {
+<span class="fc" id="L79">		return date;</span>
+	}
+
+	public void setDate(final String date) {
+<span class="fc" id="L83">		this.date = date;</span>
+<span class="fc" id="L84">	}</span>
+
+	@Override
+	public String toString() {
+<span class="nc" id="L88">		return String.format(&quot;date: %s, type: %s, description: %s, value: %f&quot;, getDate(), getType(), getDescription(),</span>
+				getValue());
+	}
+
+	@Override
+	public boolean equals(final Object o) {
+<span class="pc bpc" id="L94" title="2 of 4 branches missed.">		if ((o == null) || !(o instanceof Record)) {</span>
+<span class="nc" id="L95">			return false;</span>
+		}
+<span class="fc" id="L97">		final Record r = (Record) o;</span>
+<span class="pc bpc" id="L98" title="7 of 14 branches missed.">		return r.getAccountName().equals(accountName) &amp;&amp; r.getAccountNumber().equals(accountNumber)</span>
+				&amp;&amp; r.getBalance().equals(balance) &amp;&amp; r.getDate().equals(date) &amp;&amp; r.getDescription().equals(description)
+				&amp;&amp; r.getType().equals(type) &amp;&amp; (r.getValue() == value);
+	}
+
+	@Override
+	public int hashCode() {
+		// TODO this could probably be improved
+<span class="nc" id="L106">		return date.hashCode();</span>
+	}
+
+	public void setCovered(final boolean covered) {
+<span class="fc" id="L110">		this.covered = covered;</span>
+<span class="fc" id="L111">	}</span>
+
+	public boolean isCovered() {
+<span class="nc" id="L114">		return covered;</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.5.10.201208310627</span></div></body></html>

@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>RecordStore.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="right"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ispend</a> &gt; <a href="index.html" class="el_package">org.paulg.ispend.model</a> &gt; <span class="el_source">RecordStore.java</span></div><h1>RecordStore.java</h1><pre class="source lang-java linenums">package org.paulg.ispend.model;
+
+import java.util.*;
+
+import org.paulg.ispend.utils.StringUtils;
+
+<span class="fc" id="L7">public class RecordStore {</span>
+
+<span class="fc" id="L9">	final Map&lt;String, Account&gt; accounts = new LinkedHashMap&lt;String, Account&gt;();</span>
+
+	public void addRecord(final Record r) {
+<span class="fc" id="L12">		Account acc = accounts.get(r.getAccountNumber());</span>
+<span class="fc bfc" id="L13" title="All 2 branches covered.">		if (acc == null) {</span>
+<span class="fc" id="L14">			acc = new Account(r.getAccountNumber(), r.getAccountName());</span>
+<span class="fc" id="L15">			accounts.put(r.getAccountNumber(), acc);</span>
+		}
+<span class="fc" id="L17">		acc.addRecord(r);</span>
+<span class="fc" id="L18">	}</span>
+
+	public List&lt;Record&gt; getRecordsByAccountNumber(final String number) {
+<span class="pc bpc" id="L21" title="1 of 2 branches missed.">		if (accounts.get(number) != null) {</span>
+<span class="fc" id="L22">			return new ArrayList&lt;Record&gt;(accounts.get(number).getRecords());</span>
+		}
+<span class="nc" id="L24">		return new ArrayList&lt;Record&gt;();</span>
+	}
+
+	public void printSummary() {
+<span class="nc bnc" id="L28" title="All 2 branches missed.">		for (final Account a : accounts.values()) {</span>
+<span class="nc" id="L29">			a.printSummary();</span>
+<span class="nc" id="L30">		}</span>
+<span class="nc" id="L31">	}</span>
+
+	public List&lt;Record&gt; getAllRecords() {
+<span class="fc" id="L34">		final List&lt;Record&gt; allRecords = new ArrayList&lt;Record&gt;();</span>
+<span class="fc bfc" id="L35" title="All 2 branches covered.">		for (final Account a : accounts.values()) {</span>
+<span class="fc" id="L36">			allRecords.addAll(a.getRecords());</span>
+<span class="fc" id="L37">		}</span>
+<span class="fc" id="L38">		return allRecords;</span>
+	}
+
+	public List&lt;Record&gt; filter(final String text) {
+<span class="fc" id="L42">		final List&lt;Record&gt; unfiltered = getAllRecords();</span>
+<span class="fc" id="L43">		final List&lt;Record&gt; filtered = new ArrayList&lt;Record&gt;();</span>
+<span class="fc bfc" id="L44" title="All 2 branches covered.">		for (final Record r : unfiltered) {</span>
+<span class="fc bfc" id="L45" title="All 2 branches covered.">			if (StringUtils.containsIgnoreCase(r.getDescription(), text)) {</span>
+<span class="fc" id="L46">				filtered.add(r);</span>
+			}
+<span class="fc" id="L48">		}</span>
+<span class="fc" id="L49">		return filtered;</span>
+	}
+
+	private String[] parseArguments(final String text) {
+<span class="fc" id="L53">		return text.split(&quot;,&quot;);</span>
+	}
+
+	public List&lt;AggregatedRecord&gt; groupByDescription(final String query) {
+
+<span class="fc" id="L58">		String[] tags = parseArguments(query);</span>
+
+<span class="fc" id="L60">		final List&lt;AggregatedRecord&gt; tagRecords = new ArrayList&lt;AggregatedRecord&gt;();</span>
+<span class="pc bpc" id="L61" title="2 of 4 branches missed.">		if ((tags != null) &amp;&amp; (tags.length &gt; 0)) {</span>
+
+<span class="fc bfc" id="L63" title="All 2 branches covered.">			for (Account a : accounts.values()) {</span>
+<span class="fc" id="L64">				a.setCovered(0);</span>
+<span class="fc" id="L65">			}</span>
+
+<span class="fc bfc" id="L67" title="All 2 branches covered.">			for (String tag : tags) {</span>
+<span class="fc" id="L68">				tag = tag.trim();</span>
+<span class="fc" id="L69">				final AggregatedRecord tagRecord = new AggregatedRecord(tag, 0);</span>
+<span class="fc bfc" id="L70" title="All 2 branches covered.">				for (Account a : accounts.values()) {</span>
+<span class="fc bfc" id="L71" title="All 2 branches covered.">					for (final Record r : a.getRecords()) {</span>
+<span class="fc bfc" id="L72" title="All 2 branches covered.">						if (StringUtils.containsIgnoreCase(r.getDescription(), tag)) {</span>
+<span class="fc" id="L73">							tagRecord.addRecord(r);</span>
+<span class="fc" id="L74">							r.setCovered(true);</span>
+<span class="fc" id="L75">							a.setCovered(a.getCovered() + 1);</span>
+						} else {
+<span class="fc" id="L77">							r.setCovered(false);</span>
+						}
+<span class="fc" id="L79">					}</span>
+<span class="fc" id="L80">				}</span>
+<span class="fc" id="L81">				tagRecords.add(tagRecord);</span>
+			}
+		}
+<span class="fc" id="L84">		return tagRecords;</span>
+	}
+
+	public double getTotalIncome() {
+<span class="fc" id="L88">		double income = 0;</span>
+<span class="fc bfc" id="L89" title="All 2 branches covered.">		for (Account a : accounts.values()) {</span>
+<span class="fc bfc" id="L90" title="All 2 branches covered.">			for (Record r : a.getRecords()) {</span>
+<span class="fc bfc" id="L91" title="All 2 branches covered.">				if (r.getValue() &gt; 0) {</span>
+<span class="fc" id="L92">					income += r.getValue();</span>
+				}
+<span class="fc" id="L94">			}</span>
+<span class="fc" id="L95">		}</span>
+<span class="fc" id="L96">		return income;</span>
+	}
+
+	public double getTotalSpent() {
+<span class="fc" id="L100">		double spent = 0;</span>
+<span class="fc bfc" id="L101" title="All 2 branches covered.">		for (Account a : accounts.values()) {</span>
+<span class="fc bfc" id="L102" title="All 2 branches covered.">			for (Record r : a.getRecords()) {</span>
+<span class="fc bfc" id="L103" title="All 2 branches covered.">				if (r.getValue() &lt; 0) {</span>
+<span class="fc" id="L104">					spent += Math.abs(r.getValue());</span>
+				}
+<span class="fc" id="L106">			}</span>
+<span class="fc" id="L107">		}</span>
+<span class="fc" id="L108">		return spent;</span>
+	}
+
+	public Collection&lt;Account&gt; getAccounts() {
+<span class="nc" id="L112">		return accounts.values();</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.5.10.201208310627</span></div></body></html>

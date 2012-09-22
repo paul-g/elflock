@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>HistoryFileVisitor.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="right"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ispend</a> &gt; <a href="index.html" class="el_package">org.paulg.ispend.main</a> &gt; <span class="el_source">HistoryFileVisitor.java</span></div><h1>HistoryFileVisitor.java</h1><pre class="source lang-java linenums">package org.paulg.ispend.main;
+
+import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
+
+import org.paulg.ispend.model.*;
+
+public final class HistoryFileVisitor extends SimpleFileVisitor&lt;Path&gt; {
+
+	private final RecordStore recordStore;
+	private RecordParser recordParser;
+
+<span class="nc" id="L15">	public HistoryFileVisitor() {</span>
+<span class="nc" id="L16">		recordStore = new RecordStore();</span>
+<span class="nc" id="L17">	}</span>
+
+	public RecordStore getRecordStore() {
+<span class="nc" id="L20">		return recordStore;</span>
+	}
+
+	@Override
+	public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
+
+<span class="nc bnc" id="L26" title="All 2 branches missed.">		if (!file.toString().endsWith(&quot;csv&quot;)) {</span>
+<span class="nc" id="L27">			return FileVisitResult.CONTINUE;</span>
+		}
+
+<span class="nc" id="L30">		final BufferedReader br = Files.newBufferedReader(file, Charset.defaultCharset());</span>
+
+<span class="nc" id="L32">		String line = null;</span>
+<span class="nc bnc" id="L33" title="All 2 branches missed.">		while ((line = br.readLine()) != null) {</span>
+<span class="nc" id="L34">			line = line.trim();</span>
+<span class="nc bnc" id="L35" title="All 2 branches missed.">			if (line.startsWith(&quot;Date&quot;)) {</span>
+				// TODO parse header and check record type - assume nat west for now
+<span class="nc" id="L37">				recordParser = new NatWestRecordParser();</span>
+<span class="nc bnc" id="L38" title="All 2 branches missed.">			} else if (!line.isEmpty()) {</span>
+<span class="nc" id="L39">				recordStore.addRecord(recordParser.parseRecord(line));</span>
+			}
+		}
+
+<span class="nc" id="L43">		return FileVisitResult.CONTINUE;</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.5.10.201208310627</span></div></body></html>

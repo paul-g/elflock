@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>PreferencesStore.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="right"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ispend</a> &gt; <a href="index.html" class="el_package">org.paulg.ispend.model</a> &gt; <span class="el_source">PreferencesStore.java</span></div><h1>PreferencesStore.java</h1><pre class="source lang-java linenums">package org.paulg.ispend.model;
+
+import java.util.prefs.Preferences;
+
+public class PreferencesStore {
+
+	public static final String NO_FILE = &quot;NoFile&quot;;
+	private static final String LOADED_FILE = &quot;LoadedFile&quot;;
+	private static final String SAVED_QUERY = &quot;SavedQuery&quot;;
+
+	private final Preferences prefs;
+
+<span class="fc" id="L13">	public PreferencesStore() {</span>
+<span class="fc" id="L14">		prefs = Preferences.userRoot().node(Preferences.class.getName());</span>
+<span class="fc" id="L15">	}</span>
+
+	public void saveQuery(final String query) {
+<span class="fc" id="L18">		prefs.put(SAVED_QUERY, query);</span>
+<span class="fc" id="L19">	}</span>
+
+	public void saveLoadedFile(final String absolutePath) {
+<span class="fc" id="L22">		prefs.put(LOADED_FILE, absolutePath);</span>
+<span class="fc" id="L23">	}</span>
+
+	public boolean hasLoadedFile() {
+<span class="fc" id="L26">		String file = prefs.get(LOADED_FILE, null);</span>
+<span class="fc bfc" id="L27" title="All 2 branches covered.">		return file != null;</span>
+	}
+
+	public String getLoadedFile() {
+<span class="fc" id="L31">		return prefs.get(LOADED_FILE, null);</span>
+	}
+
+	public boolean hasQuery() {
+<span class="fc" id="L35">		String query = prefs.get(SAVED_QUERY, null);</span>
+<span class="fc bfc" id="L36" title="All 2 branches covered.">		return query != null;</span>
+	}
+
+	public String getQuery() {
+<span class="fc" id="L40">		return prefs.get(SAVED_QUERY, null);</span>
+	}
+
+	public void clearAll() {
+<span class="fc" id="L44">		prefs.remove(SAVED_QUERY);</span>
+<span class="fc" id="L45">		prefs.remove(LOADED_FILE);</span>
+<span class="fc" id="L46">	}</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.5.10.201208310627</span></div></body></html>

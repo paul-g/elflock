@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>ISpendPane.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="right"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ispend</a> &gt; <a href="index.html" class="el_package">org.paulg.ispend.view</a> &gt; <span class="el_source">ISpendPane.java</span></div><h1>ISpendPane.java</h1><pre class="source lang-java linenums">package org.paulg.ispend.view;
+
+import java.io.*;
+import java.nio.file.*;
+import java.util.List;
+
+import javafx.collections.*;
+import javafx.event.*;
+import javafx.geometry.*;
+import javafx.scene.*;
+import javafx.scene.chart.*;
+import javafx.scene.chart.PieChart.Data;
+import javafx.scene.control.*;
+import javafx.scene.input.*;
+import javafx.scene.layout.*;
+import javafx.scene.text.Font;
+import javafx.stage.*;
+import javafx.util.Callback;
+
+import org.paulg.ispend.controller.OpenHistoryHandler;
+import org.paulg.ispend.main.HistoryFileVisitor;
+import org.paulg.ispend.model.*;
+
+public class ISpendPane {
+
+<span class="nc" id="L26">	private final ObservableList&lt;Record&gt; data = FXCollections.observableArrayList();</span>
+<span class="nc" id="L27">	private final ObservableList&lt;AggregatedRecord&gt; groupData = FXCollections.observableArrayList();</span>
+<span class="nc" id="L28">	private final ObservableList&lt;PieChart.Data&gt; pieChartPosData = FXCollections.observableArrayList();</span>
+<span class="nc" id="L29">	private final ObservableList&lt;PieChart.Data&gt; pieChartNegData = FXCollections.observableArrayList();</span>
+<span class="nc" id="L30">	private final ObservableList&lt;Account&gt; accountsData = FXCollections.observableArrayList();</span>
+	private RecordStore recordStore;
+
+	private TextField groupBy;
+	private TextField search;
+	private Integer totalSpent;
+	private Integer totalIncome;
+	private final Stage stage;
+	private GridPane gridPane;
+
+	private final PreferencesStore preferencesStore;
+
+<span class="nc" id="L42">	public ISpendPane(final Stage stage, final PreferencesStore preferencesStore) {</span>
+<span class="nc" id="L43">		this.stage = stage;</span>
+<span class="nc" id="L44">		this.preferencesStore = preferencesStore;</span>
+<span class="nc" id="L45">		stage.setTitle(&quot;ISpend&quot;);</span>
+
+<span class="nc" id="L47">		BorderPane pane = new BorderPane();</span>
+<span class="nc" id="L48">		pane.setCenter(makeAppContent());</span>
+
+<span class="nc" id="L50">		MenuBar menuBar = new MenuBar();</span>
+<span class="nc" id="L51">		Menu menu = new Menu(&quot;File&quot;);</span>
+<span class="nc" id="L52">		MenuItem item = new MenuItem(&quot;Open&quot;);</span>
+<span class="nc" id="L53">		item.setOnAction(new OpenHistoryHandler(this));</span>
+<span class="nc" id="L54">		menu.getItems().addAll(item);</span>
+<span class="nc" id="L55">		menuBar.getMenus().addAll(menu);</span>
+
+<span class="nc" id="L57">		pane.setTop(menuBar);</span>
+
+<span class="nc" id="L59">		final Scene scene = new Scene(pane);</span>
+
+<span class="nc" id="L61">		stage.setScene(scene);</span>
+<span class="nc" id="L62">		stage.centerOnScreen();</span>
+<span class="nc" id="L63">		stage.setResizable(true);</span>
+<span class="nc" id="L64">		stage.show();</span>
+<span class="nc" id="L65">	}</span>
+
+	private Pane makeAppContent() {
+<span class="nc" id="L68">		gridPane = new GridPane();</span>
+<span class="nc" id="L69">		gridPane.setHgap(10);</span>
+<span class="nc" id="L70">		gridPane.setVgap(10);</span>
+<span class="nc" id="L71">		gridPane.setPadding(new Insets(10, 10, 10, 10));</span>
+<span class="nc" id="L72">		gridPane.setGridLinesVisible(false);</span>
+
+<span class="nc" id="L74">		gridPane.add(accountSummary(), 0, 0, 3, 1);</span>
+<span class="nc" id="L75">		gridPane.add(makeSearchPanel(), 0, 1);</span>
+<span class="nc" id="L76">		gridPane.add(makeGroupByPanel(), 1, 1);</span>
+
+<span class="nc" id="L78">		Node posChart = pieChart(&quot;Income&quot;, pieChartPosData, 1, 3);</span>
+<span class="nc" id="L79">		Node negChart = pieChart(&quot;Expenses&quot;, pieChartNegData, 2, 3);</span>
+
+<span class="nc" id="L81">		final TableView&lt;Record&gt; recordView = makeTable(data, Record.class, 0, 2, 1, 2);</span>
+<span class="nc" id="L82">		final TableView&lt;AggregatedRecord&gt; aggregatedRecordView = makeTable(groupData, AggregatedRecord.class, 1, 2, 2,</span>
+				1);
+
+<span class="nc" id="L85">		setColumnConstraints(gridPane, 50, 25, 25);</span>
+<span class="nc" id="L86">		gridPane.getChildren().addAll(posChart, negChart, recordView, aggregatedRecordView);</span>
+		// gridPane.setGridLinesVisible(true);
+<span class="nc" id="L88">		return gridPane;</span>
+	}
+
+	private void setColumnConstraints(final GridPane gridPane, final Integer... widths) {
+<span class="nc bnc" id="L92" title="All 2 branches missed.">		for (int i : widths) {</span>
+<span class="nc" id="L93">			ColumnConstraints col = new ColumnConstraints();</span>
+<span class="nc" id="L94">			col.setPercentWidth(i);</span>
+<span class="nc" id="L95">			gridPane.getColumnConstraints().add(col);</span>
+		}
+<span class="nc" id="L97">	}</span>
+
+	private Node pieChart(final String title, final ObservableList&lt;PieChart.Data&gt; data, final int row, final int col) {
+<span class="nc" id="L100">		final PieChart chart = new PieChart(data);</span>
+<span class="nc" id="L101">		GridPane.setConstraints(chart, row, col, 1, 1, HPos.CENTER, VPos.CENTER, Priority.ALWAYS, Priority.ALWAYS);</span>
+<span class="nc" id="L102">		chart.setTitle(title);</span>
+<span class="nc" id="L103">		return chart;</span>
+	}
+
+	private ObservableList&lt;Data&gt; toNegativePieChartData() {
+<span class="nc bnc" id="L107" title="All 2 branches missed.">		double total = (totalSpent == null ? 7500 : totalSpent);</span>
+<span class="nc" id="L108">		double leftTotal = total;</span>
+<span class="nc" id="L109">		pieChartNegData.clear();</span>
+<span class="nc bnc" id="L110" title="All 2 branches missed.">		for (AggregatedRecord record : groupData) {</span>
+<span class="nc" id="L111">			pieChartNegData.add(new PieChart.Data(record.getDescription(),</span>
+					(Math.abs(record.getNegative()) / total) * 100));
+<span class="nc" id="L113">			leftTotal -= record.getNegative();</span>
+<span class="nc" id="L114">		}</span>
+<span class="nc" id="L115">		pieChartNegData.add(new PieChart.Data(&quot;Other&quot;, (leftTotal / total) * 100));</span>
+<span class="nc" id="L116">		return pieChartNegData;</span>
+	}
+
+	private ObservableList&lt;Data&gt; toPositivePieChartData() {
+<span class="nc bnc" id="L120" title="All 2 branches missed.">		double total = (totalIncome == null ? 7500 : totalIncome);</span>
+<span class="nc" id="L121">		double leftTotal = total;</span>
+<span class="nc" id="L122">		pieChartPosData.clear();</span>
+<span class="nc bnc" id="L123" title="All 2 branches missed.">		for (AggregatedRecord record : groupData) {</span>
+<span class="nc" id="L124">			pieChartPosData.add(new PieChart.Data(record.getDescription(), (record.getPositive() / total) * 100));</span>
+<span class="nc" id="L125">			leftTotal -= record.getPositive();</span>
+<span class="nc" id="L126">		}</span>
+<span class="nc" id="L127">		pieChartPosData.add(new PieChart.Data(&quot;Other&quot;, (leftTotal / total) * 100));</span>
+<span class="nc" id="L128">		return pieChartPosData;</span>
+	}
+
+	private Node makeGroupByPanel() {
+<span class="nc" id="L132">		groupBy = new TextField();</span>
+<span class="nc" id="L133">		groupBy.setPromptText(&quot;Group by&quot;);</span>
+<span class="nc" id="L134">		groupBy.setDisable(true);</span>
+<span class="nc" id="L135">		groupBy.setOnKeyReleased(new EventHandler&lt;KeyEvent&gt;() {</span>
+			@Override
+			public void handle(final KeyEvent t) {
+<span class="nc bnc" id="L138" title="All 2 branches missed.">				if (t.getCode() == KeyCode.ENTER) {</span>
+<span class="nc" id="L139">					setQuery(groupBy.getText());</span>
+<span class="nc bnc" id="L140" title="All 2 branches missed.">				} else if (t.getCode() == KeyCode.ESCAPE) {</span>
+<span class="nc" id="L141">					clearQuery();</span>
+				}
+<span class="nc" id="L143">			}</span>
+
+		});
+<span class="nc" id="L146">		Button save = new Button();</span>
+<span class="nc" id="L147">		save.setText(&quot;Save&quot;);</span>
+<span class="nc" id="L148">		save.setOnAction(new EventHandler&lt;ActionEvent&gt;() {</span>
+			@Override
+			public void handle(final ActionEvent arg0) {
+<span class="nc" id="L151">				preferencesStore.saveQuery(groupBy.getText());</span>
+<span class="nc" id="L152">			}</span>
+		});
+<span class="nc" id="L154">		final HBox box = new HBox();</span>
+<span class="nc" id="L155">		box.getChildren().addAll(groupBy, save);</span>
+<span class="nc" id="L156">		box.setAlignment(Pos.CENTER);</span>
+<span class="nc" id="L157">		HBox.setHgrow(groupBy, Priority.ALWAYS);</span>
+<span class="nc" id="L158">		return box;</span>
+	}
+
+	private &lt;T&gt; TableView&lt;T&gt; makeTable(final ObservableList&lt;T&gt; data, final Class&lt;T&gt; clazz, final int row,
+			final int col, final int hSpan, final int vSpan) {
+<span class="nc" id="L163">		final TableView&lt;T&gt; table = new CompleteTableView&lt;T&gt;(clazz);</span>
+<span class="nc" id="L164">		table.setEditable(true);</span>
+<span class="nc" id="L165">		table.setItems(data);</span>
+<span class="nc" id="L166">		GridPane.setConstraints(table, row, col, hSpan, vSpan, HPos.CENTER, VPos.CENTER, Priority.ALWAYS,</span>
+				Priority.ALWAYS);
+<span class="nc" id="L168">		return table;</span>
+	}
+
+	private Node makeSearchPanel() {
+<span class="nc" id="L172">		search = new TextField();</span>
+<span class="nc" id="L173">		search.setPromptText(&quot;Search&quot;);</span>
+<span class="nc" id="L174">		search.setDisable(true);</span>
+<span class="nc" id="L175">		search.setPrefWidth(400);</span>
+<span class="nc" id="L176">		search.setOnKeyReleased(new EventHandler&lt;KeyEvent&gt;() {</span>
+
+			@Override
+			public void handle(final KeyEvent t) {
+<span class="nc bnc" id="L180" title="All 2 branches missed.">				if (t.getCode() == KeyCode.ENTER) {</span>
+<span class="nc" id="L181">					filterData(search.getText());</span>
+<span class="nc bnc" id="L182" title="All 2 branches missed.">				} else if (t.getCode() == KeyCode.ESCAPE) {</span>
+<span class="nc" id="L183">					search.clear();</span>
+<span class="nc" id="L184">					filterData(search.getText());</span>
+				}
+<span class="nc" id="L186">			}</span>
+
+			private void filterData(final String searchText) {
+<span class="nc" id="L189">				final List&lt;Record&gt; filtered = recordStore.filter(searchText);</span>
+<span class="nc" id="L190">				data.clear();</span>
+<span class="nc" id="L191">				data.addAll(filtered);</span>
+<span class="nc" id="L192">			}</span>
+
+		});
+
+<span class="nc" id="L196">		final HBox box = new HBox();</span>
+<span class="nc" id="L197">		box.getChildren().addAll(search);</span>
+<span class="nc" id="L198">		return box;</span>
+	}
+
+	private Node accountSummary() {
+<span class="nc" id="L202">		final Label label = new Label(&quot;Accounts&quot;);</span>
+<span class="nc" id="L203">		label.setFont(new Font(&quot;Arial&quot;, 20));</span>
+
+<span class="nc" id="L205">		ListView&lt;Account&gt; accounts = new ListView&lt;Account&gt;(accountsData);</span>
+
+<span class="nc" id="L207">		accounts.setCellFactory(new Callback&lt;ListView&lt;Account&gt;, ListCell&lt;Account&gt;&gt;() {</span>
+			@Override
+			public ListCell&lt;Account&gt; call(final ListView&lt;Account&gt; arg0) {
+<span class="nc" id="L210">				return new AccountCell();</span>
+			}
+		});
+
+<span class="nc" id="L214">		accounts.setPrefHeight(50);</span>
+
+<span class="nc" id="L216">		HBox box = new HBox();</span>
+<span class="nc" id="L217">		box.setAlignment(Pos.CENTER);</span>
+<span class="nc" id="L218">		box.getChildren().addAll(label, accounts);</span>
+<span class="nc" id="L219">		box.setPadding(new Insets(10, 10, 10, 10));</span>
+<span class="nc" id="L220">		box.setSpacing(10);</span>
+<span class="nc" id="L221">		HBox.setHgrow(accounts, Priority.ALWAYS);</span>
+
+<span class="nc" id="L223">		return box;</span>
+	}
+
+	public void fileSelected(final String path) throws IOException {
+<span class="nc" id="L227">		final HistoryFileVisitor fileVisitor = new HistoryFileVisitor();</span>
+<span class="nc" id="L228">		recordStore = fileVisitor.getRecordStore();</span>
+
+<span class="nc" id="L230">		Files.walkFileTree(Paths.get(path), fileVisitor);</span>
+<span class="nc" id="L231">		groupBy.setDisable(false);</span>
+<span class="nc" id="L232">		search.setDisable(false);</span>
+<span class="nc" id="L233">		totalSpent = (int) recordStore.getTotalSpent();</span>
+<span class="nc" id="L234">		totalIncome = (int) recordStore.getTotalIncome();</span>
+<span class="nc" id="L235">		data.clear();</span>
+<span class="nc" id="L236">		data.addAll(recordStore.getAllRecords());</span>
+<span class="nc" id="L237">		accountsData.clear();</span>
+<span class="nc" id="L238">		accountsData.addAll(recordStore.getAccounts());</span>
+<span class="nc" id="L239">		recordStore.printSummary();</span>
+<span class="nc" id="L240">	}</span>
+
+	public File showDialog() {
+<span class="nc" id="L243">		final DirectoryChooser chooser = new DirectoryChooser();</span>
+<span class="nc" id="L244">		File f = chooser.showDialog(stage);</span>
+
+<span class="nc bnc" id="L246" title="All 2 branches missed.">		if (f != null) {</span>
+<span class="nc" id="L247">			preferencesStore.saveLoadedFile(f.getAbsolutePath());</span>
+		}
+
+<span class="nc" id="L250">		return f;</span>
+	}
+
+	public void show() {
+<span class="nc bnc" id="L254" title="All 2 branches missed.">		if (preferencesStore.hasLoadedFile()) {</span>
+			try {
+<span class="nc" id="L256">				fileSelected(preferencesStore.getLoadedFile());</span>
+<span class="nc" id="L257">			} catch (IOException e) {</span>
+				// TODO Auto-generated catch block
+<span class="nc" id="L259">				e.printStackTrace();</span>
+<span class="nc" id="L260">			}</span>
+		}
+<span class="nc bnc" id="L262" title="All 2 branches missed.">		if (preferencesStore.hasQuery()) {</span>
+<span class="nc" id="L263">			String query = preferencesStore.getQuery();</span>
+<span class="nc" id="L264">			setQuery(query);</span>
+<span class="nc" id="L265">			groupBy.setText(query);</span>
+		}
+<span class="nc" id="L267">		stage.show();</span>
+<span class="nc" id="L268">	}</span>
+
+	private void clearQuery() {
+<span class="nc" id="L271">		groupData.clear();</span>
+<span class="nc" id="L272">	}</span>
+
+	private void setQuery(final String query) {
+<span class="nc" id="L275">		clearQuery();</span>
+<span class="nc" id="L276">		groupData.addAll(recordStore.groupByDescription(query));</span>
+<span class="nc" id="L277">		accountsData.clear();</span>
+<span class="nc" id="L278">		accountsData.addAll(recordStore.getAccounts());</span>
+<span class="nc" id="L279">		toPositivePieChartData();</span>
+<span class="nc" id="L280">		toNegativePieChartData();</span>
+<span class="nc" id="L281">	}</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.5.10.201208310627</span></div></body></html>

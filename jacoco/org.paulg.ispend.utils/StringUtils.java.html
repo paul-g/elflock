@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>StringUtils.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="right"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ispend</a> &gt; <a href="index.html" class="el_package">org.paulg.ispend.utils</a> &gt; <span class="el_source">StringUtils.java</span></div><h1>StringUtils.java</h1><pre class="source lang-java linenums">package org.paulg.ispend.utils;
+
+import java.util.Locale;
+
+public final class StringUtils {
+
+<span class="nc" id="L7">	private StringUtils() {</span>
+<span class="nc" id="L8">	}</span>
+
+	public static boolean containsIgnoreCase(final String text, final String pattern) {
+<span class="fc" id="L11">		return text.toLowerCase(Locale.getDefault()).contains(pattern.toLowerCase(Locale.getDefault()));</span>
+	}
+
+	public static String trimCharacters(final String text, final String characters) {
+<span class="fc" id="L15">		int spos = 0;</span>
+<span class="fc bfc" id="L16" title="All 4 branches covered.">		while ((spos &lt; text.length()) &amp;&amp; (characters.indexOf(text.charAt(spos)) &gt;= 0)) {</span>
+<span class="fc" id="L17">			spos++;</span>
+		}
+<span class="fc" id="L19">		int fpos = text.length() - 1;</span>
+<span class="fc bfc" id="L20" title="All 4 branches covered.">		while ((fpos &gt;= 0) &amp;&amp; (characters.indexOf(text.charAt(fpos)) &gt;= 0)) {</span>
+<span class="fc" id="L21">			fpos--;</span>
+		}
+<span class="fc bfc" id="L23" title="All 2 branches covered.">		if (spos &lt;= fpos) {</span>
+<span class="fc" id="L24">			return text.substring(spos, fpos + 1);</span>
+		}
+<span class="fc" id="L26">		return new String(&quot;&quot;);</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.5.10.201208310627</span></div></body></html>

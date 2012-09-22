@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>Account.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="right"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ispend</a> &gt; <a href="index.html" class="el_package">org.paulg.ispend.model</a> &gt; <span class="el_source">Account.java</span></div><h1>Account.java</h1><pre class="source lang-java linenums">package org.paulg.ispend.model;
+
+import java.util.*;
+
+public class Account {
+
+	private String number;
+	private String name;
+<span class="fc" id="L9">	private final List&lt;Record&gt; records = new ArrayList&lt;Record&gt;();</span>
+<span class="fc" id="L10">	private int covered = 0;</span>
+
+<span class="fc" id="L12">	public Account(final String number, final String name) {</span>
+<span class="fc" id="L13">		this.number = number;</span>
+<span class="fc" id="L14">		this.name = name;</span>
+<span class="fc" id="L15">	}</span>
+
+	public String getNumber() {
+<span class="nc" id="L18">		return number;</span>
+	}
+
+	public void setNumber(final String number) {
+<span class="nc" id="L22">		this.number = number;</span>
+<span class="nc" id="L23">	}</span>
+
+	public String getName() {
+<span class="nc" id="L26">		return name;</span>
+	}
+
+	public void setName(final String name) {
+<span class="nc" id="L30">		this.name = name;</span>
+<span class="nc" id="L31">	}</span>
+
+	public void setCovered(final int covered) {
+<span class="fc" id="L34">		this.covered = covered;</span>
+<span class="fc" id="L35">	}</span>
+
+	public int getCovered() {
+<span class="fc" id="L38">		return covered;</span>
+	}
+
+	public int getTotal() {
+<span class="nc" id="L42">		return records.size();</span>
+	}
+
+	@Override
+	public int hashCode() {
+<span class="nc" id="L47">		return number.hashCode();</span>
+	}
+
+	@Override
+	public boolean equals(final Object o) {
+<span class="nc bnc" id="L52" title="All 8 branches missed.">		if ((o == null) || !(o instanceof Account) || (number == null) || (name == null)) {</span>
+<span class="nc" id="L53">			return false;</span>
+		}
+<span class="nc" id="L55">		Account a = (Account) o;</span>
+<span class="nc bnc" id="L56" title="All 4 branches missed.">		return number.equals(a.getNumber()) &amp;&amp; name.equals(a.getName());</span>
+	}
+
+	public void printSummary() {
+<span class="nc" id="L60">		double maxNegative = Double.MAX_VALUE;</span>
+<span class="nc" id="L61">		Record maxNegativeRecord = null;</span>
+<span class="nc" id="L62">		double totalNegative = 0;</span>
+<span class="nc" id="L63">		double totalPositive = 0;</span>
+<span class="nc" id="L64">		int negatives = 0;</span>
+<span class="nc" id="L65">		int positives = 0;</span>
+<span class="nc bnc" id="L66" title="All 2 branches missed.">		for (final Record r : records) {</span>
+<span class="nc bnc" id="L67" title="All 2 branches missed.">			if (r.getValue() &lt; 0) {</span>
+<span class="nc" id="L68">				totalNegative += r.getValue();</span>
+<span class="nc" id="L69">				negatives++;</span>
+
+<span class="nc bnc" id="L71" title="All 2 branches missed.">				if (r.getValue() &lt; maxNegative) {</span>
+<span class="nc" id="L72">					maxNegative = r.getValue();</span>
+<span class="nc" id="L73">					maxNegativeRecord = r;</span>
+				}
+
+			} else {
+<span class="nc" id="L77">				totalPositive += r.getValue();</span>
+<span class="nc" id="L78">				positives++;</span>
+			}
+
+<span class="nc" id="L81">		}</span>
+
+<span class="nc" id="L83">		System.out.println(&quot;For account number &quot; + name + &quot; name : &quot; + name);</span>
+<span class="nc" id="L84">		System.out.println(&quot;\tTotal records: &quot; + records.size());</span>
+<span class="nc" id="L85">		System.out.println(&quot;\tTotal negative:&quot; + totalNegative + &quot; avg: &quot; + (totalNegative / negatives));</span>
+<span class="nc" id="L86">		System.out.println(&quot;\tTotal positive:&quot; + totalPositive + &quot; avg: &quot; + (totalPositive / positives));</span>
+<span class="nc" id="L87">		System.out.println(&quot;\tMaximum negative record: &quot; + maxNegativeRecord);</span>
+<span class="nc" id="L88">		System.out.println(&quot;\tFlow: &quot; + (totalPositive + totalNegative));</span>
+<span class="nc" id="L89">	}</span>
+
+	public void addRecord(final Record r) {
+<span class="fc" id="L92">		records.add(r);</span>
+<span class="fc" id="L93">	}</span>
+
+	public Collection&lt;Record&gt; getRecords() {
+<span class="fc" id="L96">		return records;</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.5.10.201208310627</span></div></body></html>

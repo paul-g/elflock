@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>CompleteTableView.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="right"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ispend</a> &gt; <a href="index.html" class="el_package">org.paulg.ispend.view</a> &gt; <span class="el_source">CompleteTableView.java</span></div><h1>CompleteTableView.java</h1><pre class="source lang-java linenums">package org.paulg.ispend.view;
+
+import java.lang.reflect.Field;
+import java.util.*;
+
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
+
+/**
+ * Table view that binds to all fields (public, private and protected) of a provided class.
+ **/
+public class CompleteTableView&lt;T&gt; extends TableView&lt;T&gt; {
+
+<span class="nc" id="L14">	public CompleteTableView(final Class&lt;T&gt; classToBind) {</span>
+<span class="nc" id="L15">		final List&lt;TableColumn&lt;T, String&gt;&gt; columns = makeColumns(classToBind);</span>
+<span class="nc" id="L16">		getColumns().addAll(columns);</span>
+<span class="nc" id="L17">	}</span>
+
+	/** Bind to all declared fields of the provided class. **/
+	private List&lt;TableColumn&lt;T, String&gt;&gt; makeColumns(final Class&lt;T&gt; clazz) {
+<span class="nc" id="L21">		final List&lt;TableColumn&lt;T, String&gt;&gt; columns = new ArrayList&lt;TableColumn&lt;T, String&gt;&gt;();</span>
+<span class="nc bnc" id="L22" title="All 2 branches missed.">		for (final Field f : clazz.getDeclaredFields()) {</span>
+<span class="nc" id="L23">			final TableColumn&lt;T, String&gt; column = new TableColumn&lt;T, String&gt;(f.getName());</span>
+<span class="nc" id="L24">			column.setCellValueFactory(new PropertyValueFactory&lt;T, String&gt;(f.getName()));</span>
+<span class="nc" id="L25">			columns.add(column);</span>
+		}
+<span class="nc" id="L27">		return columns;</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.5.10.201208310627</span></div></body></html>
