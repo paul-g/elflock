@@ -1,0 +1,26 @@
+-classpath
+'/home/paul/workspaces/ispend/target/classes:/home/paul/workspaces/ispend/target/test-classes:/home/paul/.m2/repository/org/hamcrest/hamcrest-core/1.1/hamcrest-core-1.1.jar:/usr/lib/jvm/jdk1.7.0_06/jre/../lib/ant-javafx.jar:/usr/lib/jvm/jdk1.7.0_06/jre/lib/jfxrt.jar:/home/paul/.m2/repository/junit/junit/4.10/junit-4.10.jar'
+-encoding
+'UTF-8'
+-protected
+-sourcepath
+'/home/paul/workspaces/ispend/src/test/java'
+-author
+-bottom
+'Copyright &#169; 2012. All Rights Reserved.'
+-charset
+'UTF-8'
+-d
+'/home/paul/workspaces/ispend/target/site/testapidocs'
+-docencoding
+'UTF-8'
+-doctitle
+'ispend 0.1-SNAPSHOT Test API'
+-link
+'../apidocs'
+-linkoffline
+'http://download.oracle.com/javase/6/docs/api' '/home/paul/workspaces/ispend/target/javadoc-bundle-options'
+-use
+-version
+-windowtitle
+'ispend 0.1-SNAPSHOT Test API'

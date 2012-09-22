@@ -1,0 +1,5 @@
+org.paulg.ispend.controller
+org.paulg.ispend.main
+org.paulg.ispend.model
+org.paulg.ispend.utils
+org.paulg.ispend.view
