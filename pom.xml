@@ -13,7 +13,6 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<jfx.main.class>org.paulg.ispend.main.ISpend</jfx.main.class>
 		<dist.dir>${project.build.directory}/dist</dist.dir>
-		<coverage.limit>80</coverage.limit>
 		<javafx.jar.path>${java.home}/lib/jfxrt.jar</javafx.jar.path>
 		<ant.javafx.jar>${java.home}/../lib/ant-javafx.jar</ant.javafx.jar>
 	</properties>
@@ -40,7 +39,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-site-plugin</artifactId>
-				<version>3.1</version>
 			</plugin>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
@@ -49,22 +47,20 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-checkstyle-plugin</artifactId>
-				<version>2.9.1</version>
 			</plugin>
+			
 			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>cobertura-maven-plugin</artifactId>
-				<version>2.5.1</version>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
 			</plugin>
+			
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-report-plugin</artifactId>
-				<version>2.12</version>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-pmd-plugin</artifactId>
-				<version>2.7.1</version>
 				<configuration>
 					<linkXref>true</linkXref>
 					<targetJdk>1.7</targetJdk>
@@ -78,7 +74,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.3.2</version>
 				<configuration>
 					<source>1.7</source>
 					<target>1.7</target>
@@ -89,29 +84,19 @@
 			</plugin>
 
 			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>cobertura-maven-plugin</artifactId>
-				<version>2.5.1</version>
-				<configuration>
-					<check>
-						<haltOnFailure>false</haltOnFailure>
-						<branchRate>${coverage.limit}</branchRate>
-						<lineRate>${coverage.limit}</lineRate>
-						<totalBranchRate>${coverage.limit}</totalBranchRate>
-						<totalLineRate>${coverage.limit}</totalLineRate>
-						<packageLineRate>${coverage.limit}</packageLineRate>
-						<packageBranchRate>${coverage.limit}</packageBranchRate>
-					</check>
-					<formats>
-						<format>xml</format>
-					</formats>
-				</configuration>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
 				<executions>
 					<execution>
-						<phase>package</phase>
 						<goals>
-							<goal>clean</goal>
-							<goal>check</goal>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>report</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>report</goal>
 						</goals>
 					</execution>
 				</executions>
