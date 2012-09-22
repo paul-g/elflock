@@ -6,10 +6,6 @@ import org.paulg.ispend.model.Account;
 
 public class AccountCell extends ListCell<Account> {
 
-	public AccountCell() {
-
-	}
-
 	@Override
 	protected void updateItem(final Account account, final boolean empty) {
 		super.updateItem(account, empty);

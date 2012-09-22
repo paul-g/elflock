@@ -8,11 +8,13 @@ public class AggregatedRecord {
 	private double positive;
 	private double negative;
 
+	// XXX dumb!
 	public AggregatedRecord(final Record r) {
 		super();
 		description = r.getDescription();
 		value = r.getValue();
 		count = 0;
+		addRecord(r);
 	}
 
 	public AggregatedRecord(final String description, final double value) {
@@ -71,4 +73,19 @@ public class AggregatedRecord {
 		this.negative = negative;
 	}
 
+	@Override
+	public boolean equals(final Object o) {
+		if ((o == null) || !(o instanceof AggregatedRecord)) {
+			return false;
+		}
+		AggregatedRecord ar = (AggregatedRecord) o;
+		return (description.equals(ar.getDescription()) && (count == ar.getCount())
+				&& (positive == ar.getPositive()) && (negative == ar.getNegative()) && (value == ar
+					.getValue()));
+	}
+
+	@Override
+	public int hashCode() {
+		return description.hashCode();
+	}
 }

@@ -1,4 +1,4 @@
-package org.paulg.ispend.view;
+package org.paulg.ispend.model;
 
 import java.util.prefs.Preferences;
 
@@ -38,6 +38,11 @@ public class PreferencesStore {
 
 	public String getQuery() {
 		return prefs.get(SAVED_QUERY, null);
+	}
+
+	public void clearAll() {
+		prefs.remove(SAVED_QUERY);
+		prefs.remove(LOADED_FILE);
 	}
 
 }

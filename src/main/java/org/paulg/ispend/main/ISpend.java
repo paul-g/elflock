@@ -5,6 +5,7 @@ import java.io.IOException;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
+import org.paulg.ispend.model.PreferencesStore;
 import org.paulg.ispend.view.*;
 
 public class ISpend extends Application {

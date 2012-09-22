@@ -6,22 +6,22 @@ import org.paulg.ispend.utils.StringUtils;
 
 public class RecordStore {
 
-	final Map<String, Account> accounts = new HashMap<String, Account>();
+	final Map<String, Account> accounts = new LinkedHashMap<String, Account>();
+
+	public void addRecord(final Record r) {
+		Account acc = accounts.get(r.getAccountNumber());
+		if (acc == null) {
+			acc = new Account(r.getAccountNumber(), r.getAccountName());
+			accounts.put(r.getAccountNumber(), acc);
+		}
+		acc.addRecord(r);
+	}
 
 	public List<Record> getRecordsByAccountNumber(final String number) {
 		if (accounts.get(number) != null) {
 			return new ArrayList<Record>(accounts.get(number).getRecords());
 		}
 		return new ArrayList<Record>();
-	}
-
-	public void addRecord(final Record r) {
-		Account acc;
-		if ((acc = accounts.get(r.getAccountNumber())) == null) {
-			acc = new Account(r.getAccountNumber(), r.getAccountName());
-			accounts.put(r.getAccountNumber(), acc);
-		}
-		acc.addRecord(r);
 	}
 
 	public void printSummary() {
@@ -54,18 +54,17 @@ public class RecordStore {
 	}
 
 	public List<AggregatedRecord> groupByDescription(final String query) {
-		return groupByDescription(parseArguments(query));
-	}
 
-	public List<AggregatedRecord> groupByDescription(final String... groupTags) {
+		String[] tags = parseArguments(query);
+
 		final List<AggregatedRecord> tagRecords = new ArrayList<AggregatedRecord>();
-		if ((groupTags != null) && (groupTags.length > 0)) {
+		if ((tags != null) && (tags.length > 0)) {
 
 			for (Account a : accounts.values()) {
 				a.setCovered(0);
 			}
 
-			for (String tag : groupTags) {
+			for (String tag : tags) {
 				tag = tag.trim();
 				final AggregatedRecord tagRecord = new AggregatedRecord(tag, 0);
 				for (Account a : accounts.values()) {
