@@ -7,7 +7,7 @@ public class NatWestRecordParser implements RecordParser {
 	@Override
 	public Record parseRecord(final String line) {
 		final String[] oldFields = line.split(",");
-		final String[] recordFields = new String[7];
+		final String[] recordFields = new String[20];
 		int fieldCount = 0;
 		for (int i = 0; i < oldFields.length; i++) {
 			String field = "";
