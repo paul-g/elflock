@@ -77,16 +77,27 @@ public class ISpendPane {
         gridPane.add(makeSearchPanel(), 0, 1);
         gridPane.add(makeGroupByPanel(), 1, 1);
 
+        HBox box = new HBox();
         Node posChart = pieChart("Income", pieChartPosData, 1, 3);
         Node negChart = pieChart("Expenses", pieChartNegData, 2, 3);
+        box.getChildren().addAll(posChart, negChart);
 
         final TableView<Record> recordView = makeTable(data, Record.class, 0, 2, 1, 2);
-        final TableView<AggregatedRecord> aggregatedRecordView = makeTable(groupData, AggregatedRecord.class, 1, 2, 2,
-                                                                           1);
+        final TableView<AggregatedRecord> aggregatedRecordView = makeTable(groupData,
+                                                                           AggregatedRecord.class,
+                                                                           1, 2, 2, 1);
 
+        TabPane tabPane = new TabPane();
+        Tab tab = new Tab();
+        tab.setText("Total");
+        tab.setContent(box);
+        tabPane.getTabs().add(tab);
+
+        GridPane.setConstraints(tabPane, 1, 3, 2, 1,
+                                HPos.CENTER, VPos.CENTER, Priority.ALWAYS, Priority.ALWAYS);
         setColumnConstraints(gridPane, 50, 25, 25);
-        gridPane.getChildren().addAll(posChart, negChart, recordView, aggregatedRecordView);
-        // gridPane.setGridLinesVisible(true);
+        gridPane.getChildren().addAll(tabPane, recordView, aggregatedRecordView);
+        gridPane.setGridLinesVisible(false);
         return gridPane;
     }
 
@@ -136,7 +147,7 @@ public class ISpendPane {
         groupBy.setDisable(true);
         groupBy.setOnKeyReleased(new EventHandler<KeyEvent>() {
                 @Override
-                    public void handle(final KeyEvent t) {
+                public void handle(final KeyEvent t) {
                     if (t.getCode() == KeyCode.ENTER) {
                         setQuery(groupBy.getText());
                     } else if (t.getCode() == KeyCode.ESCAPE) {
@@ -149,7 +160,7 @@ public class ISpendPane {
         save.setText("Save");
         save.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
-                    public void handle(final ActionEvent arg0) {
+                public void handle(final ActionEvent arg0) {
                     preferencesStore.saveQuery(groupBy.getText());
                 }
             });
@@ -178,7 +189,7 @@ public class ISpendPane {
         search.setOnKeyReleased(new EventHandler<KeyEvent>() {
 
                 @Override
-                    public void handle(final KeyEvent t) {
+                public void handle(final KeyEvent t) {
                     if (t.getCode() == KeyCode.ENTER) {
                         filterData(search.getText());
                     } else if (t.getCode() == KeyCode.ESCAPE) {
@@ -208,7 +219,7 @@ public class ISpendPane {
 
         accounts.setCellFactory(new Callback<ListView<Account>, ListCell<Account>>() {
                 @Override
-                    public ListCell<Account> call(final ListView<Account> arg0) {
+                public ListCell<Account> call(final ListView<Account> arg0) {
                     return new AccountCell();
                 }
             });
@@ -283,4 +294,3 @@ public class ISpendPane {
     }
 
 }
-
