@@ -13,7 +13,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<jfx.main.class>org.paulg.ispend.main.ISpend</jfx.main.class>
 		<dist.dir>${project.build.directory}/dist</dist.dir>
-		<javafx.jar.path>${java.home}/lib/jfxrt.jar</javafx.jar.path>
+		<javafx.jar.path>${java.home}/../lib/javafx-mx.jar</javafx.jar.path>
 		<ant.javafx.jar>${java.home}/../lib/ant-javafx.jar</ant.javafx.jar>
 	</properties>
 
@@ -61,11 +61,6 @@
 			</plugin>
 
 			<plugin>
-				<groupId>org.jacoco</groupId>
-				<artifactId>jacoco-maven-plugin</artifactId>
-			</plugin>
-
-			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-report-plugin</artifactId>
 			</plugin>
@@ -94,8 +89,8 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
+					<source>1.8</source>
+					<target>1.8</target>
 					<verbose>true</verbose>
 					<fork>true</fork>
 					<executable>${java.compiler}</executable>
@@ -115,31 +110,6 @@
 							<goal>site</goal>
 						</goals>
 						<phase>site</phase>
-					</execution>
-				</executions>
-			</plugin>
-
-			<!-- <plugin> <groupId>com.github.github</groupId> <artifactId>site-maven-plugin</artifactId> 
-				<executions> <execution> <goals> <goal>site</goal> </goals> <phase>site-deploy</phase> 
-				<configuration> <path>${project.version}</path> <merge>true</merge> </configuration> 
-				</execution> </executions> </plugin> -->
-
-
-			<plugin>
-				<groupId>org.jacoco</groupId>
-				<artifactId>jacoco-maven-plugin</artifactId>
-				<executions>
-					<execution>
-						<goals>
-							<goal>prepare-agent</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>report</id>
-						<phase>prepare-package</phase>
-						<goals>
-							<goal>report</goal>
-						</goals>
 					</execution>
 				</executions>
 			</plugin>
