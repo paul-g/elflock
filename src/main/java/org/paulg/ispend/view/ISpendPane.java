@@ -77,21 +77,14 @@ public class ISpendPane {
         gridPane.add(makeSearchPanel(), 0, 1);
         gridPane.add(makeGroupByPanel(), 1, 1);
 
-        HBox box = new HBox();
-        Node posChart = pieChart("Income", pieChartPosData, 1, 3);
-        Node negChart = pieChart("Expenses", pieChartNegData, 2, 3);
-        box.getChildren().addAll(posChart, negChart);
+
 
         final TableView<Record> recordView = makeTable(data, Record.class, 0, 2, 1, 2);
         final TableView<AggregatedRecord> aggregatedRecordView = makeTable(groupData,
                                                                            AggregatedRecord.class,
                                                                            1, 2, 2, 1);
 
-        TabPane tabPane = new TabPane();
-        Tab tab = new Tab();
-        tab.setText("Total");
-        tab.setContent(box);
-        tabPane.getTabs().add(tab);
+        TabPane tabPane = new Visualizer(pieChartNegData, pieChartPosData);
 
         GridPane.setConstraints(tabPane, 1, 3, 2, 1,
                                 HPos.CENTER, VPos.CENTER, Priority.ALWAYS, Priority.ALWAYS);
@@ -101,19 +94,14 @@ public class ISpendPane {
         return gridPane;
     }
 
+
+
     private void setColumnConstraints(final GridPane gridPane, final Integer... widths) {
         for (int i : widths) {
             ColumnConstraints col = new ColumnConstraints();
             col.setPercentWidth(i);
             gridPane.getColumnConstraints().add(col);
         }
-    }
-
-    private Node pieChart(final String title, final ObservableList<PieChart.Data> data, final int row, final int col) {
-        final PieChart chart = new PieChart(data);
-        GridPane.setConstraints(chart, row, col, 1, 1, HPos.CENTER, VPos.CENTER, Priority.ALWAYS, Priority.ALWAYS);
-        chart.setTitle(title);
-        return chart;
     }
 
     private ObservableList<Data> toNegativePieChartData() {

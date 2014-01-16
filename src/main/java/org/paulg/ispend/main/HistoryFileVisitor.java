@@ -1,11 +1,17 @@
 package org.paulg.ispend.main;
 
-import java.io.*;
-import java.nio.charset.Charset;
-import java.nio.file.*;
-import java.nio.file.attribute.BasicFileAttributes;
+import org.paulg.ispend.model.NatWestRecordParser;
+import org.paulg.ispend.model.RecordParser;
+import org.paulg.ispend.model.RecordStore;
 
-import org.paulg.ispend.model.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 
 public final class HistoryFileVisitor extends SimpleFileVisitor<Path> {
 

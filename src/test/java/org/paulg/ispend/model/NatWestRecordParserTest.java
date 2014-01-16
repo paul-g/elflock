@@ -17,3 +17,4 @@ public class NatWestRecordParserTest {
 		assertEquals("Constructed record matches parsed record", expected, r);
 	}
 }
+
