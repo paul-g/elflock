@@ -2,6 +2,7 @@ package org.paulg.ispend.model;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 public class Record {
@@ -19,11 +20,15 @@ public class Record {
 		// XXX should probably use a builder
 	}
 
-	public Record(final String date, final String type, final String description, final String balance,
-			final String accountName, final String accountNumber, final double value) throws ParseException {
+	public Record(final String date,
+                  final String type,
+                  final String description,
+                  final String balance,
+                  final String accountName,
+                  final String accountNumber,
+                  final double value) {
 		super();
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-        this.date = sdf.parse(date);
+        this.date = formatDate(date);
 		this.type = type;
 		this.description = description;
 		this.balance = balance;
@@ -32,7 +37,18 @@ public class Record {
 		this.value = value;
 	}
 
-	String getType() {
+    private Date formatDate(String date)  {
+        Date res = new Date(0);
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+            res = sdf.parse(date);
+        } catch (ParseException pe) {
+            pe.printStackTrace();
+        }
+        return res;
+    }
+
+    String getType() {
 		return type;
 	}
 
@@ -83,6 +99,10 @@ public class Record {
 	Date getDate() {
 		return date;
 	}
+
+    public void setDate(final String date)  {
+        this.date = formatDate(date);
+    }
 
 	public void setDate(final Date date) {
 		this.date = date;

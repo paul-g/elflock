@@ -18,11 +18,11 @@ public class RecordStoreTest {
 	@Before
 	public void setUp() {
 		store = new RecordStore();
-		r1 = new Record("date", "type", "transaction 1", "0", "account", ACC1, 3.75);
+		r1 = new Record("01/02/2013", "type", "transaction 1", "0", "account", ACC1, 3.75);
 		store.addRecord(r1);
-		r2 = new Record("date", "type", "transaction 2", "0", "account", ACC1, 5.11);
+		r2 = new Record("01/02/2013", "type", "transaction 2", "0", "account", ACC1, 5.11);
 		store.addRecord(r2);
-		r = new Record("date", "type", "trans 2", "0", "account", ACC2, -2.11);
+		r = new Record("01/02/2013", "type", "trans 2", "0", "account", ACC2, -2.11);
 		store.addRecord(r);
 		ar1 = new AggregatedRecord("transaction", 0);
 		ar1.addRecord(r1);
