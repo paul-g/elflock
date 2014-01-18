@@ -48,7 +48,7 @@ public class Record {
         return res;
     }
 
-    String getType() {
+    public String getType() {
 		return type;
 	}
 
@@ -64,7 +64,7 @@ public class Record {
 		this.description = description;
 	}
 
-	String getBalance() {
+	public String getBalance() {
 		return balance;
 	}
 
@@ -96,7 +96,7 @@ public class Record {
 		this.value = value;
 	}
 
-	Date getDate() {
+	public Date getDate() {
 		return date;
 	}
 
