@@ -1,5 +1,8 @@
 package org.paulg.ispend.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class AggregatedRecord {
 
 	private String description;
@@ -7,6 +10,7 @@ public class AggregatedRecord {
 	private int count;
 	private double positive;
 	private double negative;
+    private List<Record> records = new ArrayList<>();
 
 	// XXX dumb!
 	public AggregatedRecord(final Record r) {
@@ -47,6 +51,7 @@ public class AggregatedRecord {
 		} else {
 			positive += r.getValue();
 		}
+        records.add(r);
 	}
 
 	int getCount() {
@@ -88,4 +93,8 @@ public class AggregatedRecord {
 	public int hashCode() {
 		return description.hashCode();
 	}
+
+    public List<Record> getRecords() {
+        return records;
+    }
 }

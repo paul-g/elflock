@@ -257,12 +257,13 @@ public class ISpendPane {
 
     private void setQuery(final String query) {
         clearQuery();
-        groupData.addAll(recordStore.groupByDescription(query));
+        List<AggregatedRecord> byDescription = recordStore.groupByDescription(query);
+        groupData.addAll(byDescription);
         accountsData.clear();
         accountsData.addAll(recordStore.getAccounts());
         toPositivePieChartData();
         toNegativePieChartData();
-        visualizer.plotHistoricalData(null);
+        visualizer.plotHistoricalData(byDescription);
     }
 
 }

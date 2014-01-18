@@ -5,7 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-public class Record {
+public class Record implements Comparable<Record> {
 
 	private Date date;
 	private String type;
@@ -138,4 +138,10 @@ public class Record {
 	public boolean isCovered() {
 		return covered;
 	}
+
+    @Override
+    public int compareTo(Record o) {
+        if (o == null) return -1;
+        return date.compareTo(o.getDate());
+    }
 }

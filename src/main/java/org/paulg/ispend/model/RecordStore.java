@@ -54,10 +54,11 @@ public class RecordStore {
 	}
 
 	public List<AggregatedRecord> groupByDescription(final String query) {
-
 		String[] tags = parseArguments(query);
-
 		final List<AggregatedRecord> tagRecords = new ArrayList<>();
+        if (query.isEmpty())
+            return tagRecords;
+
 		if ((tags != null) && (tags.length > 0)) {
 
 			for (Account a : accounts.values()) {
