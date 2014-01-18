@@ -1,8 +1,12 @@
 package org.paulg.ispend.model;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class Record {
 
-	private String date;
+	private Date date;
 	private String type;
 	private String description;
 	private String balance;
@@ -16,9 +20,10 @@ public class Record {
 	}
 
 	public Record(final String date, final String type, final String description, final String balance,
-			final String accountName, final String accountNumber, final double value) {
+			final String accountName, final String accountNumber, final double value) throws ParseException {
 		super();
-		this.date = date;
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        this.date = sdf.parse(date);
 		this.type = type;
 		this.description = description;
 		this.balance = balance;
@@ -75,11 +80,11 @@ public class Record {
 		this.value = value;
 	}
 
-	String getDate() {
+	Date getDate() {
 		return date;
 	}
 
-	public void setDate(final String date) {
+	public void setDate(final Date date) {
 		this.date = date;
 	}
 
