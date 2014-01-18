@@ -3,7 +3,7 @@ package org.paulg.ispend.view;
 import javafx.scene.control.ListCell;
 import org.paulg.ispend.model.Account;
 
-public class AccountCell extends ListCell<Account> {
+class AccountCell extends ListCell<Account> {
 
     @Override
     protected void updateItem(final Account account, final boolean empty) {

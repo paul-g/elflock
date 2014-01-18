@@ -23,6 +23,6 @@ public final class StringUtils {
 		if (spos <= fpos) {
 			return text.substring(spos, fpos + 1);
 		}
-		return new String("");
+		return "";
 	}
 }

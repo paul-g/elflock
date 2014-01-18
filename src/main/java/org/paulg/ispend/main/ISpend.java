@@ -7,7 +7,7 @@ import org.paulg.ispend.view.ISpendPane;
 
 import java.io.IOException;
 
-public class ISpend extends Application {
+class ISpend extends Application {
 
     public static void main(final String[] args) throws IOException {
         launch(args);

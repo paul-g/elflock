@@ -6,7 +6,7 @@ public class Account {
 
 	private String number;
 	private String name;
-	private final List<Record> records = new ArrayList<Record>();
+	private final List<Record> records = new ArrayList<>();
 	private int covered = 0;
 
 	public Account(final String number, final String name) {

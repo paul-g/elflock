@@ -6,7 +6,7 @@ import org.paulg.ispend.utils.StringUtils;
 
 public class RecordStore {
 
-	final Map<String, Account> accounts = new LinkedHashMap<String, Account>();
+	private final Map<String, Account> accounts = new LinkedHashMap<>();
 
 	public void addRecord(final Record r) {
 		Account acc = accounts.get(r.getAccountNumber());
@@ -19,9 +19,9 @@ public class RecordStore {
 
 	public List<Record> getRecordsByAccountNumber(final String number) {
 		if (accounts.get(number) != null) {
-			return new ArrayList<Record>(accounts.get(number).getRecords());
+			return new ArrayList<>(accounts.get(number).getRecords());
 		}
-		return new ArrayList<Record>();
+		return new ArrayList<>();
 	}
 
 	public void printSummary() {
@@ -31,7 +31,7 @@ public class RecordStore {
 	}
 
 	public List<Record> getAllRecords() {
-		final List<Record> allRecords = new ArrayList<Record>();
+		final List<Record> allRecords = new ArrayList<>();
 		for (final Account a : accounts.values()) {
 			allRecords.addAll(a.getRecords());
 		}
@@ -40,7 +40,7 @@ public class RecordStore {
 
 	public List<Record> filter(final String text) {
 		final List<Record> unfiltered = getAllRecords();
-		final List<Record> filtered = new ArrayList<Record>();
+		final List<Record> filtered = new ArrayList<>();
 		for (final Record r : unfiltered) {
 			if (StringUtils.containsIgnoreCase(r.getDescription(), text)) {
 				filtered.add(r);
@@ -57,7 +57,7 @@ public class RecordStore {
 
 		String[] tags = parseArguments(query);
 
-		final List<AggregatedRecord> tagRecords = new ArrayList<AggregatedRecord>();
+		final List<AggregatedRecord> tagRecords = new ArrayList<>();
 		if ((tags != null) && (tags.length > 0)) {
 
 			for (Account a : accounts.values()) {

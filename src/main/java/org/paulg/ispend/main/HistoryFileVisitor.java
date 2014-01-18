@@ -35,7 +35,7 @@ public final class HistoryFileVisitor extends SimpleFileVisitor<Path> {
 
         final BufferedReader br = Files.newBufferedReader(file, Charset.defaultCharset());
 
-        String line = null;
+        String line;
         while ((line = br.readLine()) != null) {
             line = line.trim();
             if (line.startsWith("Date")) {

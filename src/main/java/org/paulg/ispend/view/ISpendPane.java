@@ -15,7 +15,6 @@ import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.stage.*;
-import javafx.util.Callback;
 
 import org.paulg.ispend.controller.OpenHistoryHandler;
 import org.paulg.ispend.main.HistoryFileVisitor;
@@ -37,7 +36,6 @@ public class ISpendPane {
     private Integer totalSpent;
     private Integer totalIncome;
     private final Stage stage;
-    private GridPane gridPane;
 
     private final PreferencesStore preferencesStore;
 
@@ -67,7 +65,7 @@ public class ISpendPane {
     }
 
     private Pane makeAppContent() {
-        gridPane = new GridPane();
+        GridPane gridPane = new GridPane();
         gridPane.setHgap(10);
         gridPane.setVgap(10);
         gridPane.setPadding(new Insets(10, 10, 10, 10));
@@ -104,7 +102,7 @@ public class ISpendPane {
         }
     }
 
-    private ObservableList<Data> toNegativePieChartData() {
+    private void toNegativePieChartData() {
         double total = (totalSpent == null ? 7500 : totalSpent);
         double leftTotal = total;
         pieChartNegData.clear();
@@ -114,10 +112,9 @@ public class ISpendPane {
             leftTotal -= record.getNegative();
         }
         pieChartNegData.add(new PieChart.Data("Other", (leftTotal / total) * 100));
-        return pieChartNegData;
     }
 
-    private ObservableList<Data> toPositivePieChartData() {
+    private void toPositivePieChartData() {
         double total = (totalIncome == null ? 7500 : totalIncome);
         double leftTotal = total;
         pieChartPosData.clear();
@@ -126,32 +123,22 @@ public class ISpendPane {
             leftTotal -= record.getPositive();
         }
         pieChartPosData.add(new PieChart.Data("Other", (leftTotal / total) * 100));
-        return pieChartPosData;
     }
 
     private Node makeGroupByPanel() {
         groupBy = new TextField();
         groupBy.setPromptText("Group by");
         groupBy.setDisable(true);
-        groupBy.setOnKeyReleased(new EventHandler<KeyEvent>() {
-                @Override
-                public void handle(final KeyEvent t) {
-                    if (t.getCode() == KeyCode.ENTER) {
-                        setQuery(groupBy.getText());
-                    } else if (t.getCode() == KeyCode.ESCAPE) {
-                        clearQuery();
-                    }
-                }
-
-            });
+        groupBy.setOnKeyReleased(t -> {
+            if (t.getCode() == KeyCode.ENTER) {
+                setQuery(groupBy.getText());
+            } else if (t.getCode() == KeyCode.ESCAPE) {
+                clearQuery();
+            }
+        });
         Button save = new Button();
         save.setText("Save");
-        save.setOnAction(new EventHandler<ActionEvent>() {
-                @Override
-                public void handle(final ActionEvent arg0) {
-                    preferencesStore.saveQuery(groupBy.getText());
-                }
-            });
+        save.setOnAction(event -> preferencesStore.saveQuery(groupBy.getText()));
         final HBox box = new HBox();
         box.getChildren().addAll(groupBy, save);
         box.setAlignment(Pos.CENTER);
@@ -161,7 +148,7 @@ public class ISpendPane {
 
     private <T> TableView<T> makeTable(final ObservableList<T> data, final Class<T> clazz, final int row,
                                        final int col, final int hSpan, final int vSpan) {
-        final TableView<T> table = new CompleteTableView<T>(clazz);
+        final TableView<T> table = new CompleteTableView<>(clazz);
         table.setEditable(true);
         table.setItems(data);
         GridPane.setConstraints(table, row, col, hSpan, vSpan, HPos.CENTER, VPos.CENTER, Priority.ALWAYS,
@@ -203,14 +190,9 @@ public class ISpendPane {
         final Label label = new Label("Accounts");
         label.setFont(new Font("Arial", 20));
 
-        ListView<Account> accounts = new ListView<Account>(accountsData);
+        ListView<Account> accounts = new ListView<>(accountsData);
 
-        accounts.setCellFactory(new Callback<ListView<Account>, ListCell<Account>>() {
-                @Override
-                public ListCell<Account> call(final ListView<Account> arg0) {
-                    return new AccountCell();
-                }
-            });
+        accounts.setCellFactory(listViewAccount -> new AccountCell());
 
         accounts.setPrefHeight(50);
 

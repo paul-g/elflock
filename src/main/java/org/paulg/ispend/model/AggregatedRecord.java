@@ -31,7 +31,7 @@ public class AggregatedRecord {
 		this.description = description;
 	}
 
-	public Double getValue() {
+	Double getValue() {
 		return value;
 	}
 
@@ -49,7 +49,7 @@ public class AggregatedRecord {
 		}
 	}
 
-	public int getCount() {
+	int getCount() {
 		return count;
 	}
 
