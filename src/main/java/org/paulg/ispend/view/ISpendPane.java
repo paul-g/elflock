@@ -38,6 +38,7 @@ public class ISpendPane {
     private final Stage stage;
 
     private final PreferencesStore preferencesStore;
+    private Visualizer visualizer;
 
     public ISpendPane(final Stage stage, final PreferencesStore preferencesStore) {
         this.stage = stage;
@@ -82,12 +83,12 @@ public class ISpendPane {
                                                                            AggregatedRecord.class,
                                                                            1, 2, 2, 1);
 
-        TabPane tabPane = new Visualizer(pieChartNegData, pieChartPosData);
+        this.visualizer = new Visualizer(pieChartNegData, pieChartPosData);
 
-        GridPane.setConstraints(tabPane, 1, 3, 2, 1,
+        GridPane.setConstraints(visualizer, 1, 3, 2, 1,
                                 HPos.CENTER, VPos.CENTER, Priority.ALWAYS, Priority.ALWAYS);
         setColumnConstraints(gridPane, 50, 25, 25);
-        gridPane.getChildren().addAll(tabPane, recordView, aggregatedRecordView);
+        gridPane.getChildren().addAll(visualizer, recordView, aggregatedRecordView);
         gridPane.setGridLinesVisible(false);
         return gridPane;
     }
@@ -261,6 +262,7 @@ public class ISpendPane {
         accountsData.addAll(recordStore.getAccounts());
         toPositivePieChartData();
         toNegativePieChartData();
+        visualizer.plotHistoricalData(null);
     }
 
 }

@@ -9,13 +9,29 @@ import javafx.scene.chart.XYChart;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.HBox;
+import org.paulg.ispend.model.Record;
+
+import java.util.List;
 
 class Visualizer extends TabPane {
+
+
+    private Node posChart;
+    private Node negChart;
+    private LineChart<Number,Number> lineChart;
+    private XYChart.Series series;
+    private int count = 0;
 
     Visualizer(ObservableList<PieChart.Data> pieChartNegData,
                ObservableList<PieChart.Data> pieChartPosData) {
         getTabs().add(makeTotalTab(pieChartNegData, pieChartPosData));
         getTabs().add(makeHistoricalTab());
+    }
+
+    void plotHistoricalData(List<Record> records) {
+        series.setName("New Name");
+        series.getData().add(new XYChart.Data<>(count, count));
+        count++;
     }
 
     private Tab makeHistoricalTab() {
@@ -26,18 +42,14 @@ class Visualizer extends TabPane {
         final NumberAxis yAxis = new NumberAxis();
         xAxis.setLabel("Number of Month");
         //creating the chart
-        final LineChart<Number,Number> lineChart =
-                new LineChart<>(xAxis,yAxis);
+        lineChart = new LineChart<>(xAxis,yAxis);
 
         lineChart.setTitle("History");
         //defining a series
-        XYChart.Series series = new XYChart.Series();
+        series = new XYChart.Series();
         series.setName("My portfolio");
         //populating the series with data
-        series.getData().add(new XYChart.Data(1, 1));
-        series.getData().add(new XYChart.Data(2, 2));
-        series.getData().add(new XYChart.Data(3, 3));
-        series.getData().add(new XYChart.Data(4, 4));
+
         lineChart.getData().add(series);
 
         tab.setContent(lineChart);
@@ -45,8 +57,8 @@ class Visualizer extends TabPane {
     }
 
     private Tab makeTotalTab(ObservableList<PieChart.Data> pieChartNegData, ObservableList<PieChart.Data> pieChartPosData) {
-        Node posChart = pieChart("Income", pieChartPosData, 1, 3);
-        Node negChart = pieChart("Expenses", pieChartNegData, 2, 3);
+        posChart = pieChart("Income", pieChartPosData, 1, 3);
+        negChart = pieChart("Expenses", pieChartNegData, 2, 3);
 
         Tab totalTab = new Tab();
         totalTab.setText("Total");
