@@ -10,16 +10,12 @@ import org.paulg.ispend.model.AggregatedRecord;
 import org.paulg.ispend.model.Record;
 
 import java.text.SimpleDateFormat;
-import java.util.List;
-
-import static java.util.Collections.*;
+import java.util.*;
 
 class Visualizer extends TabPane {
 
-    private Node posChart;
-    private Node negChart;
-    private LineChart<String,Number> lineChart;
-    private XYChart.Series series;
+    private Node posChart, negChart;
+    private LineChart<String, Number> lineChart;
 
     Visualizer(ObservableList<PieChart.Data> pieChartNegData,
                ObservableList<PieChart.Data> pieChartPosData) {
@@ -28,54 +24,76 @@ class Visualizer extends TabPane {
     }
 
     void plotHistoricalData(List<AggregatedRecord> records) {
-        series.setName("New Name");
-        series.getData().clear();
-        for (AggregatedRecord aggregatedRecord : records) {
-            List<Record> rs = aggregatedRecord.getRecords();
-            sort(rs);
-            SimpleDateFormat sdf = new SimpleDateFormat("EEE dd MMM yy");
-            for (Record r : rs) {
+
+        SimpleDateFormat sdf = new SimpleDateFormat("MMM yy");
+
+        LinkedHashSet<String> allMonths = getAllMonthsInRecordRange(records, sdf);
+
+        lineChart.getData().removeAll();
+        lineChart.getData().clear();
+
+        // tag -> month -> total
+        for (AggregatedRecord ar : records) {
+            XYChart.Series series = new XYChart.Series();
+            series.setName(ar.getDescription());
+            Map<String, Double> monthToTotal = new HashMap<>();
+            for (Record r : ar.getRecords()) {
                 String date = sdf.format(r.getDate());
-                series.getData().add(new XYChart.Data<>(date, r.getValue()));
+                monthToTotal.compute(date,
+                        (k, v) -> (v == null) ? r.getValue() : r.getValue() + v);
             }
+
+            for (String s : allMonths) {
+                Double total = monthToTotal.get(s);
+                series.getData().add(new XYChart.Data(s, total == null ? 0 : total));
+            }
+
+            lineChart.getData().add(series);
         }
     }
 
+    private LinkedHashSet<String> getAllMonthsInRecordRange(List<AggregatedRecord> records, SimpleDateFormat sdf) {
+        List<Date> dates = new ArrayList<>();
+        for (AggregatedRecord aggregatedRecord : records) {
+            for (Record r : aggregatedRecord.getRecords()) {
+                dates.add(r.getDate());
+            }
+        }
+
+        Date maxDate = Collections.max(dates);
+        Calendar c = Calendar.getInstance();
+        c.setTime(Collections.min(dates));
+
+        LinkedHashSet<String> allMonths = new LinkedHashSet<>();
+        while (c.getTime().before(maxDate)) {
+            allMonths.add(sdf.format(c.getTime()));
+            c.add(Calendar.MONTH, 1);
+        }
+
+        allMonths.add(sdf.format(maxDate));
+        return allMonths;
+    }
+
     private Tab makeHistoricalTab() {
-        Tab tab = new Tab();
-        tab.setText("Historical");
-
-        final CategoryAxis xAxis = new CategoryAxis();
-        final NumberAxis yAxis = new NumberAxis();
-        xAxis.setLabel("Number of Month");
-        //creating the chart
-        lineChart = new LineChart<>(xAxis, yAxis);
-
+        Tab tab = new Tab("Historical (Line)");
+        lineChart = new LineChart<>(new CategoryAxis(), new NumberAxis());
         lineChart.setTitle("History");
-        //defining a series
-        series = new XYChart.Series();
-        series.setName("My portfolio");
-        //populating the series with data
-
-        lineChart.getData().add(series);
-
         tab.setContent(lineChart);
         return tab;
     }
 
     private Tab makeTotalTab(ObservableList<PieChart.Data> pieChartNegData, ObservableList<PieChart.Data> pieChartPosData) {
-        posChart = pieChart("Income", pieChartPosData, 1, 3);
-        negChart = pieChart("Expenses", pieChartNegData, 2, 3);
+        posChart = pieChart("Income", pieChartPosData);
+        negChart = pieChart("Expenses", pieChartNegData);
 
-        Tab totalTab = new Tab();
-        totalTab.setText("Total");
+        Tab totalTab = new Tab("Total");
         HBox box = new HBox();
         box.getChildren().addAll(posChart, negChart);
         totalTab.setContent(box);
         return totalTab;
     }
 
-    private Node pieChart(final String title, final ObservableList<PieChart.Data> data, final int row, final int col) {
+    private Node pieChart(final String title, final ObservableList<PieChart.Data> data) {
         final PieChart chart = new PieChart(data);
         chart.setTitle(title);
         return chart;
