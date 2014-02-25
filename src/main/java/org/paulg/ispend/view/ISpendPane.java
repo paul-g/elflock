@@ -4,12 +4,12 @@ import java.io.*;
 import java.nio.file.*;
 import java.util.List;
 
+import javafx.application.Platform;
 import javafx.collections.*;
 import javafx.event.*;
 import javafx.geometry.*;
 import javafx.scene.*;
 import javafx.scene.chart.*;
-import javafx.scene.chart.PieChart.Data;
 import javafx.scene.control.*;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
@@ -48,14 +48,7 @@ public class ISpendPane {
         BorderPane pane = new BorderPane();
         pane.setCenter(makeAppContent());
 
-        MenuBar menuBar = new MenuBar();
-        Menu menu = new Menu("File");
-        MenuItem item = new MenuItem("Open");
-        item.setOnAction(new OpenHistoryHandler(this));
-        menu.getItems().addAll(item);
-        menuBar.getMenus().addAll(menu);
-
-        pane.setTop(menuBar);
+        pane.setTop(createMenuBar());
 
         final Scene scene = new Scene(pane);
 
@@ -63,6 +56,20 @@ public class ISpendPane {
         stage.centerOnScreen();
         stage.setResizable(true);
         stage.show();
+    }
+
+    private MenuBar createMenuBar() {
+        MenuBar menuBar = new MenuBar();
+        Menu menu = new Menu("File");
+        MenuItem open = new MenuItem("Open");
+        open.setOnAction(new OpenHistoryHandler(this));
+
+        MenuItem close = new MenuItem("Close");
+        close.setOnAction(e -> Platform.exit());
+
+        menu.getItems().addAll(open, close);
+        menuBar.getMenus().addAll(menu);
+        return menuBar;
     }
 
     private Pane makeAppContent() {
@@ -75,8 +82,6 @@ public class ISpendPane {
         gridPane.add(accountSummary(), 0, 0, 3, 1);
         gridPane.add(makeSearchPanel(), 0, 1);
         gridPane.add(makeGroupByPanel(), 1, 1);
-
-
 
         final TableView<Record> recordView = makeTable(data, Record.class, 0, 2, 1, 2);
         final TableView<AggregatedRecord> aggregatedRecordView = makeTable(groupData,
@@ -92,8 +97,6 @@ public class ISpendPane {
         gridPane.setGridLinesVisible(false);
         return gridPane;
     }
-
-
 
     private void setColumnConstraints(final GridPane gridPane, final Integer... widths) {
         for (int i : widths) {
