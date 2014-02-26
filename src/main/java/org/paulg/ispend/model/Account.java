@@ -92,7 +92,7 @@ public class Account {
 		records.add(r);
 	}
 
-	public Collection<Record> getRecords() {
+	public List<Record> getRecords() {
 		return records;
 	}
 }
