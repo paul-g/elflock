@@ -15,12 +15,13 @@ import java.util.*;
 class Visualizer extends TabPane {
 
     private Node posChart, negChart;
-    private LineChart<String, Number> lineChart;
+    private LineChart<String, Number> lineChart, balanceChart;
 
     Visualizer(ObservableList<PieChart.Data> pieChartNegData,
                ObservableList<PieChart.Data> pieChartPosData) {
         getTabs().add(makeTotalTab(pieChartNegData, pieChartPosData));
         getTabs().add(makeHistoricalTab());
+        getTabs().add(makeWeeklyTotalBalanceTab());
     }
 
     void plotHistoricalData(List<AggregatedRecord> records) {
@@ -52,7 +53,25 @@ class Visualizer extends TabPane {
         }
     }
 
-    private LinkedHashSet<String> getAllMonthsInRecordRange(List<AggregatedRecord> records, SimpleDateFormat sdf) {
+    void plotWeeklyTotalData(Map<Date, Double> records) {
+        List<Date> allDates = new ArrayList<>(records.keySet());
+        Collections.sort(allDates);
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yy w");
+
+        XYChart.Series series = new XYChart.Series();
+        series.setName("Weekly Balance");
+
+        for (Date d : allDates) {
+           String s = sdf.format(d);
+           series.getData().addAll(new XYChart.Data(s, records.get(d)));
+        }
+
+        balanceChart.getData().add(series);
+    }
+
+    private LinkedHashSet<String> getAllMonthsInRecordRange(
+            List<AggregatedRecord> records, SimpleDateFormat sdf) {
         List<Date> dates = new ArrayList<>();
         for (AggregatedRecord aggregatedRecord : records) {
             for (Record r : aggregatedRecord.getRecords()) {
@@ -72,6 +91,14 @@ class Visualizer extends TabPane {
 
         allMonths.add(sdf.format(maxDate));
         return allMonths;
+    }
+
+    private Tab makeWeeklyTotalBalanceTab() {
+        Tab tab = new Tab("Weekly Balance");
+        balanceChart = new LineChart<>(new CategoryAxis(), new NumberAxis());
+        balanceChart.setTitle("Balance");
+        tab.setContent(balanceChart);
+        return tab;
     }
 
     private Tab makeHistoricalTab() {

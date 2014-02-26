@@ -148,8 +148,11 @@ public class RecordStore {
             // aggregate the total across all accounts
             for (Map.Entry<Integer, Map<Integer, Double>> me : weekly.entrySet()) {
                 Map<Integer, Double> wbForYear = weeklyBalance.get(me.getKey());
-                if (wbForYear == null)
-                    continue;
+                if (wbForYear == null) {
+                    wbForYear = new HashMap<>();
+                    weeklyBalance.put(me.getKey(), wbForYear);
+                }
+
                 for (Map.Entry<Integer, Double> me2 : me.getValue().entrySet()) {
                     Double aggregatedBalanceForWeek = wbForYear.get(me2.getKey());
                     if (aggregatedBalanceForWeek == null)
@@ -167,6 +170,7 @@ public class RecordStore {
             for (Map.Entry<Integer, Double> me2 : me.getValue().entrySet()) {
                 int week = me2.getKey();
                 Calendar c = Calendar.getInstance();
+                c.setTimeInMillis(0);
                 c.set(Calendar.YEAR, y);
                 c.set(Calendar.WEEK_OF_YEAR, week);
                 Date d = c.getTime();

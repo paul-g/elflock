@@ -224,6 +224,8 @@ public class ISpendPane {
         accountsData.clear();
         accountsData.addAll(recordStore.getAccounts());
         recordStore.printSummary();
+
+        visualizer.plotWeeklyTotalData(recordStore.getWeeklyBalance());
     }
 
     public File showDialog() {
