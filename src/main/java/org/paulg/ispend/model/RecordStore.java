@@ -112,4 +112,68 @@ public class RecordStore {
 	public Collection<Account> getAccounts() {
 		return accounts.values();
 	}
+
+    public Map<Date, Double> getWeeklyBalance() {
+        Map<Integer, Map<Integer, Double>> weeklyBalance = new HashMap<>();
+
+        Date firstDate = null, lastDate = null;
+
+        for (Account a : accounts.values()) {
+            List<Record> rs = a.getRecords();
+            Collections.sort(rs);
+
+            Date rDate = rs.get(0).getDate();
+            if (firstDate == null || rDate.compareTo(firstDate) <= 0)
+                firstDate = rDate;
+            if (lastDate == null || rDate.compareTo(lastDate) >= 0)
+                lastDate = rDate;
+
+            // year -> week_of_year -> last_balance
+            Map<Integer, Map<Integer, Double>> weekly = new HashMap<>();
+
+            for (Record r : rs) {
+                Calendar c = Calendar.getInstance();
+                c.setTime(r.getDate());
+                int weekOfYear = c.get(Calendar.WEEK_OF_YEAR);
+                int year = c.get(Calendar.YEAR);
+
+                Map<Integer, Double> y = weekly.get(year);
+                if (y == null) {
+                    y = new HashMap<>();
+                    weekly.put(year, y);
+                }
+                y.put(weekOfYear, r.getBalance());
+            }
+
+            // aggregate the total across all accounts
+            for (Map.Entry<Integer, Map<Integer, Double>> me : weekly.entrySet()) {
+                Map<Integer, Double> wbForYear = weeklyBalance.get(me.getKey());
+                if (wbForYear == null)
+                    continue;
+                for (Map.Entry<Integer, Double> me2 : me.getValue().entrySet()) {
+                    Double aggregatedBalanceForWeek = wbForYear.get(me2.getKey());
+                    if (aggregatedBalanceForWeek == null)
+                        wbForYear.put(me2.getKey(), me2.getValue());
+                    else
+                        wbForYear.put(me2.getKey(), aggregatedBalanceForWeek + me2.getValue());
+                }
+            }
+
+        }
+
+        Map<Date, Double> simpleWeeklyTotal = new HashMap<>();
+        for (Map.Entry<Integer, Map<Integer, Double>> me : weeklyBalance.entrySet()) {
+            int y = me.getKey();
+            for (Map.Entry<Integer, Double> me2 : me.getValue().entrySet()) {
+                int week = me2.getKey();
+                Calendar c = Calendar.getInstance();
+                c.set(Calendar.YEAR, y);
+                c.set(Calendar.WEEK_OF_YEAR, week);
+                Date d = c.getTime();
+                simpleWeeklyTotal.put(d, me2.getValue());
+            }
+        }
+
+        return simpleWeeklyTotal;
+    }
 }
