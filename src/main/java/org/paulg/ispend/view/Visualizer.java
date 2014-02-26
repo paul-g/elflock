@@ -15,13 +15,14 @@ import java.util.*;
 class Visualizer extends TabPane {
 
     private Node posChart, negChart;
-    private LineChart<String, Number> lineChart, balanceChart;
+    private LineChart<String, Number> lineChart, balanceChart, monthlyBalance;
 
     Visualizer(ObservableList<PieChart.Data> pieChartNegData,
                ObservableList<PieChart.Data> pieChartPosData) {
         getTabs().add(makeTotalTab(pieChartNegData, pieChartPosData));
         getTabs().add(makeHistoricalTab());
         getTabs().add(makeWeeklyTotalBalanceTab());
+        getTabs().add(makeMonthlyTotalBalanceTab());
     }
 
     void plotHistoricalData(List<AggregatedRecord> records) {
@@ -51,6 +52,28 @@ class Visualizer extends TabPane {
 
             lineChart.getData().add(series);
         }
+    }
+
+    void plotMonthlyTotalData(Map<Date, Double> records) {
+
+        List<Date> allDates = new ArrayList<>(records.keySet());
+        Collections.sort(allDates);
+
+        for (Date d : allDates) {
+            System.out.println(d);
+        }
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yy MM");
+
+        XYChart.Series series = new XYChart.Series();
+        series.setName("Monthly Balance");
+
+        for (Date d : allDates) {
+            String s = sdf.format(d);
+            series.getData().addAll(new XYChart.Data(s, records.get(d)));
+        }
+
+        monthlyBalance.getData().add(series);
     }
 
     void plotWeeklyTotalData(Map<Date, Double> records) {
@@ -91,6 +114,14 @@ class Visualizer extends TabPane {
 
         allMonths.add(sdf.format(maxDate));
         return allMonths;
+    }
+
+    private Tab makeMonthlyTotalBalanceTab() {
+        Tab tab = new Tab("Monthly Balance");
+        monthlyBalance = new LineChart<>(new CategoryAxis(), new NumberAxis());
+        monthlyBalance.setTitle("Monthly Balance");
+        tab.setContent(monthlyBalance);
+        return tab;
     }
 
     private Tab makeWeeklyTotalBalanceTab() {

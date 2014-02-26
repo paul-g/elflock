@@ -114,6 +114,14 @@ public class RecordStore {
 	}
 
     public Map<Date, Double> getWeeklyBalance() {
+        return getBalance(Calendar.WEEK_OF_YEAR);
+    }
+
+    public Map<Date, Double> getMonthlyBalance() {
+        return getBalance(Calendar.MONTH);
+    }
+
+    private Map<Date, Double> getBalance(int period) {
         Map<Integer, Map<Integer, Double>> weeklyBalance = new HashMap<>();
 
         Date firstDate = null, lastDate = null;
@@ -128,13 +136,13 @@ public class RecordStore {
             if (lastDate == null || rDate.compareTo(lastDate) >= 0)
                 lastDate = rDate;
 
-            // year -> week_of_year -> last_balance
+            // year -> period -> last_balance
             Map<Integer, Map<Integer, Double>> weekly = new HashMap<>();
 
             for (Record r : rs) {
                 Calendar c = Calendar.getInstance();
                 c.setTime(r.getDate());
-                int weekOfYear = c.get(Calendar.WEEK_OF_YEAR);
+                int monthOfYear = c.get(period);
                 int year = c.get(Calendar.YEAR);
 
                 Map<Integer, Double> y = weekly.get(year);
@@ -142,7 +150,7 @@ public class RecordStore {
                     y = new HashMap<>();
                     weekly.put(year, y);
                 }
-                y.put(weekOfYear, r.getBalance());
+                y.put(monthOfYear, r.getBalance());
             }
 
             // aggregate the total across all accounts
@@ -172,7 +180,7 @@ public class RecordStore {
                 Calendar c = Calendar.getInstance();
                 c.setTimeInMillis(0);
                 c.set(Calendar.YEAR, y);
-                c.set(Calendar.WEEK_OF_YEAR, week);
+                c.set(period, week);
                 Date d = c.getTime();
                 simpleWeeklyTotal.put(d, me2.getValue());
             }
@@ -180,4 +188,5 @@ public class RecordStore {
 
         return simpleWeeklyTotal;
     }
+
 }
