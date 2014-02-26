@@ -55,42 +55,26 @@ class Visualizer extends TabPane {
     }
 
     void plotMonthlyTotalData(Map<Date, Double> records) {
-
-        List<Date> allDates = new ArrayList<>(records.keySet());
-        Collections.sort(allDates);
-
-        for (Date d : allDates) {
-            System.out.println(d);
-        }
-
-        SimpleDateFormat sdf = new SimpleDateFormat("yy MM");
-
-        XYChart.Series series = new XYChart.Series();
-        series.setName("Monthly Balance");
-
-        for (Date d : allDates) {
-            String s = sdf.format(d);
-            series.getData().addAll(new XYChart.Data(s, records.get(d)));
-        }
-
-        monthlyBalance.getData().add(series);
+        plotData(records, monthlyBalance, "yy MM", "Monthly Balance");
     }
 
     void plotWeeklyTotalData(Map<Date, Double> records) {
+        plotData(records, balanceChart, "yy w", "Weekly Balance");
+    }
+
+    private void plotData(
+            Map<Date, Double> records,
+            LineChart<?, ?> chart,
+            String format,
+            String seriesTitle) {
         List<Date> allDates = new ArrayList<>(records.keySet());
         Collections.sort(allDates);
-
-        SimpleDateFormat sdf = new SimpleDateFormat("yy w");
-
+        SimpleDateFormat sdf = new SimpleDateFormat(format);
         XYChart.Series series = new XYChart.Series();
-        series.setName("Weekly Balance");
-
-        for (Date d : allDates) {
-           String s = sdf.format(d);
-           series.getData().addAll(new XYChart.Data(s, records.get(d)));
-        }
-
-        balanceChart.getData().add(series);
+        series.setName(seriesTitle);
+        for (Date d : allDates)
+            series.getData().add(new XYChart.Data(sdf.format(d), records.get(d)));
+        chart.getData().add(series);
     }
 
     private LinkedHashSet<String> getAllMonthsInRecordRange(
