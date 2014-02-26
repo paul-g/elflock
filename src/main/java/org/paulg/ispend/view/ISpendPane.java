@@ -72,7 +72,10 @@ public class ISpendPane {
         return menuBar;
     }
 
-    private Pane makeAppContent() {
+    private TabPane makeAppContent() {
+        TabPane pane = new TabPane();
+
+        Tab tab = new Tab("Dashboard");
         GridPane gridPane = new GridPane();
         gridPane.setHgap(10);
         gridPane.setVgap(10);
@@ -95,7 +98,12 @@ public class ISpendPane {
         setColumnConstraints(gridPane, 50, 25, 25);
         gridPane.getChildren().addAll(visualizer, recordView, aggregatedRecordView);
         gridPane.setGridLinesVisible(false);
-        return gridPane;
+
+        tab.setContent(gridPane);
+
+        pane.getTabs().add(tab);
+
+        return pane;
     }
 
     private void setColumnConstraints(final GridPane gridPane, final Integer... widths) {
