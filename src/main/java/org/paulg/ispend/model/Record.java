@@ -10,7 +10,7 @@ public class Record implements Comparable<Record> {
 	private Date date;
 	private String type;
 	private String description;
-	private String balance;
+	private Double balance;
 	private String accountName;
 	private String accountNumber;
 	private double value;
@@ -23,7 +23,7 @@ public class Record implements Comparable<Record> {
 	public Record(final String date,
                   final String type,
                   final String description,
-                  final String balance,
+                  final Double balance,
                   final String accountName,
                   final String accountNumber,
                   final double value) {
@@ -64,11 +64,11 @@ public class Record implements Comparable<Record> {
 		this.description = description;
 	}
 
-	public String getBalance() {
+	public Double getBalance() {
 		return balance;
 	}
 
-	public void setBalance(final String balance) {
+	public void setBalance(final Double balance) {
 		this.balance = balance;
 	}
 

@@ -12,9 +12,10 @@ public class NatWestRecordParserTest {
 	public void test() {
 		final RecordParser rp = new NatWestRecordParser();
 		final Record r = rp.parseRecord(record);
-		final Record expected = new Record("29/03/2011", "POS", "8854 28MAR11 , MARGARET MILL , LONDON GB", "6.07",
+		final Record expected = new Record("29/03/2011", "POS", "8854 28MAR11 , MARGARET MILL , LONDON GB", 6.07,
 				"curent", "515001-64829197", -9.00);
 		assertEquals("Constructed record matches parsed record", expected, r);
 	}
+
 }
 
