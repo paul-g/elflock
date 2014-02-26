@@ -10,42 +10,46 @@ public class NatWestRecordParser implements RecordParser {
     private String SEP = ",";
 
     private enum State  {
-        PARSING_NORMAL, PARSING_QUOTED_ENTRY, END_QUOTED_ENTRY,
+        PARSING_NORMAL, PARSING_QUOTED_ENTRY, END_QUOTED_ENTRY, NOT_PARSING,
     }
 
 	@Override
 	public Record parseRecord(final String line) {
 
         State state = State.PARSING_NORMAL;
-        StringTokenizer st = new StringTokenizer(line, SEP);
 
         final String[] recordFields = new String[20];
-        String entry = "";
         int fieldCount = 0;
-        while (st.hasMoreTokens()) {
-            String token = st.nextToken();
-            if (token.isEmpty())
-                // deals with trailing comma
-                continue;
-            state = token.startsWith("\"") ? State.PARSING_QUOTED_ENTRY : state;
-            state = token.endsWith("\"") ? State.END_QUOTED_ENTRY : state;
+
+        int pos = 0;
+        char [] lchars = line.toCharArray();
+        String token = "";
+        while (pos < lchars.length) {
+            char c = lchars[pos++];
             switch (state) {
                 case PARSING_QUOTED_ENTRY:
-                    entry += token + ",";
-                    break;
-                case END_QUOTED_ENTRY:
-                    entry += token;
-                    state = State.PARSING_NORMAL;
-                    recordFields[fieldCount++] = StringUtils.trimCharacters(entry, "\"'");
-                    entry = "";
+                    if (c == '"') {
+                        if (pos < lchars.length && lchars[pos] != '"') {
+                            pos++;
+                            state = State.PARSING_NORMAL;
+                        }
+                        recordFields[fieldCount++] = StringUtils.trimCharacters(token, "\"'");
+                        token = "";
+                    } else
+                        token += c;
                     break;
                 case PARSING_NORMAL:
-                    entry = token;
-                    recordFields[fieldCount++] = StringUtils.trimCharacters(entry, "\"'");
-                    entry = "";
+                    if (c == ',') {
+                        if (pos < lchars.length && lchars[pos] == '"')  {
+                            pos++;
+                            state = State.PARSING_QUOTED_ENTRY;
+                        }
+                        recordFields[fieldCount++] = StringUtils.trimCharacters(token, "\"'");
+                        token = "";
+                    } else
+                        token += c;
                     break;
             }
-
         }
 
 		final Record r = new Record();
@@ -53,7 +57,7 @@ public class NatWestRecordParser implements RecordParser {
 		r.setType(recordFields[1]);
 		r.setDescription(recordFields[2]);
 		r.setValue(Double.parseDouble(recordFields[3]));
-		r.setBalance(recordFields[4]);
+		r.setBalance(Double.parseDouble(recordFields[4]));
 		r.setAccountName(recordFields[5]);
 		r.setAccountNumber(recordFields[6]);
 		return r;
