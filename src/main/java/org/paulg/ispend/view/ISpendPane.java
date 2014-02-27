@@ -32,19 +32,24 @@ public class ISpendPane extends Observable {
     private final ObservableList<Account> accountsData = observableArrayList();
     private RecordStore recordStore;
 
-    private TextField groupBy;
     private TextField search;
     private Integer totalSpent;
     private Integer totalIncome;
     private final Stage stage;
 
+    private final GroupPane groupView;
     private final PreferencesStore preferencesStore;
-    private Visualizer visualizer;
+    private final Visualizer visualizer;
+    private boolean changed = false;
+
+    final Scene scene;
 
     public ISpendPane(final Stage stage, final PreferencesStore preferencesStore) {
         this.stage = stage;
         this.preferencesStore = preferencesStore;
         this.visualizer = new Visualizer(pieChartNegData, pieChartPosData);
+        this.groupView = new GroupPane(this);
+        addObserver(groupView);
 
         stage.setTitle("ISpend");
 
@@ -53,13 +58,11 @@ public class ISpendPane extends Observable {
 
         pane.setTop(createMenuBar());
 
-        final Scene scene = new Scene(pane);
-
+        scene = new Scene(pane);
         stage.setScene(scene);
         stage.centerOnScreen();
         stage.setResizable(true);
         stage.show();
-
     }
 
     private MenuBar createMenuBar() {
@@ -104,7 +107,7 @@ public class ISpendPane extends Observable {
 
         gridPane.add(accountSummary(), 0, 0, 3, 1);
         gridPane.add(makeSearchPanel(), 0, 1);
-        gridPane.add(makeGroupByPanel(), 1, 1);
+        gridPane.add(this.groupView, 1, 1);
 
         final TableView<Record> recordView = makeTable(data, Record.class, 0, 2, 1, 2);
         final TableView<AggregatedRecord> aggregatedRecordView = makeTable(groupData,
@@ -149,27 +152,6 @@ public class ISpendPane extends Observable {
             leftTotal -= record.getPositive();
         }
         pieChartPosData.add(new PieChart.Data("Other", (leftTotal / total) * 100));
-    }
-
-    private Node makeGroupByPanel() {
-        groupBy = new TextField();
-        groupBy.setPromptText("Group by");
-        groupBy.setDisable(true);
-        groupBy.setOnKeyReleased(t -> {
-            if (t.getCode() == KeyCode.ENTER) {
-                setQuery(groupBy.getText());
-            } else if (t.getCode() == KeyCode.ESCAPE) {
-                clearQuery();
-            }
-        });
-        Button save = new Button();
-        save.setText("Save");
-        save.setOnAction(event -> preferencesStore.saveQuery(groupBy.getText()));
-        final HBox box = new HBox();
-        box.getChildren().addAll(groupBy, save);
-        box.setAlignment(Pos.CENTER);
-        HBox.setHgrow(groupBy, Priority.ALWAYS);
-        return box;
     }
 
     private <T> TableView<T> makeTable(final ObservableList<T> data, final Class<T> clazz, final int row,
@@ -238,7 +220,6 @@ public class ISpendPane extends Observable {
 
         Files.walkFileTree(Paths.get(path), fileVisitor);
 
-        groupBy.setDisable(false);
         search.setDisable(false);
         totalSpent = (int) recordStore.getTotalSpent();
         totalIncome = (int) recordStore.getTotalIncome();
@@ -251,7 +232,12 @@ public class ISpendPane extends Observable {
         visualizer.plotWeeklyTotalData(recordStore.getWeeklyBalance());
         visualizer.plotMonthlyTotalData(recordStore.getMonthlyBalance());
 
-        notifyObservers();
+        System.out.println("Notiyfying observers");
+        System.out.println(this.countObservers());
+
+        this.setChanged();
+        //notifyObservers();
+        this.groupView.update(this, null);
     }
 
     public File showDialog() {
@@ -277,16 +263,16 @@ public class ISpendPane extends Observable {
         if (preferencesStore.hasQuery()) {
             String query = preferencesStore.getQuery();
             setQuery(query);
-            groupBy.setText(query);
+            groupView.setText(query);
         }
         stage.show();
     }
 
-    private void clearQuery() {
+    public void clearQuery() {
         groupData.clear();
     }
 
-    private void setQuery(final String query) {
+    void setQuery(final String query) {
         clearQuery();
         List<AggregatedRecord> byDescription = recordStore.groupByDescription(query);
         groupData.addAll(byDescription);
@@ -297,4 +283,7 @@ public class ISpendPane extends Observable {
         visualizer.plotHistoricalData(byDescription);
     }
 
+    public void saveQuery(String text) {
+        preferencesStore.saveQuery(text);
+    }
 }
