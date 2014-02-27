@@ -3,6 +3,7 @@ package org.paulg.ispend.view;
 import java.io.*;
 import java.nio.file.*;
 import java.util.List;
+import java.util.Observable;
 
 import javafx.application.Platform;
 import javafx.collections.*;
@@ -22,7 +23,7 @@ import org.paulg.ispend.model.*;
 
 import static javafx.collections.FXCollections.*;
 
-public class ISpendPane {
+public class ISpendPane extends Observable {
 
     private final ObservableList<Record> data = observableArrayList();
     private final ObservableList<AggregatedRecord> groupData = observableArrayList();
@@ -43,6 +44,8 @@ public class ISpendPane {
     public ISpendPane(final Stage stage, final PreferencesStore preferencesStore) {
         this.stage = stage;
         this.preferencesStore = preferencesStore;
+        this.visualizer = new Visualizer(pieChartNegData, pieChartPosData);
+
         stage.setTitle("ISpend");
 
         BorderPane pane = new BorderPane();
@@ -56,6 +59,7 @@ public class ISpendPane {
         stage.centerOnScreen();
         stage.setResizable(true);
         stage.show();
+
     }
 
     private MenuBar createMenuBar() {
@@ -74,7 +78,23 @@ public class ISpendPane {
 
     private TabPane makeAppContent() {
         TabPane pane = new TabPane();
+        pane.getTabs().add(makeDashboardTab());
+        pane.getTabs().add(makeDrillDownTab());
+        pane.getTabs().add(makeManageTab());
+        return pane;
+    }
 
+    private Tab makeManageTab() {
+        Tab tab = new Tab("Manage");
+        return tab;
+    }
+
+    private Tab makeDrillDownTab() {
+        Tab tab = new Tab("Drilldown");
+        return tab;
+    }
+
+    private Tab makeDashboardTab() {
         Tab tab = new Tab("Dashboard");
         GridPane gridPane = new GridPane();
         gridPane.setHgap(10);
@@ -90,9 +110,6 @@ public class ISpendPane {
         final TableView<AggregatedRecord> aggregatedRecordView = makeTable(groupData,
                                                                            AggregatedRecord.class,
                                                                            1, 2, 2, 1);
-
-        this.visualizer = new Visualizer(pieChartNegData, pieChartPosData);
-
         GridPane.setConstraints(visualizer, 1, 3, 2, 1,
                                 HPos.CENTER, VPos.CENTER, Priority.ALWAYS, Priority.ALWAYS);
         setColumnConstraints(gridPane, 50, 25, 25);
@@ -100,10 +117,7 @@ public class ISpendPane {
         gridPane.setGridLinesVisible(false);
 
         tab.setContent(gridPane);
-
-        pane.getTabs().add(tab);
-
-        return pane;
+        return tab;
     }
 
     private void setColumnConstraints(final GridPane gridPane, final Integer... widths) {
@@ -223,6 +237,7 @@ public class ISpendPane {
         recordStore = fileVisitor.getRecordStore();
 
         Files.walkFileTree(Paths.get(path), fileVisitor);
+
         groupBy.setDisable(false);
         search.setDisable(false);
         totalSpent = (int) recordStore.getTotalSpent();
@@ -235,6 +250,8 @@ public class ISpendPane {
 
         visualizer.plotWeeklyTotalData(recordStore.getWeeklyBalance());
         visualizer.plotMonthlyTotalData(recordStore.getMonthlyBalance());
+
+        notifyObservers();
     }
 
     public File showDialog() {
