@@ -8,10 +8,7 @@ import javafx.geometry.VPos;
 import javafx.scene.Scene;
 import javafx.scene.chart.PieChart;
 import javafx.scene.control.*;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Priority;
+import javafx.scene.layout.*;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import org.paulg.ispend.controller.OpenHistoryHandler;
@@ -39,7 +36,7 @@ public class ISpendPane extends Observable {
     private final Stage stage;
     private final GroupView groupView;
     private final PreferencesStore preferencesStore;
-    private final Visualizer visualizer;
+   // private final Visualizer visualizer;
     private final AccountSummaryView accountsView;
     private RecordStore recordStore;
     private Integer totalSpent;
@@ -48,8 +45,8 @@ public class ISpendPane extends Observable {
     public ISpendPane(final Stage stage, final PreferencesStore preferencesStore) {
         this.stage = stage;
         this.preferencesStore = preferencesStore;
-        this.visualizer = new Visualizer(pieChartNegData, pieChartPosData);
-        this.groupView = new GroupView(this, groupData);
+    //    this.visualizer = new Visualizer(pieChartNegData, pieChartPosData);
+        this.groupView = new GroupView(this, groupData, pieChartPosData, pieChartNegData);
         this.searchView = new SearchView(data);
         this.accountsView = new AccountSummaryView(accountsData);
         addObserver(groupView);
@@ -104,21 +101,9 @@ public class ISpendPane extends Observable {
 
     private Tab makeDashboardTab() {
         Tab tab = new Tab("Dashboard");
-        GridPane gridPane = new GridPane();
-        gridPane.setHgap(10);
-        gridPane.setVgap(10);
-        gridPane.setPadding(new Insets(10, 10, 10, 10));
-        gridPane.setGridLinesVisible(false);
-
-        gridPane.add(this.accountsView, 0, 0, 3, 1);
-
-        GridPane.setConstraints(visualizer, 1, 3, 2, 1,
-                HPos.CENTER, VPos.CENTER, Priority.ALWAYS, Priority.ALWAYS);
-        setColumnConstraints(gridPane, 50, 25, 25);
-        gridPane.getChildren().addAll(visualizer);
-        gridPane.setGridLinesVisible(false);
-
-        tab.setContent(gridPane);
+        HBox box = new HBox();
+        box.getChildren().add(this.accountsView);
+        tab.setContent(box);
         return tab;
     }
 
@@ -170,8 +155,8 @@ public class ISpendPane extends Observable {
         accountsData.addAll(recordStore.getAccounts());
         recordStore.printSummary();
 
-        visualizer.plotWeeklyTotalData(recordStore.getWeeklyBalance());
-        visualizer.plotMonthlyTotalData(recordStore.getMonthlyBalance());
+  //      groupView.plotWeeklyTotalData(recordStore.getWeeklyBalance());
+//        groupView.plotMonthlyTotalData(recordStore.getMonthlyBalance());
 
         this.setChanged();
         this.groupView.update(this, null);
@@ -217,7 +202,7 @@ public class ISpendPane extends Observable {
         accountsData.addAll(recordStore.getAccounts());
         toPositivePieChartData();
         toNegativePieChartData();
-        visualizer.plotHistoricalData(byDescription);
+        groupView.plotHistoricalData(byDescription);
     }
 
     public void saveQuery(String text) {
