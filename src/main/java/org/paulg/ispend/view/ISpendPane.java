@@ -112,7 +112,6 @@ public class ISpendPane extends Observable {
 
         gridPane.add(this.accountsView, 0, 0, 3, 1);
 
-
         GridPane.setConstraints(visualizer, 1, 3, 2, 1,
                 HPos.CENTER, VPos.CENTER, Priority.ALWAYS, Priority.ALWAYS);
         setColumnConstraints(gridPane, 50, 25, 25);

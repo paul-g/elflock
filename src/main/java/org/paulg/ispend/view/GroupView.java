@@ -1,23 +1,22 @@
 package org.paulg.ispend.view;
 
 import javafx.collections.ObservableList;
-import javafx.geometry.HPos;
 import javafx.geometry.Pos;
-import javafx.geometry.VPos;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import org.paulg.ispend.model.AggregatedRecord;
 
 import java.util.Observable;
 import java.util.Observer;
 
 
-public class GroupView extends HBox implements Observer {
+public class GroupView extends VBox implements Observer {
 
     private TextField groupBy;
 
@@ -32,18 +31,20 @@ public class GroupView extends HBox implements Observer {
                 ispendPane.clearQuery();
             }
         });
+
         Button save = new Button();
         save.setText("Save");
         save.setOnAction(event -> ispendPane.saveQuery(groupBy.getText()));
 
-        setAlignment(Pos.CENTER);
-        setHgrow(groupBy, Priority.ALWAYS);
-
         final TableView<AggregatedRecord> aggregatedRecordView = makeTable(groupData,
-                AggregatedRecord.class,
-                1, 2, 2, 1);
+                AggregatedRecord.class);
 
-        getChildren().addAll(groupBy, save, aggregatedRecordView);
+        HBox hbox = new HBox();
+        hbox.setHgrow(groupBy, Priority.ALWAYS);
+        Label label = new Label("Group By: ");
+        hbox.getChildren().addAll(label, groupBy, save);
+        hbox.setAlignment(Pos.CENTER);
+        getChildren().addAll(hbox, aggregatedRecordView);
     }
 
     public void setText(String query) {
@@ -55,14 +56,10 @@ public class GroupView extends HBox implements Observer {
         this.groupBy.setDisable(false);
     }
 
-
-    private <T> TableView<T> makeTable(final ObservableList<T> data, final Class<T> clazz, final int row,
-                                       final int col, final int hSpan, final int vSpan) {
+    private <T> TableView<T> makeTable(final ObservableList<T> data, final Class<T> clazz) {
         final TableView<T> table = new CompleteTableView<>(clazz);
         table.setEditable(true);
         table.setItems(data);
-        GridPane.setConstraints(table, row, col, hSpan, vSpan, HPos.CENTER, VPos.CENTER, Priority.ALWAYS,
-                Priority.ALWAYS);
         return table;
     }
 }
