@@ -12,17 +12,15 @@ import org.paulg.ispend.model.Record;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-class Visualizer extends TabPane {
+class HistoricalVisualizer extends TabPane {
 
     private Node posChart, negChart;
     private LineChart<String, Number> lineChart, balanceChart, monthlyBalance;
 
-    Visualizer(ObservableList<PieChart.Data> pieChartNegData,
-               ObservableList<PieChart.Data> pieChartPosData) {
+    HistoricalVisualizer(ObservableList<PieChart.Data> pieChartNegData,
+                         ObservableList<PieChart.Data> pieChartPosData) {
         getTabs().add(makeTotalTab(pieChartNegData, pieChartPosData));
         getTabs().add(makeHistoricalTab());
-        getTabs().add(makeWeeklyTotalBalanceTab());
-        getTabs().add(makeMonthlyTotalBalanceTab());
     }
 
     void plotHistoricalData(List<AggregatedRecord> records) {
@@ -54,29 +52,6 @@ class Visualizer extends TabPane {
         }
     }
 
-    void plotMonthlyTotalData(Map<Date, Double> records) {
-        plotData(records, monthlyBalance, "yy MM", "Monthly Balance");
-    }
-
-    void plotWeeklyTotalData(Map<Date, Double> records) {
-        plotData(records, balanceChart, "yy w", "Weekly Balance");
-    }
-
-    private void plotData(
-            Map<Date, Double> records,
-            LineChart<?, ?> chart,
-            String format,
-            String seriesTitle) {
-        List<Date> allDates = new ArrayList<>(records.keySet());
-        Collections.sort(allDates);
-        SimpleDateFormat sdf = new SimpleDateFormat(format);
-        XYChart.Series series = new XYChart.Series();
-        series.setName(seriesTitle);
-        for (Date d : allDates)
-            series.getData().add(new XYChart.Data(sdf.format(d), records.get(d)));
-        chart.getData().add(series);
-    }
-
     private LinkedHashSet<String> getAllMonthsInRecordRange(
             List<AggregatedRecord> records, SimpleDateFormat sdf) {
         List<Date> dates = new ArrayList<>();
@@ -100,23 +75,7 @@ class Visualizer extends TabPane {
         return allMonths;
     }
 
-    private Tab makeMonthlyTotalBalanceTab() {
-        Tab tab = new Tab("Monthly Balance");
-        monthlyBalance = new LineChart<>(new CategoryAxis(), new NumberAxis());
-        monthlyBalance.setTitle("Monthly Balance");
-        tab.setContent(monthlyBalance);
-        return tab;
-    }
-
-    private Tab makeWeeklyTotalBalanceTab() {
-        Tab tab = new Tab("Weekly Balance");
-        balanceChart = new LineChart<>(new CategoryAxis(), new NumberAxis());
-        balanceChart.setTitle("Balance");
-        tab.setContent(balanceChart);
-        return tab;
-    }
-
-    private Tab makeHistoricalTab() {
+     private Tab makeHistoricalTab() {
         Tab tab = new Tab("Historical (Line)");
         lineChart = new LineChart<>(new CategoryAxis(), new NumberAxis());
         lineChart.setTitle("History");

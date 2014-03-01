@@ -36,8 +36,9 @@ public class ISpendPane extends Observable {
     private final Stage stage;
     private final GroupView groupView;
     private final PreferencesStore preferencesStore;
-   // private final Visualizer visualizer;
+
     private final AccountSummaryView accountsView;
+    private final StaticVisualizer staticVisualizer;
     private RecordStore recordStore;
     private Integer totalSpent;
     private Integer totalIncome;
@@ -45,7 +46,7 @@ public class ISpendPane extends Observable {
     public ISpendPane(final Stage stage, final PreferencesStore preferencesStore) {
         this.stage = stage;
         this.preferencesStore = preferencesStore;
-    //    this.visualizer = new Visualizer(pieChartNegData, pieChartPosData);
+        this.staticVisualizer = new StaticVisualizer();
         this.groupView = new GroupView(this, groupData, pieChartPosData, pieChartNegData);
         this.searchView = new SearchView(data);
         this.accountsView = new AccountSummaryView(accountsData);
@@ -102,7 +103,7 @@ public class ISpendPane extends Observable {
     private Tab makeDashboardTab() {
         Tab tab = new Tab("Dashboard");
         HBox box = new HBox();
-        box.getChildren().add(this.accountsView);
+        box.getChildren().addAll(this.accountsView, this.staticVisualizer);
         tab.setContent(box);
         return tab;
     }
@@ -155,8 +156,9 @@ public class ISpendPane extends Observable {
         accountsData.addAll(recordStore.getAccounts());
         recordStore.printSummary();
 
-  //      groupView.plotWeeklyTotalData(recordStore.getWeeklyBalance());
-//        groupView.plotMonthlyTotalData(recordStore.getMonthlyBalance());
+
+        staticVisualizer.plotWeeklyTotalData(recordStore.getWeeklyBalance());
+        staticVisualizer.plotMonthlyTotalData(recordStore.getMonthlyBalance());
 
         this.setChanged();
         this.groupView.update(this, null);

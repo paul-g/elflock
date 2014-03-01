@@ -15,10 +15,9 @@ import org.paulg.ispend.model.AggregatedRecord;
 
 import java.util.*;
 
-
 public class GroupView extends VBox implements Observer {
 
-    private final Visualizer visualizer;
+    private final HistoricalVisualizer visualizer;
     private TextField groupBy;
 
     GroupView(ISpendPane ispendPane,
@@ -26,7 +25,7 @@ public class GroupView extends VBox implements Observer {
               ObservableList<PieChart.Data> pieChartPosData,
               ObservableList<PieChart.Data> pieChartNegData) {
 
-        this.visualizer = new Visualizer(pieChartNegData, pieChartPosData);
+        this.visualizer = new HistoricalVisualizer(pieChartNegData, pieChartPosData);
 
         groupBy = new TextField();
         groupBy.setPromptText("Group byyy");
