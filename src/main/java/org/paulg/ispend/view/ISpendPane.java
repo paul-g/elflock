@@ -1,47 +1,48 @@
 package org.paulg.ispend.view;
 
-import java.io.*;
-import java.nio.file.*;
-import java.util.List;
-import java.util.Observable;
-
 import javafx.application.Platform;
-import javafx.collections.*;
-import javafx.event.*;
-import javafx.geometry.*;
-import javafx.scene.*;
-import javafx.scene.chart.*;
+import javafx.collections.ObservableList;
+import javafx.geometry.HPos;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.geometry.VPos;
+import javafx.scene.Node;
+import javafx.scene.Scene;
+import javafx.scene.chart.PieChart;
 import javafx.scene.control.*;
-import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
-import javafx.stage.*;
-
+import javafx.stage.DirectoryChooser;
+import javafx.stage.Stage;
 import org.paulg.ispend.controller.OpenHistoryHandler;
 import org.paulg.ispend.main.HistoryFileVisitor;
 import org.paulg.ispend.model.*;
 
-import static javafx.collections.FXCollections.*;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.Observable;
+
+import static javafx.collections.FXCollections.observableArrayList;
 
 public class ISpendPane extends Observable {
 
+    final Scene scene;
     private final ObservableList<Record> data = observableArrayList();
     private final ObservableList<AggregatedRecord> groupData = observableArrayList();
     private final ObservableList<PieChart.Data> pieChartPosData = observableArrayList();
     private final ObservableList<PieChart.Data> pieChartNegData = observableArrayList();
     private final ObservableList<Account> accountsData = observableArrayList();
     private final SearchView searchView;
-    private RecordStore recordStore;
-
-    private Integer totalSpent;
-    private Integer totalIncome;
     private final Stage stage;
-
     private final GroupPane groupView;
     private final PreferencesStore preferencesStore;
     private final Visualizer visualizer;
-
-    final Scene scene;
+    private RecordStore recordStore;
+    private Integer totalSpent;
+    private Integer totalIncome;
 
     public ISpendPane(final Stage stage, final PreferencesStore preferencesStore) {
         this.stage = stage;
@@ -94,6 +95,7 @@ public class ISpendPane extends Observable {
 
     private Tab makeDrillDownTab() {
         Tab tab = new Tab("Drilldown");
+        tab.setContent(this.searchView);
         return tab;
     }
 
@@ -106,17 +108,15 @@ public class ISpendPane extends Observable {
         gridPane.setGridLinesVisible(false);
 
         gridPane.add(accountSummary(), 0, 0, 3, 1);
-        gridPane.add(this.searchView, 0, 1);
         gridPane.add(this.groupView, 1, 1);
 
-        final TableView<Record> recordView = makeTable(data, Record.class, 0, 2, 1, 2);
         final TableView<AggregatedRecord> aggregatedRecordView = makeTable(groupData,
-                                                                           AggregatedRecord.class,
-                                                                           1, 2, 2, 1);
+                AggregatedRecord.class,
+                1, 2, 2, 1);
         GridPane.setConstraints(visualizer, 1, 3, 2, 1,
-                                HPos.CENTER, VPos.CENTER, Priority.ALWAYS, Priority.ALWAYS);
+                HPos.CENTER, VPos.CENTER, Priority.ALWAYS, Priority.ALWAYS);
         setColumnConstraints(gridPane, 50, 25, 25);
-        gridPane.getChildren().addAll(visualizer, recordView, aggregatedRecordView);
+        gridPane.getChildren().addAll(visualizer, aggregatedRecordView);
         gridPane.setGridLinesVisible(false);
 
         tab.setContent(gridPane);
@@ -137,7 +137,7 @@ public class ISpendPane extends Observable {
         pieChartNegData.clear();
         for (AggregatedRecord record : groupData) {
             pieChartNegData.add(new PieChart.Data(record.getDescription(),
-                                                  (Math.abs(record.getNegative()) / total) * 100));
+                    (Math.abs(record.getNegative()) / total) * 100));
             leftTotal -= record.getNegative();
         }
         pieChartNegData.add(new PieChart.Data("Other", (leftTotal / total) * 100));
@@ -160,7 +160,7 @@ public class ISpendPane extends Observable {
         table.setEditable(true);
         table.setItems(data);
         GridPane.setConstraints(table, row, col, hSpan, vSpan, HPos.CENTER, VPos.CENTER, Priority.ALWAYS,
-                                Priority.ALWAYS);
+                Priority.ALWAYS);
         return table;
     }
 
