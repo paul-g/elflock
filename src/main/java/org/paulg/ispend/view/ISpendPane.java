@@ -49,7 +49,7 @@ public class ISpendPane extends Observable {
         this.stage = stage;
         this.preferencesStore = preferencesStore;
         this.visualizer = new Visualizer(pieChartNegData, pieChartPosData);
-        this.groupView = new GroupView(this);
+        this.groupView = new GroupView(this, groupData);
         this.searchView = new SearchView(data);
         this.accountsView = new AccountSummaryView(accountsData);
         addObserver(groupView);
@@ -92,6 +92,7 @@ public class ISpendPane extends Observable {
 
     private Tab makeManageTab() {
         Tab tab = new Tab("Manage");
+        tab.setContent(groupView);
         return tab;
     }
 
@@ -110,15 +111,12 @@ public class ISpendPane extends Observable {
         gridPane.setGridLinesVisible(false);
 
         gridPane.add(this.accountsView, 0, 0, 3, 1);
-        gridPane.add(this.groupView, 1, 1);
 
-        final TableView<AggregatedRecord> aggregatedRecordView = makeTable(groupData,
-                AggregatedRecord.class,
-                1, 2, 2, 1);
+
         GridPane.setConstraints(visualizer, 1, 3, 2, 1,
                 HPos.CENTER, VPos.CENTER, Priority.ALWAYS, Priority.ALWAYS);
         setColumnConstraints(gridPane, 50, 25, 25);
-        gridPane.getChildren().addAll(visualizer, aggregatedRecordView);
+        gridPane.getChildren().addAll(visualizer);
         gridPane.setGridLinesVisible(false);
 
         tab.setContent(gridPane);
@@ -156,15 +154,6 @@ public class ISpendPane extends Observable {
         pieChartPosData.add(new PieChart.Data("Other", (leftTotal / total) * 100));
     }
 
-    private <T> TableView<T> makeTable(final ObservableList<T> data, final Class<T> clazz, final int row,
-                                       final int col, final int hSpan, final int vSpan) {
-        final TableView<T> table = new CompleteTableView<>(clazz);
-        table.setEditable(true);
-        table.setItems(data);
-        GridPane.setConstraints(table, row, col, hSpan, vSpan, HPos.CENTER, VPos.CENTER, Priority.ALWAYS,
-                Priority.ALWAYS);
-        return table;
-    }
 
     public void fileSelected(final String path) throws IOException {
         final HistoryFileVisitor fileVisitor = new HistoryFileVisitor();
