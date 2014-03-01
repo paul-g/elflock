@@ -40,6 +40,7 @@ public class ISpendPane extends Observable {
     private final GroupPane groupView;
     private final PreferencesStore preferencesStore;
     private final Visualizer visualizer;
+    private final AccountSummaryView accountsView;
     private RecordStore recordStore;
     private Integer totalSpent;
     private Integer totalIncome;
@@ -50,6 +51,7 @@ public class ISpendPane extends Observable {
         this.visualizer = new Visualizer(pieChartNegData, pieChartPosData);
         this.groupView = new GroupPane(this);
         this.searchView = new SearchView(data);
+        this.accountsView = new AccountSummaryView(accountsData);
         addObserver(groupView);
 
         stage.setTitle("ISpend");
@@ -107,7 +109,7 @@ public class ISpendPane extends Observable {
         gridPane.setPadding(new Insets(10, 10, 10, 10));
         gridPane.setGridLinesVisible(false);
 
-        gridPane.add(accountSummary(), 0, 0, 3, 1);
+        gridPane.add(this.accountsView, 0, 0, 3, 1);
         gridPane.add(this.groupView, 1, 1);
 
         final TableView<AggregatedRecord> aggregatedRecordView = makeTable(groupData,
@@ -162,26 +164,6 @@ public class ISpendPane extends Observable {
         GridPane.setConstraints(table, row, col, hSpan, vSpan, HPos.CENTER, VPos.CENTER, Priority.ALWAYS,
                 Priority.ALWAYS);
         return table;
-    }
-
-    private Node accountSummary() {
-        final Label label = new Label("Accounts");
-        label.setFont(new Font("Arial", 20));
-
-        ListView<Account> accounts = new ListView<>(accountsData);
-
-        accounts.setCellFactory(listViewAccount -> new AccountCell());
-
-        accounts.setPrefHeight(50);
-
-        HBox box = new HBox();
-        box.setAlignment(Pos.CENTER);
-        box.getChildren().addAll(label, accounts);
-        box.setPadding(new Insets(10, 10, 10, 10));
-        box.setSpacing(10);
-        HBox.setHgrow(accounts, Priority.ALWAYS);
-
-        return box;
     }
 
     public void fileSelected(final String path) throws IOException {
