@@ -1,7 +1,6 @@
 package org.paulg.ispend.view;
 
 
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
@@ -14,16 +13,16 @@ import java.util.*;
 
 public class StaticVisualizer extends VBox {
 
-    private LineChart<String, Number> balanceChart, monthlyBalance;
+    private LineChart<String, Number> weeklyBalance, monthlyBalance;
 
     StaticVisualizer() {
         monthlyBalance = new LineChart<>(new CategoryAxis(), new NumberAxis());
         monthlyBalance.setTitle("Monthly Balance");
 
-        balanceChart = new LineChart<>(new CategoryAxis(), new NumberAxis());
-        balanceChart.setTitle("Balance");
+        weeklyBalance = new LineChart<>(new CategoryAxis(), new NumberAxis());
+        weeklyBalance.setTitle("Weekly Balance");
 
-        getChildren().addAll(balanceChart, monthlyBalance);
+        getChildren().addAll(weeklyBalance, monthlyBalance);
 
         setAlignment(Pos.CENTER);
         setSpacing(20);
@@ -34,7 +33,7 @@ public class StaticVisualizer extends VBox {
     }
 
     void plotWeeklyTotalData(Map<Date, Double> records) {
-        plotData(records, balanceChart, "yy w", "Weekly Balance");
+        plotData(records, weeklyBalance, "yy w", "Weekly Balance");
     }
 
     private void plotData(

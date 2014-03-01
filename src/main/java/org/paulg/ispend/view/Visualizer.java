@@ -75,7 +75,7 @@ class HistoricalVisualizer extends TabPane {
         return allMonths;
     }
 
-     private Tab makeHistoricalTab() {
+    private Tab makeHistoricalTab() {
         Tab tab = new Tab("Historical (Line)");
         lineChart = new LineChart<>(new CategoryAxis(), new NumberAxis());
         lineChart.setTitle("History");

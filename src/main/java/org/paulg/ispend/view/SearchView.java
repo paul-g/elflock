@@ -2,6 +2,7 @@ package org.paulg.ispend.view;
 
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
@@ -31,6 +32,8 @@ public class SearchView extends VBox {
 
         getChildren().addAll(search, recordView);
         setVgrow(recordView, Priority.ALWAYS);
+        setSpacing(10);
+        setPadding(new Insets(5, 5, 5, 5));
     }
 
     public void setRecordStore(RecordStore recordStore) {

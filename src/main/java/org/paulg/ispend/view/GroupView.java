@@ -1,6 +1,7 @@
 package org.paulg.ispend.view;
 
 import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.chart.PieChart;
 import javafx.scene.control.Button;
@@ -13,7 +14,9 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import org.paulg.ispend.model.AggregatedRecord;
 
-import java.util.*;
+import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
 public class GroupView extends VBox implements Observer {
 
@@ -28,7 +31,7 @@ public class GroupView extends VBox implements Observer {
         this.visualizer = new HistoricalVisualizer(pieChartNegData, pieChartPosData);
 
         groupBy = new TextField();
-        groupBy.setPromptText("Group byyy");
+        groupBy.setPromptText("Group by");
         groupBy.setDisable(true);
         groupBy.setOnKeyReleased(t -> {
             if (t.getCode() == KeyCode.ENTER) {
@@ -47,12 +50,13 @@ public class GroupView extends VBox implements Observer {
 
         HBox hbox = new HBox();
         hbox.setHgrow(groupBy, Priority.ALWAYS);
-        Label label = new Label("Group By: ");
+        Label label = new Label("Group By");
         hbox.getChildren().addAll(label, groupBy, save);
         hbox.setAlignment(Pos.CENTER);
+        hbox.setSpacing(5);
+        hbox.setPadding(new Insets(5, 5, 5, 5));
         getChildren().addAll(hbox, aggregatedRecordView, visualizer);
-
-
+        setSpacing(5);
     }
 
     public void setText(String query) {

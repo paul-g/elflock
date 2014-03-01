@@ -2,15 +2,15 @@ package org.paulg.ispend.view;
 
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import org.paulg.ispend.model.Account;
 
-public class AccountSummaryView extends HBox {
+public class AccountSummaryView extends VBox {
 
     public AccountSummaryView(ObservableList<Account> accountsData) {
         final Label label = new Label("Accounts");
@@ -21,10 +21,9 @@ public class AccountSummaryView extends HBox {
 
         accounts.setPrefHeight(50);
 
-        setAlignment(Pos.CENTER);
         getChildren().addAll(label, accounts);
-        setPadding(new Insets(10, 10, 10, 10));
-        setSpacing(10);
+        setPadding(new Insets(30, 5, 5, 5));
+        setSpacing(5);
         HBox.setHgrow(accounts, Priority.ALWAYS);
     }
 }
