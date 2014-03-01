@@ -30,9 +30,9 @@ public class ISpendPane extends Observable {
     private final ObservableList<PieChart.Data> pieChartPosData = observableArrayList();
     private final ObservableList<PieChart.Data> pieChartNegData = observableArrayList();
     private final ObservableList<Account> accountsData = observableArrayList();
+    private final SearchView searchView;
     private RecordStore recordStore;
 
-    private TextField search;
     private Integer totalSpent;
     private Integer totalIncome;
     private final Stage stage;
@@ -40,7 +40,6 @@ public class ISpendPane extends Observable {
     private final GroupPane groupView;
     private final PreferencesStore preferencesStore;
     private final Visualizer visualizer;
-    private boolean changed = false;
 
     final Scene scene;
 
@@ -49,6 +48,7 @@ public class ISpendPane extends Observable {
         this.preferencesStore = preferencesStore;
         this.visualizer = new Visualizer(pieChartNegData, pieChartPosData);
         this.groupView = new GroupPane(this);
+        this.searchView = new SearchView(data);
         addObserver(groupView);
 
         stage.setTitle("ISpend");
@@ -106,7 +106,7 @@ public class ISpendPane extends Observable {
         gridPane.setGridLinesVisible(false);
 
         gridPane.add(accountSummary(), 0, 0, 3, 1);
-        gridPane.add(makeSearchPanel(), 0, 1);
+        gridPane.add(this.searchView, 0, 1);
         gridPane.add(this.groupView, 1, 1);
 
         final TableView<Record> recordView = makeTable(data, Record.class, 0, 2, 1, 2);
@@ -164,36 +164,6 @@ public class ISpendPane extends Observable {
         return table;
     }
 
-    private Node makeSearchPanel() {
-        search = new TextField();
-        search.setPromptText("Search");
-        search.setDisable(true);
-        search.setPrefWidth(400);
-        search.setOnKeyReleased(new EventHandler<KeyEvent>() {
-
-                @Override
-                public void handle(final KeyEvent t) {
-                    if (t.getCode() == KeyCode.ENTER) {
-                        filterData(search.getText());
-                    } else if (t.getCode() == KeyCode.ESCAPE) {
-                        search.clear();
-                        filterData(search.getText());
-                    }
-                }
-
-                private void filterData(final String searchText) {
-                    final List<Record> filtered = recordStore.filter(searchText);
-                    data.clear();
-                    data.addAll(filtered);
-                }
-
-            });
-
-        final HBox box = new HBox();
-        box.getChildren().addAll(search);
-        return box;
-    }
-
     private Node accountSummary() {
         final Label label = new Label("Accounts");
         label.setFont(new Font("Arial", 20));
@@ -220,7 +190,8 @@ public class ISpendPane extends Observable {
 
         Files.walkFileTree(Paths.get(path), fileVisitor);
 
-        search.setDisable(false);
+        searchView.setRecordStore(recordStore);
+
         totalSpent = (int) recordStore.getTotalSpent();
         totalIncome = (int) recordStore.getTotalIncome();
         data.clear();
