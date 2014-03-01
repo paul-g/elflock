@@ -6,6 +6,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import org.paulg.ispend.model.Record;
 import org.paulg.ispend.model.RecordStore;
@@ -29,6 +30,7 @@ public class SearchView extends VBox {
         final TableView<Record> recordView = makeTable(data, Record.class);
 
         getChildren().addAll(search, recordView);
+        setVgrow(recordView, Priority.ALWAYS);
     }
 
     public void setRecordStore(RecordStore recordStore) {
