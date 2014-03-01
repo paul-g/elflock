@@ -12,11 +12,11 @@ import java.util.Observable;
 import java.util.Observer;
 
 
-public class GroupPane extends HBox implements Observer {
+public class GroupView extends HBox implements Observer {
 
     private TextField groupBy;
 
-    GroupPane(ISpendPane ispendPane) {
+    GroupView(ISpendPane ispendPane) {
         groupBy = new TextField();
         groupBy.setPromptText("Group byyy");
         groupBy.setDisable(true);
