@@ -2,43 +2,36 @@ package org.paulg.ispend.view;
 
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
-import javafx.geometry.HPos;
-import javafx.geometry.VPos;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import org.paulg.ispend.model.Record;
 import org.paulg.ispend.model.RecordStore;
 
 import java.util.List;
 
-import static javafx.scene.layout.GridPane.setConstraints;
-
 public class SearchView extends VBox {
 
 
     private final TextField search;
     private final ObservableList<Record> data;
-    private RecordStore recordStore;
+
 
     public SearchView(ObservableList<Record> data) {
         this.data = data;
-
         search = new TextField();
         search.setPromptText("Search");
         search.setDisable(true);
         search.setPrefWidth(400);
 
-        final TableView<Record> recordView = makeTable(data, Record.class, 0, 2, 1, 2);
+        final TableView<Record> recordView = makeTable(data, Record.class);
 
         getChildren().addAll(search, recordView);
     }
 
     public void setRecordStore(RecordStore recordStore) {
-        this.recordStore = recordStore;
         search.setOnKeyReleased(new EventHandler<KeyEvent>() {
 
             @Override
@@ -61,8 +54,8 @@ public class SearchView extends VBox {
         this.search.setDisable(false);
     }
 
-    private <T> TableView<T> makeTable(final ObservableList<T> data, final Class<T> clazz, final int row,
-                                       final int col, final int hSpan, final int vSpan) {
+    private <T> TableView<T> makeTable(final ObservableList<T> data,
+                                       final Class<T> clazz) {
         final TableView<T> table = new CompleteTableView<>(clazz);
         table.setEditable(true);
         table.setItems(data);
