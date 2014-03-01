@@ -203,11 +203,7 @@ public class ISpendPane extends Observable {
         visualizer.plotWeeklyTotalData(recordStore.getWeeklyBalance());
         visualizer.plotMonthlyTotalData(recordStore.getMonthlyBalance());
 
-        System.out.println("Notiyfying observers");
-        System.out.println(this.countObservers());
-
         this.setChanged();
-        //notifyObservers();
         this.groupView.update(this, null);
     }
 
