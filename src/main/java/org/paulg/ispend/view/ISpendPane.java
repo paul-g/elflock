@@ -103,17 +103,11 @@ public class ISpendPane extends Observable {
     private Tab makeDashboardTab() {
         Tab tab = new Tab("Dashboard");
         HBox box = new HBox();
-        box.getChildren().addAll(this.accountsView, this.staticVisualizer);
+        box.getChildren().addAll(accountsView, staticVisualizer);
+        box.setHgrow(accountsView, Priority.ALWAYS);
+        box.setHgrow(staticVisualizer, Priority.ALWAYS);
         tab.setContent(box);
         return tab;
-    }
-
-    private void setColumnConstraints(final GridPane gridPane, final Integer... widths) {
-        for (int i : widths) {
-            ColumnConstraints col = new ColumnConstraints();
-            col.setPercentWidth(i);
-            gridPane.getColumnConstraints().add(col);
-        }
     }
 
     private void toNegativePieChartData() {

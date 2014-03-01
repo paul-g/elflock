@@ -1,6 +1,8 @@
 package org.paulg.ispend.view;
 
 
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
@@ -22,6 +24,9 @@ public class StaticVisualizer extends VBox {
         balanceChart.setTitle("Balance");
 
         getChildren().addAll(balanceChart, monthlyBalance);
+
+        setAlignment(Pos.CENTER);
+        setSpacing(20);
     }
 
     void plotMonthlyTotalData(Map<Date, Double> records) {
