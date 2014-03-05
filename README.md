@@ -1,7 +1,7 @@
 elflock
 =======
 
-Load and plot transaction history from a bank account.
+_Ever wondered where all that money went?_ Now you have __elflock__...
 
 ## Requires
 
