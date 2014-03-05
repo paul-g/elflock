@@ -19,6 +19,7 @@ public class AccountSummaryView extends VBox {
 
         CompleteTableView<Account> accounts = new CompleteTableView<Account>(Account.class);
         accounts.setItems(accountsData);
+
         getChildren().addAll(label, accounts);
         setPadding(new Insets(30, 5, 5, 5));
         setSpacing(5);
