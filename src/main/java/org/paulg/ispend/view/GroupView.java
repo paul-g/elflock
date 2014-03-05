@@ -47,7 +47,7 @@ public class GroupView extends VBox implements Observer {
 
         final TableView<AggregatedRecord> aggregatedRecordView = makeTable(groupData,
                 AggregatedRecord.class);
-
+        aggregatedRecordView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         HBox hbox = new HBox();
         hbox.setHgrow(groupBy, Priority.ALWAYS);
         Label label = new Label("Group By");

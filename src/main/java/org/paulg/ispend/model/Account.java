@@ -1,13 +1,17 @@
 package org.paulg.ispend.model;
 
+import org.paulg.ispend.view.IgnoreField;
+
 import java.util.*;
 
 public class Account {
 
 	private String number;
 	private String name;
+    private int covered = 0;
+
+    @IgnoreField
 	private final List<Record> records = new ArrayList<>();
-	private int covered = 0;
 
 	public Account(final String number, final String name) {
 		this.number = number;

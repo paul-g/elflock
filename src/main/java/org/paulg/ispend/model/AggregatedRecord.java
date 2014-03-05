@@ -1,5 +1,7 @@
 package org.paulg.ispend.model;
 
+import org.paulg.ispend.view.IgnoreField;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,6 +12,8 @@ public class AggregatedRecord {
 	private int count;
 	private double positive;
 	private double negative;
+
+    @IgnoreField
     private List<Record> records = new ArrayList<>();
 
 	// XXX dumb!

@@ -24,6 +24,9 @@ class CompleteTableView<T> extends TableView<T> {
     private List<TableColumn<T, String>> makeColumns(final Class<T> clazz) {
         final List<TableColumn<T, String>> columns = new ArrayList<>();
         for (final Field f : clazz.getDeclaredFields()) {
+            if (f.getAnnotation(IgnoreField.class) != null)
+                // skip annotated fields
+                continue;
             final TableColumn<T, String> column = new TableColumn<>(f.getName());
             column.setCellValueFactory(new PropertyValueFactory<>(f.getName()));
             columns.add(column);
