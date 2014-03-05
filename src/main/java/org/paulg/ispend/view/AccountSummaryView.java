@@ -5,6 +5,7 @@ import javafx.geometry.Insets;
 import javafx.scene.control.Accordion;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TableView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -19,7 +20,7 @@ public class AccountSummaryView extends VBox {
 
         CompleteTableView<Account> accounts = new CompleteTableView<Account>(Account.class);
         accounts.setItems(accountsData);
-
+        accounts.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         getChildren().addAll(label, accounts);
         setPadding(new Insets(30, 5, 5, 5));
         setSpacing(5);

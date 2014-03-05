@@ -29,6 +29,7 @@ public class SearchView extends VBox {
         search.setPrefWidth(400);
 
         final TableView<Record> recordView = makeTable(data, Record.class);
+        recordView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
         getChildren().addAll(search, recordView);
         setVgrow(recordView, Priority.ALWAYS);
