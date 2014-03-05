@@ -3,6 +3,19 @@ elflock
 
 _Ever wondered where all that money went?_ Now you have __elflock__...
 
+## Features
+
+1. Load transaction history from CSV
+
+2. Search transaction history
+
+3. Plot weekly/monthly history
+
+4. Group and plot transactions matching search terms
+
+5. Save searches on close
+
+
 ## Requires
 
 1. Java 8 JDK ea (sorry :p)
@@ -18,18 +31,6 @@ mvn package && java -jar target/dist/ispend-${version}.jar
 
 This also produces native installers in target/dist/ (e.g. ispend.exe,
 .msi, .deb) if you are so inclined.
-
-## Features
-
-1. Load transaction history from CSV
-
-2. Search transaction history
-
-3. Plot weekly/monthly history
-
-4. Group and plot transactions matching search terms
-
-5. Save searches on close
 
 ## Limitations
 
