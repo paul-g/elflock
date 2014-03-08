@@ -1,7 +1,9 @@
 package org.paulg.ispend.model;
 
 import org.paulg.ispend.view.IgnoreField;
+import sun.java2d.pipe.SpanShapeRenderer;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class Account {
@@ -45,6 +47,10 @@ public class Account {
 	public int getTotal() {
 		return records.size();
 	}
+
+    public double getBalance() {
+        return Collections.max(records).getBalance();
+    }
 
 	@Override
 	public int hashCode() {
@@ -99,4 +105,14 @@ public class Account {
 	public List<Record> getRecords() {
 		return records;
 	}
+
+    public String getLastRecordDate() {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy");
+        Date lastRecord = Collections.max(records).getDate();
+        return sdf.format(lastRecord);
+    }
+
+    public int getTotalRecords() {
+        return records.size();
+    }
 }

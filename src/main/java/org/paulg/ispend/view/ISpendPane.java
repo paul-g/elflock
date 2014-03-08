@@ -48,8 +48,9 @@ public class ISpendPane extends Observable {
         this.staticVisualizer = new StaticVisualizer();
         this.groupView = new GroupView(this, groupData, pieChartPosData, pieChartNegData);
         this.searchView = new SearchView(data);
-        this.accountsView = new AccountSummaryView(accountsData);
+        this.accountsView = new AccountSummaryView(this);
         addObserver(groupView);
+        addObserver(accountsView);
 
         stage.setTitle("ISpend");
 
@@ -154,7 +155,7 @@ public class ISpendPane extends Observable {
         staticVisualizer.plotMonthlyTotalData(recordStore.getMonthlyBalance());
 
         this.setChanged();
-        this.groupView.update(this, null);
+        this.notifyObservers();
     }
 
     public File showDialog() {
@@ -202,5 +203,9 @@ public class ISpendPane extends Observable {
 
     public void saveQuery(String text) {
         preferencesStore.saveQuery(text);
+    }
+
+    public List<Account> getAccounts() {
+        return accountsData;
     }
 }
