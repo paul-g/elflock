@@ -103,6 +103,7 @@ public class RecordStore {
             spent += a.getRecords().stream().
                     mapToDouble(Record::getValue).
                     filter(x -> x < 0).
+                    map(x -> Math.abs(x)).
                     sum();
 		}
 		return spent;
