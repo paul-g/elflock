@@ -1,18 +1,11 @@
 package org.paulg.ispend.view;
 
-import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
-import javafx.scene.control.Accordion;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TableView;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
-import org.paulg.ispend.main.ISpend;
+import javafx.util.converter.NumberStringConverter;
 import org.paulg.ispend.model.Account;
 
 import java.util.Observable;
@@ -37,27 +30,37 @@ public class AccountSummaryView extends VBox implements Observer {
 
     private GridPane accountFieldView(Account account) {
         GridPane gp = new GridPane();
-        String [] desc = {
+        String[] desc = {
                 "Balance",
                 "Last Record",
                 "Total Records",
                 "Covered",
                 "Total Spent",
                 "Total Earned"};
-        String [] values = {
+        String[] values = {
                 Double.toString(account.getBalance()),
                 account.getLastRecordDate(),
                 Integer.toString(account.getTotalRecords()),
                 Integer.toString(account.getCovered()),
-        "None", "None"};
+                "None", "None"};
 
-        for (int i = 0; i < desc.length; i++) {
+        for (int i = 0; i < 3; i++) {
             Label l = new Label(desc[i]);
             l.setFont(accountLabelFont);
             gp.addRow(i,
                     l,
                     new Label(values[i]));
         }
+
+        gp.add(new Label("Covered"), 0, 3);
+        Label covered = new Label();
+
+        covered.textProperty().bindBidirectional(
+                account.getCoveredStringProperty(),
+                new NumberStringConverter()
+        );
+
+        gp.add(covered, 1, 3);
         gp.setPadding(new Insets(10, 10, 10, 10));
         gp.setVgap(10);
         gp.setHgap(10);
