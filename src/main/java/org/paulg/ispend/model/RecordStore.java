@@ -1,6 +1,8 @@
 package org.paulg.ispend.model;
 
 import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Collector;
 
 import org.paulg.ispend.utils.StringUtils;
 
@@ -87,24 +89,21 @@ public class RecordStore {
 
 	public double getTotalIncome() {
 		double income = 0;
-		for (Account a : accounts.values()) {
-			for (Record r : a.getRecords()) {
-				if (r.getValue() > 0) {
-					income += r.getValue();
-				}
-			}
-		}
+		for (Account a : accounts.values())
+            income += a.getRecords().stream().
+                    mapToDouble(Record::getValue).
+                    filter(x -> x > 0).
+                    sum();
 		return income;
 	}
 
 	public double getTotalSpent() {
-		double spent = 0;
+		Double spent = 0.0;
 		for (Account a : accounts.values()) {
-			for (Record r : a.getRecords()) {
-				if (r.getValue() < 0) {
-					spent += Math.abs(r.getValue());
-				}
-			}
+            spent += a.getRecords().stream().
+                    mapToDouble(Record::getValue).
+                    filter(x -> x < 0).
+                    sum();
 		}
 		return spent;
 	}
