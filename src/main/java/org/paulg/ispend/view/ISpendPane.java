@@ -8,6 +8,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import org.paulg.ispend.controller.OpenHistoryHandler;
@@ -38,6 +39,7 @@ public class ISpendPane extends Observable {
 
     private final AccountSummaryView accountsView;
     private final StaticVisualizer staticVisualizer;
+    private final BudgetView budgetView;
     private RecordStore recordStore;
     private Integer totalSpent;
     private Integer totalIncome;
@@ -49,6 +51,7 @@ public class ISpendPane extends Observable {
         this.groupView = new GroupView(this, groupData, pieChartPosData, pieChartNegData);
         this.searchView = new SearchView(data);
         this.accountsView = new AccountSummaryView(accountsData);
+        this.budgetView = new BudgetView();
         addObserver(groupView);
 
         stage.setTitle("ISpend");
@@ -102,8 +105,10 @@ public class ISpendPane extends Observable {
     private Tab makeDashboardTab() {
         Tab tab = new Tab("Dashboard");
         HBox box = new HBox();
-        box.getChildren().addAll(accountsView, staticVisualizer);
-        box.setHgrow(accountsView, Priority.ALWAYS);
+        VBox summary = new VBox();
+        summary.getChildren().addAll(accountsView, budgetView);
+        box.getChildren().addAll(summary, staticVisualizer);
+        box.setHgrow(summary, Priority.ALWAYS);
         box.setHgrow(staticVisualizer, Priority.ALWAYS);
         tab.setContent(box);
         return tab;

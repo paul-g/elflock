@@ -14,6 +14,7 @@ import java.util.List;
 class CompleteTableView<T> extends TableView<T> {
 
     public CompleteTableView(final Class<T> classToBind) {
+        super();
         final List<TableColumn<T, String>> columns = makeColumns(classToBind);
         getColumns().addAll(columns);
     }

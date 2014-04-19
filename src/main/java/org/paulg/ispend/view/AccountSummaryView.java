@@ -15,8 +15,7 @@ import org.paulg.ispend.model.Account;
 public class AccountSummaryView extends VBox {
 
     public AccountSummaryView(ObservableList<Account> accountsData) {
-        final Label label = new Label("Accounts");
-        label.setFont(new Font("Arial", 20));
+        final Label label = AppConfig.section("Account Summary");
 
         CompleteTableView<Account> accounts = new CompleteTableView<Account>(Account.class);
         accounts.setItems(accountsData);
