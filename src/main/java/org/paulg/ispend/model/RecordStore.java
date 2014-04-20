@@ -2,6 +2,7 @@ package org.paulg.ispend.model;
 
 import java.util.*;
 
+import org.jfree.data.time.*;
 import org.paulg.ispend.utils.StringUtils;
 
 public class RecordStore {
@@ -122,71 +123,52 @@ public class RecordStore {
     }
 
     private Map<Date, Double> getBalance(int period) {
-        Map<Integer, Map<Integer, Double>> weeklyBalance = new HashMap<>();
 
-        Date firstDate = null, lastDate = null;
-
-        for (Account a : accounts.values()) {
-            List<Record> rs = a.getRecords();
-            Collections.sort(rs);
-
-            Date rDate = rs.get(0).getDate();
-            if (firstDate == null || rDate.compareTo(firstDate) <= 0)
-                firstDate = rDate;
-            if (lastDate == null || rDate.compareTo(lastDate) >= 0)
-                lastDate = rDate;
-
-            // year -> period -> last_balance
-            Map<Integer, Map<Integer, Double>> weekly = new HashMap<>();
-
-            for (Record r : rs) {
-                Calendar c = Calendar.getInstance();
-                c.setTime(r.getDate());
-                int monthOfYear = c.get(period);
-                int year = c.get(Calendar.YEAR);
-
-                Map<Integer, Double> y = weekly.get(year);
-                if (y == null) {
-                    y = new HashMap<>();
-                    weekly.put(year, y);
-                }
-                y.put(monthOfYear, r.getBalance());
-            }
-
-            // aggregate the total across all accounts
-            for (Map.Entry<Integer, Map<Integer, Double>> me : weekly.entrySet()) {
-                Map<Integer, Double> wbForYear = weeklyBalance.get(me.getKey());
-                if (wbForYear == null) {
-                    wbForYear = new HashMap<>();
-                    weeklyBalance.put(me.getKey(), wbForYear);
-                }
-
-                for (Map.Entry<Integer, Double> me2 : me.getValue().entrySet()) {
-                    Double aggregatedBalanceForWeek = wbForYear.get(me2.getKey());
-                    if (aggregatedBalanceForWeek == null)
-                        wbForYear.put(me2.getKey(), me2.getValue());
-                    else
-                        wbForYear.put(me2.getKey(), aggregatedBalanceForWeek + me2.getValue());
-                }
-            }
-
+        System.out.println("Using JFREE");
+        TimeSeries ts = getRecords(period);
+        Map<Date, Double> newMap = new HashMap<>();
+        for (int i = 0; i < ts.getItemCount(); i++) {
+            TimeSeriesDataItem it = ts.getDataItem(i);
+            newMap.put(it.getPeriod().getStart(), it.getValue().doubleValue());
         }
+            return newMap;
 
-        Map<Date, Double> simpleWeeklyTotal = new HashMap<>();
-        for (Map.Entry<Integer, Map<Integer, Double>> me : weeklyBalance.entrySet()) {
-            int y = me.getKey();
-            for (Map.Entry<Integer, Double> me2 : me.getValue().entrySet()) {
-                int week = me2.getKey();
-                Calendar c = Calendar.getInstance();
-                c.setTimeInMillis(0);
-                c.set(Calendar.YEAR, y);
-                c.set(period, week);
-                Date d = c.getTime();
-                simpleWeeklyTotal.put(d, me2.getValue());
-            }
-        }
-
-        return simpleWeeklyTotal;
     }
 
+    /** Get records grouped in a certain unit of time (e.g. records per
+     * Calendar.MONTH or Calendar.WEEK etc.). This can be used for weekly/monthly
+     * statistics */
+    private TimeSeries getRecords(int period) {
+        List<List<Record>> allRecords = new ArrayList<>();
+
+        Map<RegularTimePeriod, Integer> periodCount = new HashMap<>();
+
+        TimeSeries ts = new TimeSeries("Test");
+        for (Account a : accounts.values()) {
+            List<Record> rs = a.getRecords();
+            for (Record r : rs) {
+                // aggregate
+                RegularTimePeriod timePeriod;
+                if (period == Calendar.MONTH)
+                    timePeriod = new Month(r.getDate());
+                else
+                    timePeriod = new Week(r.getDate());
+                TimeSeriesDataItem tsItem = ts.getDataItem(timePeriod);
+                double oldValue = tsItem == null ? 0 : tsItem.getValue().doubleValue();
+                Integer count = periodCount.get(timePeriod);
+                count = count == null ? 1 : count + 1;
+
+                // XXX this leads to some (acceptable for now) loss of accuracy
+                double newValue = (oldValue * (count - 1) + r.getBalance()) / count;
+                ts.addOrUpdate(timePeriod, newValue);
+            }
+            allRecords.add(rs);
+        }
+
+        for (Object item : ts.getItems()) {
+            TimeSeriesDataItem tsItem = (TimeSeriesDataItem)item;
+            System.out.println(tsItem.getPeriod() + " " + tsItem.getValue());
+        }
+        return ts;
+    }
 }
