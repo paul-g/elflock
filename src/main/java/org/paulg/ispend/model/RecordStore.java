@@ -123,6 +123,17 @@ public class RecordStore {
         return getBalance(Calendar.MONTH);
     }
 
+    public Map<Date, Double> getWeeklyAveragesByDescription(String descriptionQuery) {
+        List<Record> filtered = filter(descriptionQuery);
+        TimeSeries ts = averageByPeriod(filtered, r -> r.getValue(), Calendar.WEEK_OF_YEAR);
+        Map<Date, Double> newMap = new HashMap<>();
+        for (int i = 0; i < ts.getItemCount(); i++) {
+            TimeSeriesDataItem it = ts.getDataItem(i);
+            newMap.put(it.getPeriod().getStart(), it.getValue().doubleValue());
+        }
+        return newMap;
+    }
+
     public double getWeeklyAverageByDescription(String descriptionQuery) {
         List<Record> filtered = filter(descriptionQuery);
         TimeSeries ts = averageByPeriod(filtered, r -> r.getValue(), Calendar.WEEK_OF_YEAR);
@@ -169,10 +180,6 @@ public class RecordStore {
             ts.addOrUpdate(timePeriod, newValue);
         }
 
-        for (Object item : ts.getItems()) {
-            TimeSeriesDataItem tsItem = (TimeSeriesDataItem) item;
-            System.out.println(tsItem.getPeriod() + " " + tsItem.getValue());
-        }
         return ts;
     }
 }

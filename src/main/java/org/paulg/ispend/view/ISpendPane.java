@@ -105,12 +105,14 @@ public class ISpendPane extends Observable {
 
     private Tab makeDashboardTab() {
         Tab tab = new Tab("Dashboard");
-        HBox box = new HBox();
-        VBox summary = new VBox();
-        summary.getChildren().addAll(accountsView, budgetView);
-        box.getChildren().addAll(summary, staticVisualizer);
-        box.setHgrow(summary, Priority.ALWAYS);
-        box.setHgrow(staticVisualizer, Priority.ALWAYS);
+        VBox box = new VBox();
+        HBox summary = new HBox();
+        summary.getChildren().addAll(accountsView, staticVisualizer);
+
+        summary.setHgrow(accountsView, Priority.ALWAYS);
+        summary.setHgrow(staticVisualizer, Priority.ALWAYS);
+
+        box.getChildren().addAll(summary, budgetView);
         tab.setContent(box);
         return tab;
     }
@@ -212,5 +214,13 @@ public class ISpendPane extends Observable {
 
     public void saveQuery(String text) {
         preferencesStore.saveQuery(text);
+    }
+
+    public void saveSearchQueries(List<String> queries) {
+        preferencesStore.saveSearchQueries(queries);
+    }
+
+    public List<String> getSavedSearchQueries() {
+        return preferencesStore.getSavedQueries();
     }
 }

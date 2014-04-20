@@ -32,7 +32,7 @@ public class StaticVisualizer extends VBox {
         weeklyBalance = new LineChart<>(wbAxis, new NumberAxis());
         weeklyBalance.setTitle("Weekly Balance");
 
-        getChildren().addAll(weeklyBalance, monthlyBalance);
+        getChildren().addAll(monthlyBalance);
 
         setAlignment(Pos.CENTER);
         setSpacing(20);
