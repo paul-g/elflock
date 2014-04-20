@@ -13,13 +13,23 @@ import java.util.*;
 
 public class StaticVisualizer extends VBox {
 
-    private LineChart<String, Number> weeklyBalance, monthlyBalance;
+    private LineChart<Number, Number> weeklyBalance, monthlyBalance;
+
+    private NumberAxis makeDateAxis(String dateFormat) {
+        NumberAxis na = new NumberAxis();
+        na.setTickLabelFormatter(new DateConverter(dateFormat));
+        na.setForceZeroInRange(false);
+        return na;
+    }
 
     StaticVisualizer() {
-        monthlyBalance = new LineChart<>(new CategoryAxis(), new NumberAxis());
+        NumberAxis mbAxis = makeDateAxis("Y m");
+        NumberAxis wbAxis = makeDateAxis("Y w");
+
+        monthlyBalance = new LineChart<>(mbAxis, new NumberAxis());
         monthlyBalance.setTitle("Monthly Balance");
 
-        weeklyBalance = new LineChart<>(new CategoryAxis(), new NumberAxis());
+        weeklyBalance = new LineChart<>(wbAxis, new NumberAxis());
         weeklyBalance.setTitle("Weekly Balance");
 
         getChildren().addAll(weeklyBalance, monthlyBalance);
@@ -47,7 +57,7 @@ public class StaticVisualizer extends VBox {
         XYChart.Series series = new XYChart.Series();
         series.setName(seriesTitle);
         for (Date d : allDates)
-            series.getData().add(new XYChart.Data(sdf.format(d), records.get(d)));
+            series.getData().add(new XYChart.Data(d.getTime(), records.get(d)));
         chart.getData().add(series);
     }
 }
