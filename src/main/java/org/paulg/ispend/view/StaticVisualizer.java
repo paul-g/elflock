@@ -53,7 +53,6 @@ public class StaticVisualizer extends VBox {
             String seriesTitle) {
         List<Date> allDates = new ArrayList<>(records.keySet());
         Collections.sort(allDates);
-        SimpleDateFormat sdf = new SimpleDateFormat(format);
         XYChart.Series series = new XYChart.Series();
         series.setName(seriesTitle);
         for (Date d : allDates)

@@ -51,8 +51,9 @@ public class ISpendPane extends Observable {
         this.groupView = new GroupView(this, groupData, pieChartPosData, pieChartNegData);
         this.searchView = new SearchView(data);
         this.accountsView = new AccountSummaryView(accountsData);
-        this.budgetView = new BudgetView();
+        this.budgetView = new BudgetView(this);
         addObserver(groupView);
+        addObserver(budgetView);
 
         stage.setTitle("ISpend");
 
@@ -138,6 +139,10 @@ public class ISpendPane extends Observable {
     }
 
 
+    public RecordStore getRecordStore() {
+        return recordStore;
+    }
+
     public void fileSelected(final String path) throws IOException {
         final HistoryFileVisitor fileVisitor = new HistoryFileVisitor();
         recordStore = fileVisitor.getRecordStore();
@@ -154,12 +159,12 @@ public class ISpendPane extends Observable {
         accountsData.addAll(recordStore.getAccounts());
         recordStore.printSummary();
 
-
         staticVisualizer.plotWeeklyTotalData(recordStore.getWeeklyBalance());
         staticVisualizer.plotMonthlyTotalData(recordStore.getMonthlyBalance());
 
         this.setChanged();
-        this.groupView.update(this, null);
+        //this.groupView.update(this, null);
+        this.notifyObservers();
     }
 
     public File showDialog() {
