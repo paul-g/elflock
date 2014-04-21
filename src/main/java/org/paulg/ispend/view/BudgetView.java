@@ -43,7 +43,7 @@ public class BudgetView extends HBox implements Observer {
         plot = new LineChart<>(
                 makeDateAxis("Y m"),
                 new NumberAxis()
-                );
+        );
 
         CompleteTableView<BudgetEntry> tv = new CompleteTableView<>(BudgetEntry.class);
 

@@ -1,34 +1,35 @@
 package org.paulg.ispend.controller;
 
-import java.io.*;
-
-import javafx.event.*;
-
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import org.paulg.ispend.view.ISpendPane;
+
+import java.io.File;
+import java.io.IOException;
 
 public class OpenHistoryHandler implements EventHandler<ActionEvent> {
 
-	private final ISpendPane iSpendPane;
+    private final ISpendPane iSpendPane;
 
-	public OpenHistoryHandler(final ISpendPane iSpendPane) {
-		this.iSpendPane = iSpendPane;
-	}
+    public OpenHistoryHandler(final ISpendPane iSpendPane) {
+        this.iSpendPane = iSpendPane;
+    }
 
-	@Override
-	public void handle(final ActionEvent e) {
-		handleSelection();
-	}
+    @Override
+    public void handle(final ActionEvent e) {
+        handleSelection();
+    }
 
-	private void handleSelection() {
-		final File selectedDirectory = iSpendPane.showDialog();
-		if (selectedDirectory != null) {
-			final String path = selectedDirectory.getAbsolutePath();
-			try {
-				iSpendPane.fileSelected(path);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-	}
+    private void handleSelection() {
+        final File selectedDirectory = iSpendPane.showDialog();
+        if (selectedDirectory != null) {
+            final String path = selectedDirectory.getAbsolutePath();
+            try {
+                iSpendPane.fileSelected(path);
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+    }
 }

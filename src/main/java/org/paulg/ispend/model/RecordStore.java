@@ -2,11 +2,9 @@ package org.paulg.ispend.model;
 
 import org.jfree.data.time.*;
 import org.paulg.ispend.utils.StringUtils;
-import java.util.*;
-import java.util.function.Function;
-import org.paulg.ispend.utils.StringUtils;
 
 import java.util.*;
+import java.util.function.Function;
 
 public class RecordStore {
 
@@ -42,8 +40,6 @@ public class RecordStore {
     private String[] parseArguments(final String text) {
         return text.split(",");
     }
-
-
 
 
     public Collection<Account> getAccounts() {

@@ -2,13 +2,11 @@ package org.paulg.ispend.view;
 
 
 import javafx.geometry.Pos;
-import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.layout.VBox;
 
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class StaticVisualizer extends VBox {
