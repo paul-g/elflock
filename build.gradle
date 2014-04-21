@@ -28,9 +28,10 @@ javafx {
 
 jacoco {
         toolVersion = "0.7.0.201403182114"
-        reportsDir = file("$buildDir/customJacocoReportDir")
 }
 
 String getProjectProperty(String propertyName) {
     project.hasProperty(propertyName) ? project.property(propertyName) : null
 }
+
+jacocoTestReport.dependsOn test
