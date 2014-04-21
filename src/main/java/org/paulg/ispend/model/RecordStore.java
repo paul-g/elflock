@@ -2,9 +2,11 @@ package org.paulg.ispend.model;
 
 import org.jfree.data.time.*;
 import org.paulg.ispend.utils.StringUtils;
-
 import java.util.*;
 import java.util.function.Function;
+import org.paulg.ispend.utils.StringUtils;
+
+import java.util.*;
 
 public class RecordStore {
 
@@ -26,20 +28,6 @@ public class RecordStore {
         return new ArrayList<>();
     }
 
-    public void printSummary() {
-        for (final Account a : accounts.values()) {
-            a.printSummary();
-        }
-    }
-
-    public List<Record> getAllRecords() {
-        final List<Record> allRecords = new ArrayList<>();
-        for (final Account a : accounts.values()) {
-            allRecords.addAll(a.getRecords());
-        }
-        return allRecords;
-    }
-
     public List<Record> filter(final String text) {
         final List<Record> unfiltered = getAllRecords();
         final List<Record> filtered = new ArrayList<>();
@@ -53,6 +41,27 @@ public class RecordStore {
 
     private String[] parseArguments(final String text) {
         return text.split(",");
+    }
+
+
+
+
+    public Collection<Account> getAccounts() {
+        return accounts.values();
+    }
+
+    public void printSummary() {
+        for (final Account a : accounts.values()) {
+            a.printSummary();
+        }
+    }
+
+    public List<Record> getAllRecords() {
+        final List<Record> allRecords = new ArrayList<>();
+        for (final Account a : accounts.values()) {
+            allRecords.addAll(a.getRecords());
+        }
+        return allRecords;
     }
 
     public List<AggregatedRecord> groupByDescription(final String query) {
@@ -87,32 +96,27 @@ public class RecordStore {
         return tagRecords;
     }
 
+
     public double getTotalIncome() {
         double income = 0;
-        for (Account a : accounts.values()) {
-            for (Record r : a.getRecords()) {
-                if (r.getValue() > 0) {
-                    income += r.getValue();
-                }
-            }
-        }
+        for (Account a : accounts.values())
+            income += a.getRecords().stream().
+                    mapToDouble(Record::getValue).
+                    filter(x -> x > 0).
+                    sum();
         return income;
     }
 
     public double getTotalSpent() {
-        double spent = 0;
+        Double spent = 0.0;
         for (Account a : accounts.values()) {
-            for (Record r : a.getRecords()) {
-                if (r.getValue() < 0) {
-                    spent += Math.abs(r.getValue());
-                }
-            }
+            spent += a.getRecords().stream().
+                    mapToDouble(Record::getValue).
+                    filter(x -> x < 0).
+                    map(x -> Math.abs(x)).
+                    sum();
         }
         return spent;
-    }
-
-    public Collection<Account> getAccounts() {
-        return accounts.values();
     }
 
     public Map<Date, Double> getWeeklyBalance() {

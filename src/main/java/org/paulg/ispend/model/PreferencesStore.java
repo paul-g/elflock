@@ -70,5 +70,4 @@ public class PreferencesStore {
 		prefs.remove(SAVED_QUERY);
 		prefs.remove(LOADED_FILE);
 	}
-
 }

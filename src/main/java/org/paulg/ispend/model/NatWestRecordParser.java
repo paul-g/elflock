@@ -2,19 +2,16 @@ package org.paulg.ispend.model;
 
 import org.paulg.ispend.utils.StringUtils;
 
-import java.util.Arrays;
-import java.util.StringTokenizer;
-
 public class NatWestRecordParser implements RecordParser {
 
     private String SEP = ",";
 
-    private enum State  {
+    private enum State {
         PARSING_NORMAL, PARSING_QUOTED_ENTRY, END_QUOTED_ENTRY, NOT_PARSING,
     }
 
-	@Override
-	public Record parseRecord(final String line) {
+    @Override
+    public Record parseRecord(final String line) {
 
         State state = State.PARSING_NORMAL;
 
@@ -22,7 +19,7 @@ public class NatWestRecordParser implements RecordParser {
         int fieldCount = 0;
 
         int pos = 0;
-        char [] lchars = line.toCharArray();
+        char[] lchars = line.toCharArray();
         String token = "";
         while (pos < lchars.length) {
             char c = lchars[pos++];
@@ -40,7 +37,7 @@ public class NatWestRecordParser implements RecordParser {
                     break;
                 case PARSING_NORMAL:
                     if (c == ',') {
-                        if (pos < lchars.length && lchars[pos] == '"')  {
+                        if (pos < lchars.length && lchars[pos] == '"') {
                             pos++;
                             state = State.PARSING_QUOTED_ENTRY;
                         }
@@ -52,14 +49,14 @@ public class NatWestRecordParser implements RecordParser {
             }
         }
 
-		final Record r = new Record();
-		r.setDate(recordFields[0]);
-		r.setType(recordFields[1]);
-		r.setDescription(recordFields[2]);
-		r.setValue(Double.parseDouble(recordFields[3]));
-		r.setBalance(Double.parseDouble(recordFields[4]));
-		r.setAccountName(recordFields[5]);
-		r.setAccountNumber(recordFields[6]);
-		return r;
-	}
+        final Record r = new Record();
+        r.setDate(recordFields[0]);
+        r.setType(recordFields[1]);
+        r.setDescription(recordFields[2]);
+        r.setValue(Double.parseDouble(recordFields[3]));
+        r.setBalance(Double.parseDouble(recordFields[4]));
+        r.setAccountName(recordFields[5]);
+        r.setAccountNumber(recordFields[6]);
+        return r;
+    }
 }
