@@ -20,17 +20,17 @@ _Ever wondered where all that money went?_ Now you have __elflock__...
 
 1. Java 8 JDK ea (sorry :p)
 
-2. maven 3
+2. gradle 1.11
 
 ## Installation
 
 Build and run with:
 ```
-mvn package && java -jar target/dist/ispend-${version}.jar
+gradle build && java -jar build/libs/elflock.jar
 ```
 
-This also produces native installers in target/dist/ (e.g. ispend.exe,
-.msi, .deb) if you are so inclined.
+This also produces native installers in build/distributions/bundles/
+(.rpm, .deb) if you are so inclined.
 
 ## Limitations
 
