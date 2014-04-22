@@ -2,12 +2,12 @@ package org.paulg.ispend.model;
 
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import org.joda.time.DateTime;
 import org.paulg.ispend.view.IgnoreField;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 public class Account {
@@ -111,7 +111,7 @@ public class Account {
 
     public String getLastRecordDate() {
         SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy");
-        Date lastRecord = Collections.max(records).getDate();
+        DateTime lastRecord = Collections.max(records).getDate();
         return sdf.format(lastRecord);
     }
 

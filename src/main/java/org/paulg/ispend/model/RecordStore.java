@@ -167,9 +167,9 @@ public class RecordStore {
             // aggregate
             RegularTimePeriod timePeriod;
             if (period == Calendar.MONTH)
-                timePeriod = new Month(r.getDate());
+                timePeriod = new Month(r.getDate().toDate());
             else
-                timePeriod = new Week(r.getDate());
+                timePeriod = new Week(r.getDate().toDate());
             TimeSeriesDataItem tsItem = ts.getDataItem(timePeriod);
             double oldValue = tsItem == null ? 0 : tsItem.getValue().doubleValue();
             Integer count = periodCount.get(timePeriod);

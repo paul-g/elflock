@@ -3,8 +3,6 @@ package org.paulg.ispend.model;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 
-import java.util.Date;
-
 public class Record implements Comparable<Record> {
 
     private DateTime date;
@@ -89,15 +87,15 @@ public class Record implements Comparable<Record> {
         this.value = value;
     }
 
-    public Date getDate() {
-        return date.toDate();
+    public DateTime getDate() {
+        return date;
     }
 
     public void setDate(final String date) {
         this.date = parseDate(date);
     }
 
-    public void setDate(final Date date) {
+    public void setDate(final DateTime date) {
         this.date = new DateTime(date);
     }
 
@@ -135,6 +133,6 @@ public class Record implements Comparable<Record> {
     @Override
     public int compareTo(Record o) {
         if (o == null) return -1;
-        return date.toDate().compareTo(o.getDate());
+        return date.compareTo(o.getDate());
     }
 }

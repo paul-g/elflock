@@ -6,6 +6,7 @@ import javafx.scene.chart.*;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.HBox;
+import org.joda.time.DateTime;
 import org.paulg.ispend.model.AggregatedRecord;
 import org.paulg.ispend.model.Record;
 
@@ -54,19 +55,19 @@ class HistoricalVisualizer extends TabPane {
 
     private LinkedHashSet<String> getAllMonthsInRecordRange(
             List<AggregatedRecord> records, SimpleDateFormat sdf) {
-        List<Date> dates = new ArrayList<>();
+        List<DateTime> dates = new ArrayList<>();
         for (AggregatedRecord aggregatedRecord : records) {
             for (Record r : aggregatedRecord.getRecords()) {
                 dates.add(r.getDate());
             }
         }
 
-        Date maxDate = Collections.max(dates);
+        DateTime maxDate = Collections.max(dates);
         Calendar c = Calendar.getInstance();
-        c.setTime(Collections.min(dates));
+        c.setTime(Collections.min(dates).toDate());
 
         LinkedHashSet<String> allMonths = new LinkedHashSet<>();
-        while (c.getTime().before(maxDate)) {
+        while (c.getTime().before(maxDate.toDate())) {
             allMonths.add(sdf.format(c.getTime()));
             c.add(Calendar.MONTH, 1);
         }
