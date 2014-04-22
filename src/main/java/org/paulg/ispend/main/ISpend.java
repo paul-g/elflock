@@ -17,7 +17,6 @@ public class ISpend extends Application {
     public void start(final Stage stage) {
         PreferencesStore store = new PreferencesStore();
         ISpendPane pane = new ISpendPane(stage, store);
-        setUserAgentStylesheet(STYLESHEET_MODENA);
         pane.show();
     }
 

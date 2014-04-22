@@ -61,6 +61,7 @@ public class ISpendPane extends Observable {
 
         BorderPane pane = new BorderPane();
         pane.setCenter(makeAppContent());
+        pane.setId("container");
 
         pane.setTop(createMenuBar());
 

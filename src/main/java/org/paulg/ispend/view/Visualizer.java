@@ -39,7 +39,7 @@ class HistoricalVisualizer extends TabPane {
             series.setName(ar.getDescription());
             Map<String, Double> monthToTotal = new HashMap<>();
             for (Record r : ar.getRecords()) {
-                String date = sdf.format(r.getDate());
+                String date = sdf.format(r.getDate().toDate());
                 monthToTotal.compute(date,
                         (k, v) -> (v == null) ? r.getValue() : r.getValue() + v);
             }
@@ -72,7 +72,7 @@ class HistoricalVisualizer extends TabPane {
             c.add(Calendar.MONTH, 1);
         }
 
-        allMonths.add(sdf.format(maxDate));
+        allMonths.add(sdf.format(maxDate.toDate()));
         return allMonths;
     }
 

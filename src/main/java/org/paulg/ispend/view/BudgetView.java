@@ -101,7 +101,7 @@ public class BudgetView extends HBox implements Observer {
         HBox addEntry = new HBox();
         final TextField text = new TextField();
         text.setPromptText("Search");
-        final Button add = new Button("Add");
+        final Button add = new Button("+");
         addEntry.getChildren().addAll(text, add);
         addEntry.setHgrow(text, Priority.ALWAYS);
         addEntry.setSpacing(10);
@@ -122,7 +122,6 @@ public class BudgetView extends HBox implements Observer {
     }
 
     private void addQuery(String query) {
-        System.out.println("Adding query" + query);
         queries.add(query);
         budgets.add(getBudget(query));
         pane.saveSearchQueries(queries);
