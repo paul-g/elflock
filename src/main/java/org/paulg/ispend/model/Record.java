@@ -1,12 +1,13 @@
 package org.paulg.ispend.model;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+
 import java.util.Date;
 
 public class Record implements Comparable<Record> {
 
-    private Date date;
+    private DateTime date;
     private String type;
     private String description;
     private Double balance;
@@ -27,7 +28,7 @@ public class Record implements Comparable<Record> {
                   final String accountNumber,
                   final double value) {
         super();
-        this.date = formatDate(date);
+        this.date = parseDate(date);
         this.type = type;
         this.description = description;
         this.balance = balance;
@@ -36,15 +37,8 @@ public class Record implements Comparable<Record> {
         this.value = value;
     }
 
-    private Date formatDate(String date) {
-        Date res = new Date(0);
-        try {
-            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-            res = sdf.parse(date);
-        } catch (ParseException pe) {
-            pe.printStackTrace();
-        }
-        return res;
+    private DateTime parseDate(String date) {
+        return DateTime.parse(date, DateTimeFormat.forPattern("dd/MM/yyyy"));
     }
 
     public String getType() {
@@ -96,15 +90,15 @@ public class Record implements Comparable<Record> {
     }
 
     public Date getDate() {
-        return date;
+        return date.toDate();
     }
 
     public void setDate(final String date) {
-        this.date = formatDate(date);
+        this.date = parseDate(date);
     }
 
     public void setDate(final Date date) {
-        this.date = date;
+        this.date = new DateTime(date);
     }
 
     @Override
@@ -141,6 +135,6 @@ public class Record implements Comparable<Record> {
     @Override
     public int compareTo(Record o) {
         if (o == null) return -1;
-        return date.compareTo(o.getDate());
+        return date.toDate().compareTo(o.getDate());
     }
 }
