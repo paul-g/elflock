@@ -66,6 +66,7 @@ public class ISpendPane extends Observable {
 
         scene = new Scene(pane);
         stage.setScene(scene);
+        scene.getStylesheets().add("stylesheet.css");
         stage.centerOnScreen();
         stage.setResizable(true);
         stage.show();
@@ -141,7 +142,6 @@ public class ISpendPane extends Observable {
         }
         pieChartPosData.add(new PieChart.Data("Other", (leftTotal / total) * 100));
     }
-
 
     public RecordStore getRecordStore() {
         return recordStore;

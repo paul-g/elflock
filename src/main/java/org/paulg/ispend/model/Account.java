@@ -112,7 +112,7 @@ public class Account {
     public String getLastRecordDate() {
         SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy");
         DateTime lastRecord = Collections.max(records).getDate();
-        return sdf.format(lastRecord);
+        return sdf.format(lastRecord.toDate());
     }
 
     public int getTotalRecords() {

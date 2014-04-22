@@ -4,7 +4,6 @@ import javafx.geometry.Insets;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
 import javafx.util.converter.NumberStringConverter;
 import org.paulg.ispend.model.Account;
 
@@ -14,13 +13,10 @@ import java.util.Observer;
 public class AccountSummaryView extends VBox implements Observer {
 
     private final ISpendPane ispendPane;
-    private Font accountLabelFont = new Font("Arial", 16);
-    private Font accountNameFont = new Font("Arial", 19);
 
     public AccountSummaryView(ISpendPane ispendPane) {
         this.ispendPane = ispendPane;
-        final Label label = new Label("Accounts");
-        label.setFont(new Font("Arial", 20));
+        final Label label = UiUtils.section("Accounts Summary");
         getChildren().addAll(label);
         setPadding(new Insets(30, 5, 5, 5));
         setSpacing(15);
@@ -43,14 +39,13 @@ public class AccountSummaryView extends VBox implements Observer {
                 "None", "None"};
 
         for (int i = 0; i < 3; i++) {
-            Label l = new Label(desc[i]);
-            l.setFont(accountLabelFont);
+            Label l = UiUtils.subsection(desc[i]);
             gp.addRow(i,
                     l,
                     new Label(values[i]));
         }
 
-        gp.add(new Label("Covered"), 0, 3);
+        gp.add(UiUtils.subsection("Covered"), 0, 3);
         Label covered = new Label();
 
         covered.textProperty().bindBidirectional(
@@ -67,8 +62,7 @@ public class AccountSummaryView extends VBox implements Observer {
 
     private VBox accountView(Account account) {
         VBox box = new VBox();
-        Label l = new Label(account.getName());
-        l.setFont(accountNameFont);
+        Label l = UiUtils.section(account.getName());
         box.getChildren().add(l);
         box.getChildren().add(accountFieldView(account));
         box.setPadding(new Insets(10, 10, 10, 10));

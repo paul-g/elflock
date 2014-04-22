@@ -38,7 +38,7 @@ public class BudgetView extends HBox implements Observer {
 
     public BudgetView(ISpendPane pane) {
         this.pane = pane;
-        final Label label = AppConfig.section("Budget");
+        final Label label = UiUtils.section("Budget");
 
         plot = new LineChart<>(
                 makeDateAxis("Y m"),

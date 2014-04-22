@@ -5,7 +5,6 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.chart.PieChart;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
@@ -50,8 +49,7 @@ public class GroupView extends VBox implements Observer {
         aggregatedRecordView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         HBox hbox = new HBox();
         hbox.setHgrow(groupBy, Priority.ALWAYS);
-        Label label = new Label("Group By");
-        hbox.getChildren().addAll(label, groupBy, save);
+        hbox.getChildren().addAll(groupBy, save);
         hbox.setAlignment(Pos.CENTER);
         hbox.setSpacing(5);
         hbox.setPadding(new Insets(5, 5, 5, 5));
