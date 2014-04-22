@@ -1,5 +1,6 @@
 package org.paulg.ispend.model;
 
+import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -56,18 +57,12 @@ public class RecordStoreTest {
     @Test
     public void testAggregators() {
         Map<Date, Double> weeklyAverage = store.getWeeklyAveragesByDescription("trans");
-        Map<Date, Double> expectedWeeklyAverage = new HashMap<>();
-        Calendar c = Calendar.getInstance();
-        c.set(2013, 1, 4, 0, 0, 0);
-        c.set(Calendar.MILLISECOND, 0);
-        Date d1 = c.getTime();
-        c.set(2013, 1, 11, 0, 0, 0);
-        c.set(Calendar.MILLISECOND, 0);
-        Date d2 = c.getTime();
+        DateTime dt = new DateTime(2013, 2, 4, 0, 0, 0, 0);
+        Double d1Average = weeklyAverage.get(dt.toDate());
+        dt = new DateTime(2013, 2, 11, 0, 0, 0, 0);
+        Double d2Average = weeklyAverage.get(dt.toDate());
 
         // check average for each week
-        Double d1Average = weeklyAverage.get(d1);
-        Double d2Average = weeklyAverage.get(d2);
         assertEquals((r1.getValue() + r2.getValue()) / 2, d1Average, 1e-10);
         assertEquals(r.getValue(), d2Average, 1e-10);
 
