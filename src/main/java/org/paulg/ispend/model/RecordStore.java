@@ -178,8 +178,8 @@ public class RecordStore {
             // XXX this leads to some (acceptable for now) loss of accuracy
             double newValue = (oldValue * (count - 1) + func.apply(r).doubleValue()) / count;
             ts.addOrUpdate(timePeriod, newValue);
+            periodCount.put(timePeriod, count);
         }
-
         return ts;
     }
 }
