@@ -2,5 +2,9 @@
 .project
 .settings
 bin/
-target/
+build/
+out/
 historical-data
+.idea
+.gradle
+*.iml
