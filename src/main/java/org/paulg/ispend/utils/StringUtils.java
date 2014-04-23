@@ -20,9 +20,6 @@ public final class StringUtils {
         while ((fpos >= 0) && (characters.indexOf(text.charAt(fpos)) >= 0)) {
             fpos--;
         }
-        if (spos <= fpos) {
-            return text.substring(spos, fpos + 1);
-        }
-        return "";
+        return spos <= fpos ? text.substring(spos, fpos + 1) : "";
     }
 }

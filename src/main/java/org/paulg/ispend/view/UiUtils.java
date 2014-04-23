@@ -5,16 +5,19 @@ import javafx.scene.control.Label;
 /**
  * General configuration options for the app
  */
-public class UiUtils {
-    public static Label section(String text) {
-        final Label l = new Label(text);
-        l.getStyleClass().add("section");
-        return l;
+public final class UiUtils {
+
+    private UiUtils() {}
+
+    public static Label section(final String text) {
+        final Label label = new Label(text);
+        label.getStyleClass().add("section");
+        return label;
     }
 
-    public static Label subsection(String text) {
-        final Label l = new Label(text);
-        l.getStyleClass().add("subsection");
-        return l;
+    public static Label subsection(final String text) {
+        final Label label = new Label(text);
+        label.getStyleClass().add("subsection");
+        return label;
     }
 }
