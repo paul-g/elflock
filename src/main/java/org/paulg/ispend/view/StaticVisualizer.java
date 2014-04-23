@@ -2,32 +2,19 @@ package org.paulg.ispend.view;
 
 
 import javafx.geometry.Pos;
-import javafx.scene.chart.LineChart;
-import javafx.scene.chart.NumberAxis;
-import javafx.scene.chart.XYChart;
 import javafx.scene.layout.VBox;
-
-import java.util.*;
+import org.jfree.data.time.TimeSeries;
 
 public class StaticVisualizer extends VBox {
 
-    private LineChart<Number, Number> weeklyBalance, monthlyBalance;
-
-    private NumberAxis makeDateAxis(String dateFormat) {
-        NumberAxis na = new NumberAxis();
-        na.setTickLabelFormatter(new DateConverter(dateFormat));
-        na.setForceZeroInRange(false);
-        return na;
-    }
+    private TimeSeriesChart weeklyBalance, monthlyBalance;
 
     StaticVisualizer() {
-        NumberAxis mbAxis = makeDateAxis("Y m");
-        NumberAxis wbAxis = makeDateAxis("Y w");
 
-        monthlyBalance = new LineChart<>(mbAxis, new NumberAxis());
+        monthlyBalance = TimeSeriesChart.build();
         monthlyBalance.setTitle("Monthly Balance");
 
-        weeklyBalance = new LineChart<>(wbAxis, new NumberAxis());
+        weeklyBalance = TimeSeriesChart.build();
         weeklyBalance.setTitle("Weekly Balance");
 
         getChildren().addAll(monthlyBalance);
@@ -36,25 +23,17 @@ public class StaticVisualizer extends VBox {
         setSpacing(20);
     }
 
-    void plotMonthlyTotalData(Map<Date, Double> records) {
-        plotData(records, monthlyBalance, "yy MM", "Monthly Balance");
+    void plotMonthlyTotalData(TimeSeries records) {
+        plotData(records, monthlyBalance);
     }
 
-    void plotWeeklyTotalData(Map<Date, Double> records) {
-        plotData(records, weeklyBalance, "yy w", "Weekly Balance");
+    void plotWeeklyTotalData(TimeSeries records) {
+        plotData(records, weeklyBalance);
     }
 
     private void plotData(
-            Map<Date, Double> records,
-            LineChart<?, ?> chart,
-            String format,
-            String seriesTitle) {
-        List<Date> allDates = new ArrayList<>(records.keySet());
-        Collections.sort(allDates);
-        XYChart.Series series = new XYChart.Series();
-        series.setName(seriesTitle);
-        for (Date d : allDates)
-            series.getData().add(new XYChart.Data(d.getTime(), records.get(d)));
-        chart.getData().add(series);
+            TimeSeries records,
+            TimeSeriesChart chart) {
+        chart.setTimeSeries(records);
     }
 }

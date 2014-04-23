@@ -115,11 +115,11 @@ public class RecordStore {
         return spent;
     }
 
-    public Map<Date, Double> getWeeklyBalance() {
+    public TimeSeries getWeeklyBalance() {
         return getBalance(Calendar.WEEK_OF_YEAR);
     }
 
-    public Map<Date, Double> getMonthlyBalance() {
+    public TimeSeries getMonthlyBalance() {
         return getBalance(Calendar.MONTH);
     }
 
@@ -145,14 +145,14 @@ public class RecordStore {
         return rename / ts.getItemCount();
     }
 
-    private Map<Date, Double> getBalance(int period) {
-        TimeSeries ts = averageByPeriod(getAllRecords(), r -> r.getBalance(), period);
-        Map<Date, Double> newMap = new HashMap<>();
-        for (int i = 0; i < ts.getItemCount(); i++) {
-            TimeSeriesDataItem it = ts.getDataItem(i);
-            newMap.put(it.getPeriod().getStart(), it.getValue().doubleValue());
-        }
-        return newMap;
+    private TimeSeries getBalance(int period) {
+        return averageByPeriod(getAllRecords(), r -> r.getBalance(), period);
+//        Map<Date, Double> newMap = new HashMap<>();
+//        for (int i = 0; i < ts.getItemCount(); i++) {
+//            TimeSeriesDataItem it = ts.getDataItem(i);
+//            newMap.put(it.getPeriod().getStart(), it.getValue().doubleValue());
+//        }
+//        return newMap;
     }
 
     /**
