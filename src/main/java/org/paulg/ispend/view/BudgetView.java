@@ -80,22 +80,26 @@ public class BudgetView extends HBox implements Observer {
         final TextField text = new TextField();
         text.setPromptText("Search");
         final Button add = new Button("+");
-        addEntry.getChildren().addAll(text, add);
-        addEntry.setHgrow(text, Priority.ALWAYS);
-        addEntry.setSpacing(10);
 
         add.setOnAction(event -> {
             addQuery(text.getText());
-
+            text.clear();
         });
 
         text.setOnKeyReleased(t -> {
             if (t.getCode() == KeyCode.ENTER) {
-                addQuery(text.getText());
-                text.clear();
+                setPlotData(text.getText());
             }
         });
 
+        final Button search = new Button("S");
+        search.setOnAction(event -> {
+            setPlotData(text.getText());
+        });
+
+        addEntry.getChildren().addAll(text, search, add);
+        addEntry.setHgrow(text, Priority.ALWAYS);
+        addEntry.setSpacing(10);
         return addEntry;
     }
 
