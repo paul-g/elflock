@@ -24,7 +24,7 @@ public class TimeSeriesChart extends LineChart<Number, Number>  {
     public static TimeSeriesChart build() {
         return new TimeSeriesChart(
                 makeDateAxis("Y m"),
-                makeDateAxis("Y w")
+                new NumberAxis()
                 );
     }
 
@@ -39,7 +39,7 @@ public class TimeSeriesChart extends LineChart<Number, Number>  {
         //series.setName(seriesTitle);
 
         for (int i = 0; i < ts.getItemCount(); i++) {
-            TimeSeriesDataItem tsItem = (TimeSeriesDataItem)ts.getDataItem(i);
+            TimeSeriesDataItem tsItem = ts.getDataItem(i);
             Date date = tsItem.getPeriod().getStart();
             Number value = tsItem.getValue();
             series.getData().add(new XYChart.Data(date.getTime(), value));
