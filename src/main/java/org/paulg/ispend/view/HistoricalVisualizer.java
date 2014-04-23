@@ -32,12 +32,18 @@ public class HistoricalVisualizer extends TabPane implements Observer {
         lineChart.setTimeSeries(ts);
 
         Map<String, Double> spent = recordStore.getSpentPerItem(query);
+        negChart.setData(toPieChartData(spent));
+
+        Map<String, Double> income = recordStore.getIncomePerItem(query);
+        posChart.setData(toPieChartData(income));
+    }
+
+    private ObservableList<PieChart.Data> toPieChartData(Map<String, Double> in) {
         ObservableList<PieChart.Data> pieData = FXCollections.observableArrayList();
-        for (Map.Entry<String, Double> me : spent.entrySet()){
+        for (Map.Entry<String, Double> me : in.entrySet()){
             pieData.add(new PieChart.Data(me.getKey(), me.getValue()));
         }
-        System.out.print(spent);
-        negChart.setData(pieData);
+        return pieData;
     }
 
     private Tab makeHistoricalTab() {

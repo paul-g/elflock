@@ -22,10 +22,7 @@ public class TimeSeriesChart extends LineChart<Number, Number>  {
     }
 
     public static TimeSeriesChart build() {
-        return new TimeSeriesChart(
-                makeDateAxis("Y m"),
-                new NumberAxis()
-                );
+        return new TimeSeriesChart(makeDateAxis("Y m"), new NumberAxis());
     }
 
     public TimeSeriesChart(NumberAxis xAxis, NumberAxis yAxis) {

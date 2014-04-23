@@ -5,6 +5,7 @@ import org.paulg.ispend.utils.StringUtils;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class RecordStore {
 
@@ -91,19 +92,32 @@ public class RecordStore {
         return tagRecords;
     }
 
+    public Map<String,Double> getIncomePerItem(String query) {
+        return getFieldPerRecord(query, r -> r.getPositive(), () -> getTotalIncome());
+    }
+
     public Map<String, Double> getSpentPerItem(String query) {
+        return getFieldPerRecord(query, r -> r.getNegative(), () -> getTotalSpent());
+    }
+
+    private Map<String,Double> getFieldPerRecord(
+            String query,
+            Function<AggregatedRecord, Double> func,
+            Supplier<Double> totalFunc) {
         List<AggregatedRecord> groupData = groupByDescription(query);
         HashMap<String, Double> spent = new HashMap<>();
-        double total = getTotalSpent();
+        double total = totalFunc.get();
         double leftTotal = total;
         for (AggregatedRecord record : groupData) {
+            Double value = func.apply(record);
             spent.put(record.getDescription(),
-                    (Math.abs(record.getNegative()) / total) * 100);
-            leftTotal -= record.getNegative();
+                    (Math.abs(value) / total) * 100);
+            leftTotal -= value;
         }
         spent.put("Other", leftTotal / total * 100);
         return spent;
     }
+
 
     public double getTotalIncome() {
         double income = 0;
@@ -182,4 +196,5 @@ public class RecordStore {
         }
         return ts;
     }
+
 }

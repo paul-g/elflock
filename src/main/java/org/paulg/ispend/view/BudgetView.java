@@ -26,6 +26,7 @@ public class BudgetView extends HBox implements Observer {
             BudgetEntry> budgets = FXCollections.observableArrayList();
     private final ISpendPane pane;
     private final HistoricalVisualizer plot;
+    private final CompleteTableView<BudgetEntry> tv;
     private RecordStore recordStore;
     private final List<String> queries = new ArrayList<>();
 
@@ -34,7 +35,7 @@ public class BudgetView extends HBox implements Observer {
         final Label label = UiUtils.section("Budget");
 
         plot = new HistoricalVisualizer(pane);
-        CompleteTableView<BudgetEntry> tv = new CompleteTableView<>(BudgetEntry.class);
+        tv = new CompleteTableView<>(BudgetEntry.class);
 
         tv.setEditable(true);
 
@@ -97,10 +98,31 @@ public class BudgetView extends HBox implements Observer {
             setPlotData(text.getText());
         });
 
-        addEntry.getChildren().addAll(text, search, add);
+        final Button delete = new Button("-");
+        delete.setOnAction(event -> {
+            int i = tv.getSelectionModel().getFocusedIndex();
+            int n = tv.getItems().size() - 1;
+            if (i < 0)
+                return;
+            removeQuery(i);
+
+            if (n > 0) {
+                int selNext = ((i - 1) % n + n) % n;
+                tv.getSelectionModel().select(selNext);
+            }
+        });
+
+        addEntry.getChildren().addAll(text, search, add, delete);
         addEntry.setHgrow(text, Priority.ALWAYS);
         addEntry.setSpacing(10);
+
         return addEntry;
+    }
+
+    private void removeQuery(int i) {
+        queries.remove(i);
+        budgets.remove(i);
+        pane.saveSearchQueries(queries);
     }
 
     private void addQuery(String query) {
