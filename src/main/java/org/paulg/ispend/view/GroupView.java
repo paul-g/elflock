@@ -3,7 +3,6 @@ package org.paulg.ispend.view;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.chart.PieChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -22,14 +21,9 @@ public class GroupView extends VBox implements Observer {
     private TextField groupBy;
 
     GroupView(ISpendPane ispendPane,
-              ObservableList<AggregatedRecord> groupData,
-              ObservableList<PieChart.Data> pieChartPosData,
-              ObservableList<PieChart.Data> pieChartNegData) {
+              ObservableList<AggregatedRecord> groupData) {
 
-        this.visualizer = new HistoricalVisualizer(
-                ispendPane,
-                pieChartNegData, pieChartPosData);
-
+        this.visualizer = new HistoricalVisualizer(ispendPane);
         groupBy = new TextField();
         groupBy.setPromptText("Group by");
         groupBy.setDisable(true);

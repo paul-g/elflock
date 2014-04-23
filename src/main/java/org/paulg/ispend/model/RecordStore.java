@@ -91,6 +91,20 @@ public class RecordStore {
         return tagRecords;
     }
 
+    public Map<String, Double> getSpentPerItem(String query) {
+        List<AggregatedRecord> groupData = groupByDescription(query);
+        HashMap<String, Double> spent = new HashMap<>();
+        double total = getTotalSpent();
+        double leftTotal = total;
+        for (AggregatedRecord record : groupData) {
+            spent.put(record.getDescription(),
+                    (Math.abs(record.getNegative()) / total) * 100);
+            leftTotal -= record.getNegative();
+        }
+        spent.put("Other", leftTotal / total * 100);
+        return spent;
+    }
+
     public double getTotalIncome() {
         double income = 0;
         for (Account a : accounts.values())

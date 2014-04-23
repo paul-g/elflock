@@ -3,7 +3,6 @@ package org.paulg.ispend.view;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
-import javafx.scene.chart.PieChart;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -29,30 +28,23 @@ public class ISpendPane extends Observable {
     final Scene scene;
     private final ObservableList<Record> data = observableArrayList();
     private final ObservableList<AggregatedRecord> groupData = observableArrayList();
-    private final ObservableList<PieChart.Data> pieChartPosData = observableArrayList();
-    private final ObservableList<PieChart.Data> pieChartNegData = observableArrayList();
     private final ObservableList<Account> accountsData = observableArrayList();
     private final SearchView searchView;
     private final Stage stage;
-    private final GroupView groupView;
     private final PreferencesStore preferencesStore;
 
     private final AccountSummaryView accountsView;
     private final StaticVisualizer staticVisualizer;
     private final BudgetView budgetView;
     private RecordStore recordStore;
-    private Integer totalSpent;
-    private Integer totalIncome;
 
     public ISpendPane(final Stage stage, final PreferencesStore preferencesStore) {
         this.stage = stage;
         this.preferencesStore = preferencesStore;
         this.staticVisualizer = new StaticVisualizer();
-        this.groupView = new GroupView(this, groupData, pieChartPosData, pieChartNegData);
         this.searchView = new SearchView(data);
         this.accountsView = new AccountSummaryView(this);
         this.budgetView = new BudgetView(this);
-        addObserver(groupView);
         addObserver(budgetView);
         addObserver(accountsView);
 
@@ -89,14 +81,7 @@ public class ISpendPane extends Observable {
         TabPane pane = new TabPane();
         pane.getTabs().add(makeDashboardTab());
         pane.getTabs().add(makeDrillDownTab());
-        pane.getTabs().add(makeManageTab());
         return pane;
-    }
-
-    private Tab makeManageTab() {
-        Tab tab = new Tab("Manage");
-        tab.setContent(groupView);
-        return tab;
     }
 
     private Tab makeDrillDownTab() {
@@ -119,29 +104,6 @@ public class ISpendPane extends Observable {
         return tab;
     }
 
-    private void toNegativePieChartData() {
-        double total = (totalSpent == null ? 7500 : totalSpent);
-        double leftTotal = total;
-        pieChartNegData.clear();
-        for (AggregatedRecord record : groupData) {
-            pieChartNegData.add(new PieChart.Data(record.getDescription(),
-                    (Math.abs(record.getNegative()) / total) * 100));
-            leftTotal -= record.getNegative();
-        }
-        pieChartNegData.add(new PieChart.Data("Other", (leftTotal / total) * 100));
-    }
-
-    private void toPositivePieChartData() {
-        double total = (totalIncome == null ? 7500 : totalIncome);
-        double leftTotal = total;
-        pieChartPosData.clear();
-        for (AggregatedRecord record : groupData) {
-            pieChartPosData.add(new PieChart.Data(record.getDescription(), (record.getPositive() / total) * 100));
-            leftTotal -= record.getPositive();
-        }
-        pieChartPosData.add(new PieChart.Data("Other", (leftTotal / total) * 100));
-    }
-
     public RecordStore getRecordStore() {
         return recordStore;
     }
@@ -154,8 +116,6 @@ public class ISpendPane extends Observable {
 
         searchView.setRecordStore(recordStore);
 
-        totalSpent = (int) recordStore.getTotalSpent();
-        totalIncome = (int) recordStore.getTotalIncome();
         data.clear();
         data.addAll(recordStore.getAllRecords());
         accountsData.clear();
@@ -191,7 +151,6 @@ public class ISpendPane extends Observable {
         if (preferencesStore.hasQuery()) {
             String query = preferencesStore.getQuery();
             setQuery(query);
-            groupView.setText(query);
         }
         stage.show();
     }
@@ -206,9 +165,6 @@ public class ISpendPane extends Observable {
         groupData.addAll(byDescription);
         accountsData.clear();
         accountsData.addAll(recordStore.getAccounts());
-        toPositivePieChartData();
-        toNegativePieChartData();
-        groupView.plotHistoricalData(query);
     }
 
     public void saveQuery(String text) {
