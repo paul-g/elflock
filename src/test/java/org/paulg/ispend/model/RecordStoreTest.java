@@ -1,10 +1,10 @@
 package org.paulg.ispend.model;
 
-import org.joda.time.DateTime;
+import org.jfree.data.time.TimeSeries;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.*;
+import java.util.List;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -56,11 +56,9 @@ public class RecordStoreTest {
 
     @Test
     public void testAggregators() {
-        Map<Date, Double> weeklyAverage = store.getWeeklyAveragesByDescription("trans");
-        DateTime dt = new DateTime(2013, 2, 4, 0, 0, 0, 0);
-        Double d1Average = weeklyAverage.get(dt.toDate());
-        dt = new DateTime(2013, 2, 11, 0, 0, 0, 0);
-        Double d2Average = weeklyAverage.get(dt.toDate());
+        TimeSeries tsData = store.getWeeklyAveragesByDescription("trans");
+        Double d1Average = tsData.getDataItem(0).getValue().doubleValue();
+        Double d2Average = tsData.getDataItem(1).getValue().doubleValue();
 
         // check average for each week
         assertEquals((r1.getValue() + r2.getValue()) / 2, d1Average, 1e-10);

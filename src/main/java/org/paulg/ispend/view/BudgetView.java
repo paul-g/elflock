@@ -5,7 +5,6 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
-import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
@@ -16,6 +15,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import org.jfree.data.time.TimeSeries;
 import org.paulg.ispend.model.RecordStore;
 
 import java.util.*;
@@ -25,7 +25,7 @@ public class BudgetView extends HBox implements Observer {
     private final ObservableList<
             BudgetEntry> budgets = FXCollections.observableArrayList();
     private final ISpendPane pane;
-    private final LineChart<Number, Number> plot;
+    private final TimeSeriesChart plot;
     private RecordStore recordStore;
     private static final List<String> queries = new ArrayList<>();
 
@@ -40,10 +40,7 @@ public class BudgetView extends HBox implements Observer {
         this.pane = pane;
         final Label label = UiUtils.section("Budget");
 
-        plot = new LineChart<>(
-                makeDateAxis("Y m"),
-                new NumberAxis()
-        );
+        plot = TimeSeriesChart.build();
 
         CompleteTableView<BudgetEntry> tv = new CompleteTableView<>(BudgetEntry.class);
 
@@ -74,16 +71,9 @@ public class BudgetView extends HBox implements Observer {
 
     private void setPlotData(String group) {
         XYChart.Series series = new XYChart.Series<>();
-        Map<Date, Double> records = recordStore.getWeeklyAveragesByDescription(group);
-        List<Date> allDates = new ArrayList<>(records.keySet());
-        Collections.sort(allDates);
-
-        for (Date d : allDates) {
-            series.getData().add(new XYChart.Data<>(d.getTime(), records.get(d)));
-        }
+        TimeSeries tsData = recordStore.getWeeklyAveragesByDescription(group);
+        plot.setTimeSeries(tsData);
         series.setName(group + " (Weekly)");
-
-        plot.getData().setAll(series);
     }
 
     @Override

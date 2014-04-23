@@ -62,7 +62,6 @@ public class ISpendPane extends Observable {
         BorderPane pane = new BorderPane();
         pane.setCenter(makeAppContent());
         pane.setId("container");
-
         pane.setTop(createMenuBar());
 
         scene = new Scene(pane);
@@ -164,7 +163,6 @@ public class ISpendPane extends Observable {
         accountsData.addAll(recordStore.getAccounts());
         recordStore.printSummary();
 
-        staticVisualizer.plotWeeklyTotalData(recordStore.getWeeklyBalance());
         staticVisualizer.plotMonthlyTotalData(recordStore.getMonthlyBalance());
 
         this.setChanged();

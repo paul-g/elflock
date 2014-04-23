@@ -41,7 +41,6 @@ public class RecordStore {
         return text.split(",");
     }
 
-
     public Collection<Account> getAccounts() {
         return accounts.values();
     }
@@ -92,7 +91,6 @@ public class RecordStore {
         return tagRecords;
     }
 
-
     public double getTotalIncome() {
         double income = 0;
         for (Account a : accounts.values())
@@ -123,15 +121,9 @@ public class RecordStore {
         return getBalance(Calendar.MONTH);
     }
 
-    public Map<Date, Double> getWeeklyAveragesByDescription(String descriptionQuery) {
+    public TimeSeries getWeeklyAveragesByDescription(String descriptionQuery) {
         List<Record> filtered = filter(descriptionQuery);
-        TimeSeries ts = averageByPeriod(filtered, r -> r.getValue(), Calendar.WEEK_OF_YEAR);
-        Map<Date, Double> newMap = new HashMap<>();
-        for (int i = 0; i < ts.getItemCount(); i++) {
-            TimeSeriesDataItem it = ts.getDataItem(i);
-            newMap.put(it.getPeriod().getStart(), it.getValue().doubleValue());
-        }
-        return newMap;
+        return averageByPeriod(filtered, r -> r.getValue(), Calendar.WEEK_OF_YEAR);
     }
 
     public double getWeeklyAverageByDescription(String descriptionQuery) {
@@ -147,12 +139,6 @@ public class RecordStore {
 
     private TimeSeries getBalance(int period) {
         return averageByPeriod(getAllRecords(), r -> r.getBalance(), period);
-//        Map<Date, Double> newMap = new HashMap<>();
-//        for (int i = 0; i < ts.getItemCount(); i++) {
-//            TimeSeriesDataItem it = ts.getDataItem(i);
-//            newMap.put(it.getPeriod().getStart(), it.getValue().doubleValue());
-//        }
-//        return newMap;
     }
 
     /**
