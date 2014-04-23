@@ -44,6 +44,6 @@ public class TimeSeriesChart extends LineChart<Number, Number>  {
             Number value = tsItem.getValue();
             series.getData().add(new XYChart.Data(date.getTime(), value));
         }
-        getData().add(series);
+        getData().setAll(series);
     }
 }

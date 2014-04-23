@@ -54,7 +54,6 @@ public class ISpendPane extends Observable {
         this.budgetView = new BudgetView(this);
         addObserver(groupView);
         addObserver(budgetView);
-        addObserver(groupView);
         addObserver(accountsView);
 
         stage.setTitle("ISpend");
@@ -163,7 +162,7 @@ public class ISpendPane extends Observable {
         accountsData.addAll(recordStore.getAccounts());
         recordStore.printSummary();
 
-        staticVisualizer.plotMonthlyTotalData(recordStore.getMonthlyBalance());
+        staticVisualizer.setMonthlyBalance(recordStore.getMonthlyBalance());
 
         this.setChanged();
         this.notifyObservers();
@@ -209,7 +208,7 @@ public class ISpendPane extends Observable {
         accountsData.addAll(recordStore.getAccounts());
         toPositivePieChartData();
         toNegativePieChartData();
-        groupView.plotHistoricalData(byDescription);
+        groupView.plotHistoricalData(query);
     }
 
     public void saveQuery(String text) {

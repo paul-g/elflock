@@ -5,7 +5,6 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
-import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -18,7 +17,10 @@ import javafx.scene.layout.VBox;
 import org.jfree.data.time.TimeSeries;
 import org.paulg.ispend.model.RecordStore;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
 public class BudgetView extends HBox implements Observer {
 
@@ -28,13 +30,6 @@ public class BudgetView extends HBox implements Observer {
     private final TimeSeriesChart plot;
     private RecordStore recordStore;
     private static final List<String> queries = new ArrayList<>();
-
-    private NumberAxis makeDateAxis(String dateFormat) {
-        NumberAxis na = new NumberAxis();
-        na.setTickLabelFormatter(new DateConverter(dateFormat));
-        na.setForceZeroInRange(false);
-        return na;
-    }
 
     public BudgetView(ISpendPane pane) {
         this.pane = pane;

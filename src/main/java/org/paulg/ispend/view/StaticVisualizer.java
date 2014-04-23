@@ -7,9 +7,10 @@ import org.jfree.data.time.TimeSeries;
 
 public class StaticVisualizer extends VBox {
 
-    private TimeSeriesChart monthlyBalance;
+    private final  transient TimeSeriesChart monthlyBalance;
 
-    StaticVisualizer() {
+    public StaticVisualizer() {
+        super();
         monthlyBalance = TimeSeriesChart.build();
         monthlyBalance.setTitle("Monthly Balance");
         getChildren().addAll(monthlyBalance);
@@ -17,13 +18,7 @@ public class StaticVisualizer extends VBox {
         setSpacing(20);
     }
 
-    void plotMonthlyTotalData(TimeSeries records) {
-        plotData(records, monthlyBalance);
-    }
-
-    private void plotData(
-            TimeSeries records,
-            TimeSeriesChart chart) {
-        chart.setTimeSeries(records);
+    public void setMonthlyBalance(final TimeSeries records) {
+        monthlyBalance.setTimeSeries(records);
     }
 }

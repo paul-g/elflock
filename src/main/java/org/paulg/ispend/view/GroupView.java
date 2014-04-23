@@ -13,7 +13,6 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import org.paulg.ispend.model.AggregatedRecord;
 
-import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -27,7 +26,9 @@ public class GroupView extends VBox implements Observer {
               ObservableList<PieChart.Data> pieChartPosData,
               ObservableList<PieChart.Data> pieChartNegData) {
 
-        this.visualizer = new HistoricalVisualizer(pieChartNegData, pieChartPosData);
+        this.visualizer = new HistoricalVisualizer(
+                ispendPane,
+                pieChartNegData, pieChartPosData);
 
         groupBy = new TextField();
         groupBy.setPromptText("Group by");
@@ -64,6 +65,7 @@ public class GroupView extends VBox implements Observer {
     @Override
     public void update(Observable o, Object arg) {
         this.groupBy.setDisable(false);
+        this.visualizer.update(o, arg);
     }
 
     private <T> TableView<T> makeTable(final ObservableList<T> data, final Class<T> clazz) {
@@ -73,7 +75,7 @@ public class GroupView extends VBox implements Observer {
         return table;
     }
 
-    public void plotHistoricalData(List<AggregatedRecord> byDescription) {
-        this.visualizer.plotHistoricalData(byDescription);
+    public void plotHistoricalData(String query) {
+        this.visualizer.plotHistoricalData(query);
     }
 }
