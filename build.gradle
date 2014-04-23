@@ -1,7 +1,6 @@
 apply from: "http://dl.bintray.com/content/shemnon/javafx-gradle/0.3.0/javafx.plugin"
 apply plugin: 'idea'
 apply plugin: "jacoco"
-apply plugin: "jdepend"
 apply plugin: "pmd"
 apply plugin: "build-dashboard"
 
