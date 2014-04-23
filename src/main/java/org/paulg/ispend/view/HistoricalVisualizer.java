@@ -13,10 +13,10 @@ import org.paulg.ispend.model.Record;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-class HistoricalVisualizer extends TabPane {
+public class HistoricalVisualizer extends TabPane {
 
     private Node posChart, negChart;
-    private LineChart<String, Number> lineChart, balanceChart, monthlyBalance;
+    private LineChart<String, Number> lineChart;
 
     HistoricalVisualizer(ObservableList<PieChart.Data> pieChartNegData,
                          ObservableList<PieChart.Data> pieChartPosData) {
