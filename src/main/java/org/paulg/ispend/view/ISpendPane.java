@@ -4,10 +4,7 @@ import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import org.paulg.ispend.controller.OpenHistoryHandler;
@@ -92,15 +89,17 @@ public class ISpendPane extends Observable {
 
     private Tab makeDashboardTab() {
         Tab tab = new Tab("Dashboard");
-        VBox box = new VBox();
-        HBox summary = new HBox();
-        summary.getChildren().addAll(accountsView, staticVisualizer);
+        GridPane pane = new GridPane();
+        pane.addRow(0, accountsView, staticVisualizer);
+        pane.addRow(1, budgetView.getTableWidget(), budgetView.getPlotWidget());
 
-        summary.setHgrow(accountsView, Priority.ALWAYS);
-        summary.setHgrow(staticVisualizer, Priority.ALWAYS);
+        ColumnConstraints column1 = new ColumnConstraints();
+        column1.setPercentWidth(40);
+        ColumnConstraints column2 = new ColumnConstraints();
+        column2.setPercentWidth(60);
+        pane.getColumnConstraints().addAll(column1, column2); // each get 50% of width
 
-        box.getChildren().addAll(summary, budgetView);
-        tab.setContent(box);
+        tab.setContent(pane);
         return tab;
     }
 

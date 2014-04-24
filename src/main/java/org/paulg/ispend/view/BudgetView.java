@@ -5,6 +5,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableView;
@@ -25,8 +26,9 @@ public class BudgetView extends HBox implements Observer {
     private final ObservableList<
             BudgetEntry> budgets = FXCollections.observableArrayList();
     private final ISpendPane pane;
-    private final HistoricalVisualizer plot;
+    private final HistoricalVisualizer plotWidget;
     private final CompleteTableView<BudgetEntry> tv;
+    private final VBox tableWidget;
     private RecordStore recordStore;
     private final List<String> queries = new ArrayList<>();
 
@@ -34,7 +36,7 @@ public class BudgetView extends HBox implements Observer {
         this.pane = pane;
         final Label label = UiUtils.section("Budget");
 
-        plot = new HistoricalVisualizer(pane);
+        plotWidget = new HistoricalVisualizer(pane);
         tv = new CompleteTableView<>(BudgetEntry.class);
 
         tv.setEditable(true);
@@ -50,20 +52,20 @@ public class BudgetView extends HBox implements Observer {
             }
         });
 
-        VBox table = new VBox();
+        this.tableWidget = new VBox();
         HBox addEntry = addEntry();
 
         setPadding(new Insets(30, 5, 5, 5));
         setSpacing(5);
-        table.getChildren().addAll(addEntry, tv);
-        table.setSpacing(5);
-        setHgrow(table, Priority.ALWAYS);
-        setHgrow(plot, Priority.ALWAYS);
-        getChildren().addAll(table, plot);
+        tableWidget.getChildren().addAll(addEntry, tv);
+        tableWidget.setSpacing(5);
+        setHgrow(tableWidget, Priority.ALWAYS);
+        setHgrow(plotWidget, Priority.ALWAYS);
+        getChildren().addAll(tableWidget, plotWidget);
     }
 
     private void setPlotData(String group) {
-        plot.plotHistoricalData(group);
+        plotWidget.plotHistoricalData(group);
     }
 
     @Override
@@ -73,7 +75,7 @@ public class BudgetView extends HBox implements Observer {
         for (String s : queries) {
             addQuery(s);
         }
-        this.plot.update(o, arg);
+        this.plotWidget.update(o, arg);
     }
 
     private HBox addEntry() {
@@ -135,6 +137,14 @@ public class BudgetView extends HBox implements Observer {
         double weeklyAvg = recordStore.getWeeklyAverageByDescription(query);
         BudgetEntry be = new BudgetEntry(query, weeklyAvg / 7, weeklyAvg, weeklyAvg * 4);
         return be;
+    }
+
+    public Node getTableWidget() {
+        return tableWidget;
+    }
+
+    public Node getPlotWidget() {
+        return plotWidget;
     }
 }
 
