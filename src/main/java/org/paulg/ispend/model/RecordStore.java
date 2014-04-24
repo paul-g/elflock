@@ -142,21 +142,21 @@ public class RecordStore {
     }
 
     public TimeSeries getWeeklyBalance() {
-        return getBalance(Calendar.WEEK_OF_YEAR);
+        return getBalance(new Week());
     }
 
     public TimeSeries getMonthlyBalance() {
-        return getBalance(Calendar.MONTH);
+        return getBalance(new Month());
     }
 
     public TimeSeries getWeeklyAveragesByDescription(String descriptionQuery) {
         List<Record> filtered = filter(descriptionQuery);
-        return averageByPeriod(filtered, r -> r.getValue(), Calendar.WEEK_OF_YEAR);
+        return averageByPeriod(filtered, r -> r.getValue(), new Week());
     }
 
     public double getWeeklyAverageByDescription(String descriptionQuery) {
         List<Record> filtered = filter(descriptionQuery);
-        TimeSeries ts = averageByPeriod(filtered, r -> r.getValue(), Calendar.WEEK_OF_YEAR);
+        TimeSeries ts = averageByPeriod(filtered, r -> r.getValue(), new Week());
         double rename = 0;
         for (int i = 0; i < ts.getItemCount(); i++) {
             TimeSeriesDataItem it = ts.getDataItem(i);
@@ -165,7 +165,7 @@ public class RecordStore {
         return rename / ts.getItemCount();
     }
 
-    private TimeSeries getBalance(int period) {
+    private TimeSeries getBalance(RegularTimePeriod period) {
         return averageByPeriod(getAllRecords(), r -> r.getBalance(), period);
     }
 
@@ -174,13 +174,13 @@ public class RecordStore {
      * Calendar.MONTH or Calendar.WEEK). This can be used for weekly/monthly
      * statistics
      */
-    private TimeSeries averageByPeriod(List<Record> rs, Function<Record, Number> func, int period) {
+    private TimeSeries averageByPeriod(List<Record> rs, Function<Record, Number> func, RegularTimePeriod period) {
         Map<RegularTimePeriod, Integer> periodCount = new HashMap<>();
         TimeSeries ts = new TimeSeries("T");
         for (Record r : rs) {
             // aggregate
             RegularTimePeriod timePeriod;
-            if (period == Calendar.MONTH)
+            if (period instanceof  Month)
                 timePeriod = new Month(r.getDate().toDate());
             else
                 timePeriod = new Week(r.getDate().toDate());
@@ -197,4 +197,9 @@ public class RecordStore {
         return ts;
     }
 
+    public TimeSeries getAveragesByDescription(String query, RegularTimePeriod period) {
+        List<Record> filtered = filter(query);
+        TimeSeries ts = averageByPeriod(filtered, r -> r.getValue(), period);
+        return ts;
+    }
 }

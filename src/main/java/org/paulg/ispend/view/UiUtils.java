@@ -20,4 +20,10 @@ public final class UiUtils {
         label.getStyleClass().add("subsection");
         return label;
     }
+
+    public static Label label(final String text) {
+        final Label label = new Label(text);
+        label.getStyleClass().add("label");
+        return label;
+    }
 }

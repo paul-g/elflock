@@ -2,11 +2,17 @@ package org.paulg.ispend.view;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.Pos;
 import javafx.scene.chart.PieChart;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import org.jfree.data.time.Month;
+import org.jfree.data.time.RegularTimePeriod;
 import org.jfree.data.time.TimeSeries;
+import org.jfree.data.time.Week;
 import org.paulg.ispend.model.RecordStore;
 
 import java.util.Map;
@@ -19,6 +25,8 @@ public class HistoricalVisualizer extends TabPane implements Observer {
     private RecordStore recordStore;
     private PieChart posChart, negChart;
     private TimeSeriesChart lineChart;
+    private RegularTimePeriod timePeriod = new Month();
+    private String query;
 
     HistoricalVisualizer(ISpendPane iSpendPane) {
         this.iSpendPane = iSpendPane;
@@ -27,7 +35,8 @@ public class HistoricalVisualizer extends TabPane implements Observer {
     }
 
     void plotHistoricalData(String query) {
-        TimeSeries ts = recordStore.getWeeklyAveragesByDescription(query);
+        this.query = query;
+        TimeSeries ts = recordStore.getAveragesByDescription(query, timePeriod);
         lineChart.setTitle(query);
         lineChart.setTimeSeries(ts);
 
@@ -50,8 +59,29 @@ public class HistoricalVisualizer extends TabPane implements Observer {
         Tab tab = new Tab("Historical");
         lineChart = TimeSeriesChart.build();
         lineChart.setTitle("History");
-        tab.setContent(lineChart);
-        tab.setContent(lineChart);
+        VBox box = new VBox();
+        HBox hbox = new HBox();
+        ObservableList<String> options =
+                FXCollections.observableArrayList(
+                        "Month",
+                        "Week"
+                );
+        final ComboBox period = new ComboBox(options);
+        period.getSelectionModel().select(0);
+        period.setOnAction(event -> {
+            String value = (String)period.getValue();
+            switch (value) {
+                case "Week": timePeriod = new Week(); break;
+                case "Month": timePeriod = new Month(); break;
+                default: break;
+            }
+            plotHistoricalData(query);
+        });
+        hbox.getChildren().addAll(UiUtils.label("Period:"), period);
+        hbox.setSpacing(10);
+        hbox.setAlignment(Pos.CENTER);
+        box.getChildren().addAll(hbox, lineChart);
+        tab.setContent(box);
         return tab;
     }
 
