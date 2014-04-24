@@ -27,6 +27,7 @@ public class HistoricalVisualizer extends TabPane implements Observer {
     private TimeSeriesChart lineChart;
     private RegularTimePeriod timePeriod = new Month();
     private String query;
+    private String indicator = "Sum";
 
     HistoricalVisualizer(ISpendPane iSpendPane) {
         this.iSpendPane = iSpendPane;
@@ -36,7 +37,9 @@ public class HistoricalVisualizer extends TabPane implements Observer {
 
     void plotHistoricalData(String query) {
         this.query = query;
-        TimeSeries ts = recordStore.getTotalByDescription(query, timePeriod);
+        TimeSeries ts = indicator.equals("Sum") ?
+                recordStore.getTotalByDescription(query, timePeriod) :
+                recordStore.getAveragesByDescription(query, timePeriod);
         lineChart.setTitle(query);
         lineChart.setTimeSeries(ts);
 
@@ -77,7 +80,23 @@ public class HistoricalVisualizer extends TabPane implements Observer {
             }
             plotHistoricalData(query);
         });
-        hbox.getChildren().addAll(UiUtils.label("Period:"), period);
+        ObservableList<String> indOptions =
+                FXCollections.observableArrayList(
+                        "Sum",
+                        "Average"
+                );
+
+        final ComboBox indicatorBox = new ComboBox(indOptions);
+        indicatorBox.getSelectionModel().select(0);
+        indicatorBox.setOnAction(event -> {
+            this.indicator = (String)indicatorBox.getValue();
+            System.out.println(this.indicator);
+            plotHistoricalData(query);
+        });
+
+        hbox.getChildren().addAll(
+                UiUtils.label("Period:"), period,
+                UiUtils.label("Indicator:"), indicatorBox);
         hbox.setSpacing(10);
         hbox.setAlignment(Pos.CENTER);
         box.getChildren().addAll(hbox, lineChart);
