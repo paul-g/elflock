@@ -36,7 +36,7 @@ public class HistoricalVisualizer extends TabPane implements Observer {
 
     void plotHistoricalData(String query) {
         this.query = query;
-        TimeSeries ts = recordStore.getAveragesByDescription(query, timePeriod);
+        TimeSeries ts = recordStore.getTotalByDescription(query, timePeriod);
         lineChart.setTitle(query);
         lineChart.setTimeSeries(ts);
 

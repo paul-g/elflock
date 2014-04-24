@@ -179,11 +179,7 @@ public class RecordStore {
         TimeSeries ts = new TimeSeries("T");
         for (Record r : rs) {
             // aggregate
-            RegularTimePeriod timePeriod;
-            if (period instanceof  Month)
-                timePeriod = new Month(r.getDate().toDate());
-            else
-                timePeriod = new Week(r.getDate().toDate());
+            RegularTimePeriod timePeriod = getPeriodForDate(period, r.getDate().toDate());
             TimeSeriesDataItem tsItem = ts.getDataItem(timePeriod);
             double oldValue = tsItem == null ? 0 : tsItem.getValue().doubleValue();
             Integer count = periodCount.get(timePeriod);
@@ -197,9 +193,32 @@ public class RecordStore {
         return ts;
     }
 
+    private TimeSeries sumByPeriod(List<Record> rs, Function<Record, Number> func, RegularTimePeriod period) {
+        TimeSeries ts = new TimeSeries("T");
+        for (Record r : rs) {
+            RegularTimePeriod timePeriod = getPeriodForDate(period, r.getDate().toDate());
+            TimeSeriesDataItem tsItem = ts.getDataItem(timePeriod);
+            double oldValue = tsItem == null ? 0 : tsItem.getValue().doubleValue();
+            ts.addOrUpdate(timePeriod, oldValue + func.apply(r).doubleValue());
+        }
+        return ts;
+    }
+
+    private RegularTimePeriod getPeriodForDate(RegularTimePeriod period, Date d) {
+        if (period instanceof  Month)
+            return new Month(d);
+        return new Week(d);
+    }
+
     public TimeSeries getAveragesByDescription(String query, RegularTimePeriod period) {
         List<Record> filtered = filter(query);
         TimeSeries ts = averageByPeriod(filtered, r -> r.getValue(), period);
+        return ts;
+    }
+
+    public TimeSeries getTotalByDescription(String query, RegularTimePeriod period) {
+        List<Record> filtered = filter(query);
+        TimeSeries ts = sumByPeriod(filtered, r -> r.getValue(), period);
         return ts;
     }
 }
