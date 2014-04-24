@@ -90,7 +90,6 @@ public class HistoricalVisualizer extends TabPane implements Observer {
         indicatorBox.getSelectionModel().select(0);
         indicatorBox.setOnAction(event -> {
             this.indicator = (String)indicatorBox.getValue();
-            System.out.println(this.indicator);
             plotHistoricalData(query);
         });
 
