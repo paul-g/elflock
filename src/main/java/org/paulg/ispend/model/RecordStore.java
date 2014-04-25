@@ -27,7 +27,33 @@ public class RecordStore {
         return new ArrayList<>();
     }
 
-    public List<Record> filter(final String text) {
+    /** Returns the records matching any of the query atoms. Multiple query atoms
+     *  are separated by comma. */
+    public List<Record> filterAny(final String query) {
+        // XXX this will include duplicates for records matching more than one query atom
+        // need to use a set, pending correct equals implementation in Record
+        List<String> atoms = splitQuery(query);
+        List<Record> any = new ArrayList<>();
+        for (String atom : atoms) {
+            any.addAll(filterAtom(atom));
+        }
+        return any;
+    }
+
+    private List<String> splitQuery(String query) {
+        String[] atoms = query.split(",");
+        List<String> as = new ArrayList<>();
+        for (String s : atoms) {
+            as.add(s.trim());
+        }
+        return as;
+    }
+
+    public List<Record> filterAll() {
+        throw new RuntimeException("RecordStore#filterAll() not implemented!");
+    }
+
+    private List<Record> filterAtom(final String text) {
         final List<Record> unfiltered = getAllRecords();
         final List<Record> filtered = new ArrayList<>();
         for (final Record r : unfiltered) {
@@ -150,12 +176,12 @@ public class RecordStore {
     }
 
     public TimeSeries getWeeklyAveragesByDescription(String descriptionQuery) {
-        List<Record> filtered = filter(descriptionQuery);
+        List<Record> filtered = filterAny(descriptionQuery);
         return averageByPeriod(filtered, r -> r.getValue(), new Week());
     }
 
     public double getWeeklyAverageByDescription(String descriptionQuery) {
-        List<Record> filtered = filter(descriptionQuery);
+        List<Record> filtered = filterAny(descriptionQuery);
         TimeSeries ts = averageByPeriod(filtered, r -> r.getValue(), new Week());
         double rename = 0;
         for (int i = 0; i < ts.getItemCount(); i++) {
@@ -211,13 +237,13 @@ public class RecordStore {
     }
 
     public TimeSeries getAveragesByDescription(String query, RegularTimePeriod period) {
-        List<Record> filtered = filter(query);
+        List<Record> filtered = filterAny(query);
         TimeSeries ts = averageByPeriod(filtered, r -> r.getValue(), period);
         return ts;
     }
 
     public TimeSeries getTotalByDescription(String query, RegularTimePeriod period) {
-        List<Record> filtered = filter(query);
+        List<Record> filtered = filterAny(query);
         TimeSeries ts = sumByPeriod(filtered, r -> r.getValue(), period);
         return ts;
     }

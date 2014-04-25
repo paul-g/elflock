@@ -42,7 +42,7 @@ public class RecordStoreTest {
 
     @Test
     public void testFilter() {
-        List<Record> records = store.filter("transaction");
+        List<Record> records = store.filterAny("transaction");
         assertArrayEquals(new Record[]{r1, r2}, records.toArray());
     }
 

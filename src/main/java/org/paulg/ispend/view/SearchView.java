@@ -51,7 +51,7 @@ public class SearchView extends VBox {
             }
 
             private void filterData(final String searchText) {
-                final List<Record> filtered = recordStore.filter(searchText);
+                final List<Record> filtered = recordStore.filterAny(searchText);
                 data.clear();
                 data.addAll(filtered);
             }

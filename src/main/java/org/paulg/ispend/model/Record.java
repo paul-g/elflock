@@ -111,6 +111,9 @@ public class Record implements Comparable<Record> {
             return false;
         }
         final Record r = (Record) o;
+        // XXX this is broken for two identical records on the same day
+        // at different times (since we usually don't have the hour);
+        // need some sort of UID to handle this correctly
         return r.getAccountName().equals(accountName) && r.getAccountNumber().equals(accountNumber)
                 && r.getBalance().equals(balance) && r.getDate().equals(date) && r.getDescription().equals(description)
                 && r.getType().equals(type) && (r.getValue() == value);
