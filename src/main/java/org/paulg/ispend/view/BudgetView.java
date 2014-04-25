@@ -1,15 +1,12 @@
 package org.paulg.ispend.view;
 
-import javafx.beans.value.ChangeListener;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -20,11 +17,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.function.Function;
 
 public class BudgetView extends HBox implements Observer {
 
-    private final ObservableList<
-            BudgetEntry> budgets = FXCollections.observableArrayList();
+    private final ObservableList<BudgetEntry> budgets = FXCollections.observableArrayList();
     private final ISpendPane pane;
     private final HistoricalVisualizer plotWidget;
     private final CompleteTableView<BudgetEntry> tv;
@@ -32,29 +29,30 @@ public class BudgetView extends HBox implements Observer {
     private RecordStore recordStore;
     private final List<String> queries = new ArrayList<>();
 
+    private ObservableValue getEntries(Function<BudgetEntry, Double> func, TableColumn.CellDataFeatures cd) {
+        return new SimpleStringProperty(String.format("%.2f", func.apply((BudgetEntry)cd.getValue())));
+    }
+
     public BudgetView(ISpendPane pane) {
         this.pane = pane;
         final Label label = UiUtils.section("Budget");
 
         plotWidget = new HistoricalVisualizer(pane);
         tv = new CompleteTableView<>(BudgetEntry.class);
-
-        tv.setEditable(true);
+        ObservableList<TableColumn<BudgetEntry, ?>> tc = tv.getColumns();
+        tc.get(1).setCellValueFactory(cd -> getEntries(be -> be.getWeekly(), cd));
+        tc.get(2).setCellValueFactory(cd -> getEntries(be -> be.getMonthly(), cd));
+        tc.get(3).setCellValueFactory(cd -> getEntries(be -> be.getDaily(), cd));
 
         tv.setItems(budgets);
         tv.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-
-        tv.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<BudgetEntry>() {
-            @Override
-            public void changed(ObservableValue<? extends BudgetEntry> observableValue, BudgetEntry budgetEntry, BudgetEntry budgetEntry2) {
-                if (budgetEntry2 != null)
-                    setPlotData(budgetEntry2.getGroup());
-            }
+        tv.getSelectionModel().selectedItemProperty().addListener((ov, be, be2) -> {
+            if (be2 != null)
+                setPlotData(be2.getGroup());
         });
 
         this.tableWidget = new VBox();
         HBox addEntry = addEntry();
-
         setPadding(new Insets(30, 5, 5, 5));
         setSpacing(5);
         tableWidget.getChildren().addAll(addEntry, tv);
