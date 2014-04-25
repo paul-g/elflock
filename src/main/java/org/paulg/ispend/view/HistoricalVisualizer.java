@@ -40,8 +40,7 @@ public class HistoricalVisualizer extends TabPane implements Observer {
         TimeSeries ts = indicator.equals("Sum") ?
                 recordStore.getTotalByDescription(query, timePeriod) :
                 recordStore.getAveragesByDescription(query, timePeriod);
-        lineChart.setTitle(query);
-        lineChart.setTimeSeries(ts);
+        lineChart.setTimeSeries(ts, query);
 
         Map<String, Double> spent = recordStore.getSpentPerItem(query);
         negChart.setData(toPieChartData(spent));
@@ -61,7 +60,6 @@ public class HistoricalVisualizer extends TabPane implements Observer {
     private Tab makeHistoricalTab() {
         Tab tab = new Tab("Historical");
         lineChart = TimeSeriesChart.build();
-        lineChart.setTitle("History");
         VBox box = new VBox();
         HBox hbox = new HBox();
         ObservableList<String> options =

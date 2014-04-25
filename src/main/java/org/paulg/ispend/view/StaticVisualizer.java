@@ -7,7 +7,7 @@ import org.jfree.data.time.TimeSeries;
 
 public class StaticVisualizer extends VBox {
 
-    private final  transient TimeSeriesChart monthlyBalance;
+    private final TimeSeriesChart monthlyBalance;
 
     public StaticVisualizer() {
         super();
@@ -19,6 +19,6 @@ public class StaticVisualizer extends VBox {
     }
 
     public void setMonthlyBalance(final TimeSeries records) {
-        monthlyBalance.setTimeSeries(records);
+        monthlyBalance.setTimeSeries(records, "Average Monthly Balance (all accounts)");
     }
 }

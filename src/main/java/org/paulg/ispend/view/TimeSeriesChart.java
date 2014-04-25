@@ -29,11 +29,11 @@ public class TimeSeriesChart extends LineChart<Number, Number>  {
         super(xAxis, yAxis);
     }
 
-    public void setTimeSeries(TimeSeries ts) {
+    public void setTimeSeries(TimeSeries ts, String title) {
         this.ts = ts;
         List<Date> allDates = new ArrayList<>();
         XYChart.Series series = new XYChart.Series();
-        //series.setName(seriesTitle);
+        series.setName(title);
 
         for (int i = 0; i < ts.getItemCount(); i++) {
             TimeSeriesDataItem tsItem = ts.getDataItem(i);
