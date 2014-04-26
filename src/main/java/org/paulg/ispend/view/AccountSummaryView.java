@@ -3,6 +3,7 @@ package org.paulg.ispend.view;
 import javafx.geometry.Insets;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.converter.NumberStringConverter;
 import org.paulg.ispend.model.Account;
@@ -27,33 +28,36 @@ public class AccountSummaryView extends VBox implements Observer {
         String[] desc = {
                 "Balance",
                 "Last Record",
-                "Total Records",
-                "Covered",
-                "Total Spent",
-                "Total Earned"};
+                "Total Records"
+        };
         String[] values = {
                 Double.toString(account.getBalance()),
                 account.getLastRecordDate(),
                 Integer.toString(account.getTotalRecords()),
-                Integer.toString(account.getCovered()),
-                "None", "None"};
+        };
 
-        for (int i = 0; i < 3; i++) {
-            Label l = UiUtils.subsection(desc[i]);
+        for (int i = 0; i < desc.length; i++) {
             gp.addRow(i,
-                    l,
+                    UiUtils.subsection(desc[i]),
                     new Label(values[i]));
         }
-
         gp.add(UiUtils.subsection("Covered"), 0, 3);
         Label covered = new Label();
-
         covered.textProperty().bindBidirectional(
                 account.getCoveredStringProperty(),
                 new NumberStringConverter()
         );
 
-        gp.add(covered, 1, 3);
+        Label percentCovered = new Label();
+        percentCovered.textProperty().bindBidirectional(
+                account.getCoveredPercentProperty(),
+                new NumberStringConverter()
+        );
+
+        HBox hbox = new HBox();
+        hbox.getChildren().addAll(covered, percentCovered);
+        hbox.setSpacing(10);
+        gp.add(hbox, 1, 3);
         gp.setPadding(new Insets(10, 10, 10, 10));
         gp.setVgap(10);
         gp.setHgap(10);

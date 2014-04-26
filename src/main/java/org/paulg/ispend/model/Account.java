@@ -1,22 +1,26 @@
 package org.paulg.ispend.model;
 
+import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import org.joda.time.DateTime;
 import org.paulg.ispend.view.IgnoreField;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 public class Account {
 
     @IgnoreField
-    private final List<Record> records = new ArrayList<>();
+    private final ObservableList<Record> records = FXCollections.observableArrayList();
     private String number;
     private String name;
     private IntegerProperty covered = new SimpleIntegerProperty(0);
+    private DoubleProperty coveredPercent = new SimpleDoubleProperty();
 
     public Account(final String number, final String name) {
         this.number = number;
@@ -45,6 +49,9 @@ public class Account {
 
     public void setCovered(final int covered) {
         this.covered.set(covered);
+        this.coveredPercent.set(records.size() == 0 ?
+                0:
+                covered / (double)records.size() * 100);
     }
 
     public int getTotal() {
@@ -121,5 +128,9 @@ public class Account {
 
     public IntegerProperty getCoveredStringProperty() {
         return covered;
+    }
+
+    public DoubleProperty getCoveredPercentProperty() {
+        return coveredPercent;
     }
 }
