@@ -2,6 +2,7 @@ package org.paulg.ispend.view;
 
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
@@ -93,6 +94,9 @@ public class ISpendPane extends Observable {
         pane.addRow(0, accountsView, staticVisualizer);
         pane.addRow(1, budgetView.getTableWidget(), budgetView.getPlotWidget());
         UiUtils.setColumnPercentWidths(pane, 40, 60);
+        pane.setHgap(10);
+        pane.setVgap(10);
+        pane.setPadding(new Insets(10, 10, 10, 10));
         tab.setContent(pane);
         return tab;
     }

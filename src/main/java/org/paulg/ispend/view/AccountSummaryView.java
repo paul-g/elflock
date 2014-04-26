@@ -19,7 +19,6 @@ public class AccountSummaryView extends VBox implements Observer {
         this.ispendPane = ispendPane;
         final Label label = UiUtils.section("Accounts Summary");
         getChildren().addAll(label);
-        setPadding(new Insets(30, 5, 5, 5));
         setSpacing(15);
     }
 
@@ -69,7 +68,6 @@ public class AccountSummaryView extends VBox implements Observer {
         Label l = UiUtils.section(account.getName());
         box.getChildren().add(l);
         box.getChildren().add(accountFieldView(account));
-        box.setPadding(new Insets(10, 10, 10, 10));
         return box;
     }
 
