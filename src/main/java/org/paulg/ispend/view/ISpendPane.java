@@ -92,13 +92,7 @@ public class ISpendPane extends Observable {
         GridPane pane = new GridPane();
         pane.addRow(0, accountsView, staticVisualizer);
         pane.addRow(1, budgetView.getTableWidget(), budgetView.getPlotWidget());
-
-        ColumnConstraints column1 = new ColumnConstraints();
-        column1.setPercentWidth(40);
-        ColumnConstraints column2 = new ColumnConstraints();
-        column2.setPercentWidth(60);
-        pane.getColumnConstraints().addAll(column1, column2); // each get 50% of width
-
+        UiUtils.setColumnPercentWidths(pane, 40, 60);
         tab.setContent(pane);
         return tab;
     }
