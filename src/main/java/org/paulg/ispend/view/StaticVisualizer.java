@@ -11,8 +11,7 @@ public class StaticVisualizer extends VBox {
 
     public StaticVisualizer() {
         super();
-        monthlyBalance = new TimeSeriesChart();
-        monthlyBalance.setTitle("Monthly Balance");
+        monthlyBalance = new TimeSeriesChart("Monthly Balance");
         getChildren().addAll(monthlyBalance);
         setAlignment(Pos.CENTER);
         setSpacing(20);
