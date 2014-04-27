@@ -113,10 +113,8 @@ public class ISpendPane extends Observable {
 
         searchView.setRecordStore(recordStore);
 
-        data.clear();
-        data.addAll(recordStore.getAllRecords());
-        accountsData.clear();
-        accountsData.addAll(recordStore.getAccounts());
+        data.setAll(recordStore.getAllRecords());
+        accountsData.setAll(recordStore.getAccounts());
         recordStore.printSummary();
 
         staticVisualizer.setMonthlyBalance(recordStore.getMonthlyBalance());
