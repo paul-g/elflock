@@ -17,12 +17,8 @@ public class TimeSeriesChart extends LineChart<Number, Number>  {
         return na;
     }
 
-    public static TimeSeriesChart build() {
-        return new TimeSeriesChart(makeDateAxis("Y M W"), new NumberAxis());
-    }
-
-    public TimeSeriesChart(NumberAxis xAxis, NumberAxis yAxis) {
-        super(xAxis, yAxis);
+    public TimeSeriesChart() {
+        super(makeDateAxis("Y M W"), new NumberAxis());
     }
 
     public void setTimeSeries(TimeSeries ts, String title) {

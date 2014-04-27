@@ -58,7 +58,7 @@ public class HistoricalVisualizer extends TabPane implements Observer {
 
     private Tab makeHistoricalTab() {
         Tab tab = new Tab("Historical");
-        lineChart = TimeSeriesChart.build();
+        lineChart = new TimeSeriesChart();
         VBox box = new VBox();
         HBox hbox = new HBox();
         ObservableList<String> options =
