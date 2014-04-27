@@ -6,13 +6,9 @@ import javafx.scene.chart.XYChart;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesDataItem;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 public class TimeSeriesChart extends LineChart<Number, Number>  {
-
-    private TimeSeries ts;
 
     private static NumberAxis makeDateAxis(String dateFormat) {
         NumberAxis na = new NumberAxis();
@@ -30,8 +26,6 @@ public class TimeSeriesChart extends LineChart<Number, Number>  {
     }
 
     public void setTimeSeries(TimeSeries ts, String title) {
-        this.ts = ts;
-        List<Date> allDates = new ArrayList<>();
         XYChart.Series series = new XYChart.Series();
         series.setName(title);
 
@@ -39,7 +33,7 @@ public class TimeSeriesChart extends LineChart<Number, Number>  {
             TimeSeriesDataItem tsItem = ts.getDataItem(i);
             Date date = tsItem.getPeriod().getStart();
             Number value = tsItem.getValue();
-            series.getData().add(new XYChart.Data(date.getTime(), value));
+            series.getData().add(new XYChart.Data<Number, Number>(date.getTime(), value));
         }
         getData().setAll(series);
     }

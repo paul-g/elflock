@@ -18,7 +18,7 @@ import java.util.Observer;
 public class GroupView extends VBox implements Observer {
 
     private final HistoricalVisualizer visualizer;
-    private TextField groupBy;
+    private final TextField groupBy;
 
     GroupView(ISpendPane ispendPane,
               ObservableList<AggregatedRecord> groupData) {
@@ -43,7 +43,7 @@ public class GroupView extends VBox implements Observer {
                 AggregatedRecord.class);
         aggregatedRecordView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         HBox hbox = new HBox();
-        hbox.setHgrow(groupBy, Priority.ALWAYS);
+        HBox.setHgrow(groupBy, Priority.ALWAYS);
         hbox.getChildren().addAll(groupBy, save);
         hbox.setAlignment(Pos.CENTER);
         hbox.setSpacing(5);

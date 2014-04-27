@@ -35,14 +35,13 @@ public class BudgetView extends HBox implements Observer {
 
     public BudgetView(ISpendPane pane) {
         this.pane = pane;
-        final Label label = UiUtils.section("Budget");
 
         plotWidget = new HistoricalVisualizer(pane);
         tv = new CompleteTableView<>(BudgetEntry.class);
         ObservableList<TableColumn<BudgetEntry, ?>> tc = tv.getColumns();
-        tc.get(1).setCellValueFactory(cd -> getEntries(be -> be.getWeekly(), cd));
-        tc.get(2).setCellValueFactory(cd -> getEntries(be -> be.getMonthly(), cd));
-        tc.get(3).setCellValueFactory(cd -> getEntries(be -> be.getDaily(), cd));
+        tc.get(1).setCellValueFactory(cd -> getEntries(BudgetEntry::getWeekly, cd));
+        tc.get(2).setCellValueFactory(cd -> getEntries(BudgetEntry::getMonthly, cd));
+        tc.get(3).setCellValueFactory(cd -> getEntries(BudgetEntry::getDaily, cd));
 
         tv.setItems(budgets);
         tv.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
@@ -94,9 +93,7 @@ public class BudgetView extends HBox implements Observer {
         });
 
         final Button search = new Button("S");
-        search.setOnAction(event -> {
-            setPlotData(text.getText());
-        });
+        search.setOnAction(event -> setPlotData(text.getText()));
 
         final Button delete = new Button("-");
         delete.setOnAction(event -> {
@@ -113,7 +110,7 @@ public class BudgetView extends HBox implements Observer {
         });
 
         addEntry.getChildren().addAll(text, search, add, delete);
-        addEntry.setHgrow(text, Priority.ALWAYS);
+        HBox.setHgrow(text, Priority.ALWAYS);
         addEntry.setSpacing(10);
 
         return addEntry;
@@ -133,8 +130,7 @@ public class BudgetView extends HBox implements Observer {
 
     private BudgetEntry getBudget(String query) {
         double weeklyAvg = recordStore.getWeeklyAverageByDescription(query);
-        BudgetEntry be = new BudgetEntry(query, weeklyAvg / 7, weeklyAvg, weeklyAvg * 4);
-        return be;
+        return new BudgetEntry(query, weeklyAvg / 7, weeklyAvg, weeklyAvg * 4);
     }
 
     public Node getTableWidget() {

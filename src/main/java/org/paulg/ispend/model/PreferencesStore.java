@@ -32,9 +32,9 @@ public class PreferencesStore {
         String mergedQueries = prefs.get(SAVED_SEARCH_QUERIES, null);
         String[] qs = mergedQueries.split(";");
         List<String> queries = new ArrayList<>();
-        for (int i = 0; i < qs.length; i++) {
-            if (!qs[i].isEmpty())
-                queries.add(qs[i]);
+        for (String q : qs) {
+            if (!q.isEmpty())
+                queries.add(q);
         }
         return queries;
     }

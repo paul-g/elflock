@@ -14,7 +14,7 @@ public class AggregatedRecord {
     private double negative;
 
     @IgnoreField
-    private List<Record> records = new ArrayList<>();
+    private final List<Record> records = new ArrayList<>();
 
     // XXX dumb!
     public AggregatedRecord(final Record r) {

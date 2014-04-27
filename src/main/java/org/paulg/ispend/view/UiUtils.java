@@ -4,9 +4,6 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * General configuration options for the app
  */
@@ -33,7 +30,6 @@ public final class UiUtils {
     }
 
     public static void setColumnPercentWidths(GridPane pane, double... widths) {
-        List<ColumnConstraints> colConstraints = new ArrayList<>();
         for (double w : widths) {
             ColumnConstraints c = new ColumnConstraints();
             c.setPercentWidth(w);

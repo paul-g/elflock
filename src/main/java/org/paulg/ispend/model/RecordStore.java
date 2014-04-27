@@ -6,6 +6,7 @@ import org.paulg.ispend.utils.StringUtils;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public class RecordStore {
 
@@ -54,14 +55,9 @@ public class RecordStore {
     }
 
     private List<Record> filterAtom(final String text) {
-        final List<Record> unfiltered = getAllRecords();
-        final List<Record> filtered = new ArrayList<>();
-        for (final Record r : unfiltered) {
-            if (StringUtils.containsIgnoreCase(r.getDescription(), text)) {
-                filtered.add(r);
-            }
-        }
-        return filtered;
+        return getAllRecords().stream()
+                .filter(r -> StringUtils.containsIgnoreCase(r.getDescription(), text))
+                .collect(Collectors.toList());
     }
 
     private String[] parseArguments(final String text) {
@@ -119,11 +115,17 @@ public class RecordStore {
     }
 
     public Map<String,Double> getIncomePerItem(String query) {
-        return getFieldPerRecord(query, r -> r.getPositive(), () -> getTotalIncome());
+        return getFieldPerRecord(
+                query,
+                AggregatedRecord::getPositive,
+                this::getTotalIncome);
     }
 
     public Map<String, Double> getSpentPerItem(String query) {
-        return getFieldPerRecord(query, r -> r.getNegative(), () -> getTotalSpent());
+        return getFieldPerRecord(
+                query,
+                AggregatedRecord::getNegative,
+                this::getTotalSpent);
     }
 
     private Map<String,Double> getFieldPerRecord(
@@ -161,7 +163,7 @@ public class RecordStore {
             spent += a.getRecords().stream().
                     mapToDouble(Record::getValue).
                     filter(x -> x < 0).
-                    map(x -> Math.abs(x)).
+                    map(Math::abs).
                     sum();
         }
         return spent;
@@ -177,12 +179,12 @@ public class RecordStore {
 
     public TimeSeries getWeeklyAveragesByDescription(String descriptionQuery) {
         List<Record> filtered = filterAny(descriptionQuery);
-        return averageByPeriod(filtered, r -> r.getValue(), new Week());
+        return averageByPeriod(filtered, Record::getValue, new Week());
     }
 
     public double getWeeklyAverageByDescription(String descriptionQuery) {
         List<Record> filtered = filterAny(descriptionQuery);
-        TimeSeries ts = averageByPeriod(filtered, r -> r.getValue(), new Week());
+        TimeSeries ts = averageByPeriod(filtered, Record::getValue, new Week());
         double rename = 0;
         for (int i = 0; i < ts.getItemCount(); i++) {
             TimeSeriesDataItem it = ts.getDataItem(i);
@@ -192,7 +194,7 @@ public class RecordStore {
     }
 
     private TimeSeries getBalance(RegularTimePeriod period) {
-        return averageByPeriod(getAllRecords(), r -> r.getBalance(), period);
+        return averageByPeriod(getAllRecords(), Record::getBalance, period);
     }
 
     /**
@@ -238,13 +240,11 @@ public class RecordStore {
 
     public TimeSeries getAveragesByDescription(String query, RegularTimePeriod period) {
         List<Record> filtered = filterAny(query);
-        TimeSeries ts = averageByPeriod(filtered, r -> r.getValue(), period);
-        return ts;
+        return averageByPeriod(filtered, r -> r.getValue(), period);
     }
 
     public TimeSeries getTotalByDescription(String query, RegularTimePeriod period) {
         List<Record> filtered = filterAny(query);
-        TimeSeries ts = sumByPeriod(filtered, r -> r.getValue(), period);
-        return ts;
+        return sumByPeriod(filtered, r -> r.getValue(), period);
     }
 }

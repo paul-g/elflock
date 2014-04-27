@@ -12,7 +12,7 @@ import java.util.Date;
  */
 public class DateConverter extends StringConverter<Number> {
 
-    private String dateFormat;
+    private final String dateFormat;
 
     public DateConverter(String dateFormat) {
         this.dateFormat = dateFormat;

@@ -19,8 +19,8 @@ public class Account {
     private final ObservableList<Record> records = FXCollections.observableArrayList();
     private String number;
     private String name;
-    private IntegerProperty covered = new SimpleIntegerProperty(0);
-    private DoubleProperty coveredPercent = new SimpleDoubleProperty();
+    private final IntegerProperty covered = new SimpleIntegerProperty(0);
+    private final DoubleProperty coveredPercent = new SimpleDoubleProperty();
 
     public Account(final String number, final String name) {
         this.number = number;

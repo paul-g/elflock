@@ -18,6 +18,7 @@ import org.paulg.ispend.model.RecordStore;
 import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.stream.Collectors;
 
 public class HistoricalVisualizer extends TabPane implements Observer {
 
@@ -51,9 +52,7 @@ public class HistoricalVisualizer extends TabPane implements Observer {
 
     private ObservableList<PieChart.Data> toPieChartData(Map<String, Double> in) {
         ObservableList<PieChart.Data> pieData = FXCollections.observableArrayList();
-        for (Map.Entry<String, Double> me : in.entrySet()){
-            pieData.add(new PieChart.Data(me.getKey(), me.getValue()));
-        }
+        pieData.addAll(in.entrySet().stream().map(me -> new PieChart.Data(me.getKey(), me.getValue())).collect(Collectors.toList()));
         return pieData;
     }
 
@@ -67,10 +66,10 @@ public class HistoricalVisualizer extends TabPane implements Observer {
                         "Month",
                         "Week"
                 );
-        final ComboBox period = new ComboBox(options);
+        final ComboBox<String> period = new ComboBox(options);
         period.getSelectionModel().select(0);
         period.setOnAction(event -> {
-            String value = (String)period.getValue();
+            String value = period.getValue();
             switch (value) {
                 case "Week": timePeriod = new Week(); break;
                 case "Month": timePeriod = new Month(); break;
@@ -84,10 +83,10 @@ public class HistoricalVisualizer extends TabPane implements Observer {
                         "Average"
                 );
 
-        final ComboBox indicatorBox = new ComboBox(indOptions);
+        final ComboBox<String> indicatorBox = new ComboBox(indOptions);
         indicatorBox.getSelectionModel().select(0);
         indicatorBox.setOnAction(event -> {
-            this.indicator = (String)indicatorBox.getValue();
+            this.indicator = indicatorBox.getValue();
             plotHistoricalData(query);
         });
 
