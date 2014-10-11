@@ -21,6 +21,7 @@ public class Account {
     private String name;
     private final IntegerProperty covered = new SimpleIntegerProperty(0);
     private final DoubleProperty coveredPercent = new SimpleDoubleProperty();
+    private String firstRecordDate;
 
     public Account(final String number, final String name) {
         this.number = number;
@@ -132,5 +133,11 @@ public class Account {
 
     public DoubleProperty getCoveredPercentProperty() {
         return coveredPercent;
+    }
+
+    public String getFirstRecordDate() {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy");
+        DateTime lastRecord = Collections.min(records).getDate();
+        return sdf.format(lastRecord.toDate());
     }
 }

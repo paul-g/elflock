@@ -27,11 +27,13 @@ public class AccountSummaryView extends VBox implements Observer {
         String[] desc = {
                 "Balance",
                 "Last Record",
+                "First Record",
                 "Total Records"
         };
         String[] values = {
                 Double.toString(account.getBalance()),
                 account.getLastRecordDate(),
+                account.getFirstRecordDate(),
                 Integer.toString(account.getTotalRecords()),
         };
 
@@ -40,7 +42,7 @@ public class AccountSummaryView extends VBox implements Observer {
                     UiUtils.subsection(desc[i]),
                     new Label(values[i]));
         }
-        gp.add(UiUtils.subsection("Covered"), 0, 3);
+        gp.add(UiUtils.subsection("Covered"), 0, desc.length);
         Label covered = new Label();
         covered.textProperty().bindBidirectional(
                 account.getCoveredStringProperty(),
@@ -56,7 +58,7 @@ public class AccountSummaryView extends VBox implements Observer {
         HBox hbox = new HBox();
         hbox.getChildren().addAll(covered, percentCovered);
         hbox.setSpacing(10);
-        gp.add(hbox, 1, 3);
+        gp.add(hbox, 1, desc.length);
         gp.setPadding(new Insets(10, 10, 10, 10));
         gp.setVgap(10);
         gp.setHgap(10);
