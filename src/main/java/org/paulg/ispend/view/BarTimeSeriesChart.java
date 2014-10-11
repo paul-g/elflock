@@ -9,19 +9,29 @@ import java.util.Date;
 
 public class BarTimeSeriesChart extends BarChart<String, Number> {
 
-    private static final String format = "Y M W";
+    private String format;
 
-    private static CategoryAxis makeDateAxis(String dateFormat) {
+    private static CategoryAxis makeDateAxis() {
         CategoryAxis na = new CategoryAxis();
+        na.setTickLabelRotation(90);
+        na.setTickLabelsVisible(true);
+        na.setAnimated(false);
         return na;
     }
 
-    public BarTimeSeriesChart() {
-        super(makeDateAxis(format), new NumberAxis());
+    private static NumberAxis makeValueAxis() {
+        NumberAxis na = new NumberAxis();
+        na.setAnimated(false);
+        return na;
     }
 
-    public BarTimeSeriesChart(String title) {
-        super(makeDateAxis(format), new NumberAxis());
+    public BarTimeSeriesChart(String format) {
+        super(makeDateAxis(), makeValueAxis());
+        this.format = format;
+    }
+
+    public BarTimeSeriesChart(String format, String title) {
+        this(format);
         setTitle(title);
     }
 
@@ -34,7 +44,7 @@ public class BarTimeSeriesChart extends BarChart<String, Number> {
             Date date = tsItem.getPeriod().getStart();
             Number value = tsItem.getValue();
             String d = sdf.format(date);
-            series.getData().add(new XYChart.Data<String, Number>(d, value));
+            series.getData().add(new XYChart.Data<>(d, value));
         }
         getData().setAll(series);
     }
