@@ -1,6 +1,8 @@
 package org.paulg.ispend.model;
 
 import org.jfree.data.time.*;
+import org.joda.time.DateTime;
+import org.paulg.ispend.utils.Pair;
 import org.paulg.ispend.utils.StringUtils;
 
 import java.util.*;
@@ -11,6 +13,7 @@ import java.util.stream.Collectors;
 public class RecordStore {
 
     private final Map<String, Account> accounts = new LinkedHashMap<>();
+    private final Map<DateTime, MonthlyData> monthlyData = new LinkedHashMap<>();
 
     public void addRecord(final Record r) {
         Account acc = accounts.get(r.getAccountNumber());
@@ -19,6 +22,23 @@ public class RecordStore {
             accounts.put(r.getAccountNumber(), acc);
         }
         acc.addRecord(r);
+
+        // store it in the monthly data
+        DateTime rd = r.getDate();
+        DateTime dt = yearMonth(rd);
+
+        MonthlyData md = monthlyData.get(dt);
+        if (md == null) {
+            md = new MonthlyData();
+            monthlyData.put(dt, md);
+        }
+        md.addRecord(r, acc);
+    }
+
+    private DateTime yearMonth(DateTime rd) {
+        return new DateTime().withYear(rd.getYear()).
+                withMonthOfYear(rd.getMonthOfYear()).
+                withDayOfMonth(1).withTime(0, 0, 0, 0);
     }
 
     public List<Record> getRecordsByAccountNumber(final String number) {
@@ -246,5 +266,48 @@ public class RecordStore {
     public TimeSeries getTotalByDescription(String query, RegularTimePeriod period) {
         List<Record> filtered = filterAny(query);
         return sumByPeriod(filtered, r -> r.getValue(), period);
+    }
+
+    public TimeSeries getEndOfMonthBalance() {
+        TimeSeries ts = new TimeSeries("EomBalance");
+        DateTime start = getFirstRecordDate();
+        DateTime end = getLastRecordDate();
+        while (start.isBefore(end)) {
+            start = start.plusMonths(1);
+            MonthlyData md = monthlyData.get(start);
+            RegularTimePeriod tp = new Month(start.toDate());
+            if (md != null) {
+                Map<Account, Pair<Record, Record>> acmd = md.accMonthlyData;
+                double aggregatedBalance = 0;
+                for (Pair<Record, Record> me : acmd.values())
+                    aggregatedBalance += me.snd.getBalance();
+                ts.add(tp, aggregatedBalance);
+            } else
+                ts.add(tp, 0);
+        }
+        return ts;
+    }
+
+    private DateTime getFirstRecordDate() {
+        return yearMonth(Collections.min(getAllRecords()).getDate());
+    }
+
+    private DateTime getLastRecordDate() {
+        return yearMonth(Collections.max(getAllRecords()).getDate());
+    }
+
+    private static class MonthlyData {
+        Map<Account, Pair<Record, Record>> accMonthlyData = new LinkedHashMap<>();
+
+        public void addRecord(final Record r, final Account a) {
+            Pair<Record, Record> amd = accMonthlyData.get(a);
+            Record firstRecord = amd == null ? null : amd.fst;
+            Record lastRecord = amd == null ? null : amd.snd;
+            if (firstRecord == null || firstRecord.getDate().isAfter(r.getDate()))
+                firstRecord = r;
+            if (lastRecord == null || lastRecord.getDate().isBefore(r.getDate()))
+                lastRecord = r;
+            accMonthlyData.put(a, new Pair<>(firstRecord, lastRecord));
+        }
     }
 }

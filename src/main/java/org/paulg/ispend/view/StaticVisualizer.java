@@ -11,13 +11,13 @@ public class StaticVisualizer extends VBox {
 
     public StaticVisualizer() {
         super();
-        monthlyBalance = new BarTimeSeriesChart("Y M", "Monthly Balance");
+        monthlyBalance = new BarTimeSeriesChart("Y M", "End of Month Balance");
         getChildren().addAll(monthlyBalance);
         setAlignment(Pos.CENTER);
         setSpacing(20);
     }
 
-    public void setMonthlyBalance(final TimeSeries records) {
-        monthlyBalance.setTimeSeries(records, "Average Monthly Balance (all accounts)");
+    public void setEndOfMonthBalance(final TimeSeries records) {
+        monthlyBalance.setTimeSeries(records, "End of Month Balance (all accounts)");
     }
 }

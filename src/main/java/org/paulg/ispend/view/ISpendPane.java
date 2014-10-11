@@ -117,7 +117,7 @@ public class ISpendPane extends Observable {
         accountsData.setAll(recordStore.getAccounts());
         recordStore.printSummary();
 
-        staticVisualizer.setMonthlyBalance(recordStore.getMonthlyBalance());
+        staticVisualizer.setEndOfMonthBalance(recordStore.getEndOfMonthBalance());
 
         this.setChanged();
         this.notifyObservers();
