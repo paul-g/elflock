@@ -7,11 +7,11 @@ import org.jfree.data.time.TimeSeries;
 
 public class StaticVisualizer extends VBox {
 
-    private final TimeSeriesChart monthlyBalance;
+    private final BarTimeSeriesChart monthlyBalance;
 
     public StaticVisualizer() {
         super();
-        monthlyBalance = new TimeSeriesChart("Monthly Balance");
+        monthlyBalance = new BarTimeSeriesChart("Monthly Balance");
         getChildren().addAll(monthlyBalance);
         setAlignment(Pos.CENTER);
         setSpacing(20);
