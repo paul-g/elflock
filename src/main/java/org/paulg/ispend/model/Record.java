@@ -107,7 +107,7 @@ public class Record implements Comparable<Record> {
 
     @Override
     public boolean equals(final Object o) {
-        if ((o == null) || !(o instanceof Record)) {
+        if (o == null || !(o instanceof Record)) {
             return false;
         }
         final Record r = (Record) o;
@@ -116,7 +116,7 @@ public class Record implements Comparable<Record> {
         // need some sort of UID to handle this correctly
         return r.getAccountName().equals(accountName) && r.getAccountNumber().equals(accountNumber)
                 && r.getBalance().equals(balance) && r.getDate().equals(date) && r.getDescription().equals(description)
-                && r.getType().equals(type) && (r.getValue() == value);
+                && r.getType().equals(type) && r.getValue() == value;
     }
 
     @Override

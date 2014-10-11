@@ -84,13 +84,13 @@ public class AggregatedRecord {
 
     @Override
     public boolean equals(final Object o) {
-        if ((o == null) || !(o instanceof AggregatedRecord)) {
+        if (o == null || !(o instanceof AggregatedRecord)) {
             return false;
         }
         AggregatedRecord ar = (AggregatedRecord) o;
-        return (description.equals(ar.getDescription()) && (count == ar.getCount())
-                && (positive == ar.getPositive()) && (negative == ar.getNegative()) && (value == ar
-                .getValue()));
+        return description.equals(ar.getDescription()) && count == ar.getCount()
+                && positive == ar.getPositive() && negative == ar.getNegative() && value == ar
+                .getValue();
     }
 
     @Override

@@ -13,11 +13,11 @@ public final class StringUtils {
 
     public static String trimCharacters(final String text, final String characters) {
         int spos = 0;
-        while ((spos < text.length()) && (characters.indexOf(text.charAt(spos)) >= 0)) {
+        while (spos < text.length() && characters.indexOf(text.charAt(spos)) >= 0) {
             spos++;
         }
         int fpos = text.length() - 1;
-        while ((fpos >= 0) && (characters.indexOf(text.charAt(fpos)) >= 0)) {
+        while (fpos >= 0 && characters.indexOf(text.charAt(fpos)) >= 0) {
             fpos--;
         }
         return spos <= fpos ? text.substring(spos, fpos + 1) : "";

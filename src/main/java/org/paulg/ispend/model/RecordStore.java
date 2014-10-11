@@ -88,7 +88,7 @@ public class RecordStore {
         if (query.isEmpty())
             return tagRecords;
 
-        if ((tags != null) && (tags.length > 0)) {
+        if (tags != null && tags.length > 0) {
 
             for (Account a : accounts.values()) {
                 a.setCovered(0);

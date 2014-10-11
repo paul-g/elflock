@@ -69,7 +69,7 @@ public class Account {
 
     @Override
     public boolean equals(final Object o) {
-        if ((o == null) || !(o instanceof Account) || (number == null) || (name == null)) {
+        if ( o == null || !(o instanceof Account) || number == null || name == null) {
             return false;
         }
         Account a = (Account) o;
