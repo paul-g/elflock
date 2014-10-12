@@ -19,8 +19,7 @@ public class NatWestRecordParser implements RecordParser {
         try {
             parser = CSVParser.parse(path.toFile(),
                     Charset.defaultCharset(),
-                    CSVFormat.EXCEL.withHeader("Date", "Type", "Description",
-                            "Value", "Balance", "Account Name", "Account Number"));
+                    CSVFormat.DEFAULT.withHeader());
         } catch (IOException e) {
             e.printStackTrace();
         }
