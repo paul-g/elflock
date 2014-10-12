@@ -1,62 +1,42 @@
 package org.paulg.ispend.model;
 
-import org.paulg.ispend.utils.StringUtils;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
+
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 public class NatWestRecordParser implements RecordParser {
 
-    private String SEP = ",";
-
-    private enum State {
-        PARSING_NORMAL, PARSING_QUOTED_ENTRY, END_QUOTED_ENTRY, NOT_PARSING,
-    }
-
     @Override
-    public Record parseRecord(final String line) {
+    public List<Record> parseRecords(final Path path) {
 
-        State state = State.PARSING_NORMAL;
-
-        final String[] recordFields = new String[20];
-        int fieldCount = 0;
-
-        int pos = 0;
-        char[] lchars = line.toCharArray();
-        String token = "";
-        while (pos < lchars.length) {
-            char c = lchars[pos++];
-            switch (state) {
-                case PARSING_QUOTED_ENTRY:
-                    if (c == '"') {
-                        if (pos < lchars.length && lchars[pos] != '"') {
-                            pos++;
-                            state = State.PARSING_NORMAL;
-                        }
-                        recordFields[fieldCount++] = StringUtils.trimCharacters(token, "\"'");
-                        token = "";
-                    } else
-                        token += c;
-                    break;
-                case PARSING_NORMAL:
-                    if (c == ',') {
-                        if (pos < lchars.length && lchars[pos] == '"') {
-                            pos++;
-                            state = State.PARSING_QUOTED_ENTRY;
-                        }
-                        recordFields[fieldCount++] = StringUtils.trimCharacters(token, "\"'");
-                        token = "";
-                    } else
-                        token += c;
-                    break;
-            }
+        CSVParser parser = null;
+        try {
+            parser = CSVParser.parse(path.toFile(),
+                    Charset.defaultCharset(),
+                    CSVFormat.EXCEL.withHeader("Date", "Type", "Description",
+                            "Value", "Balance", "Account Name", "Account Number"));
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
-        final Record r = new Record();
-        r.setDate(recordFields[0]);
-        r.setType(recordFields[1]);
-        r.setDescription(recordFields[2]);
-        r.setValue(Double.parseDouble(recordFields[3]));
-        r.setBalance(Double.parseDouble(recordFields[4]));
-        r.setAccountName(recordFields[5]);
-        r.setAccountNumber(recordFields[6]);
-        return r;
+        List<Record> records = new ArrayList<>();
+        for (CSVRecord csvRecord : parser) {
+            final Record r = new Record();
+            r.setDate(csvRecord.get("Date"));
+            r.setType(csvRecord.get("Type"));
+            r.setDescription(csvRecord.get("Description"));
+            r.setValue(Double.parseDouble(csvRecord.get("Value")));
+            r.setBalance(Double.parseDouble(csvRecord.get("Balance")));
+            r.setAccountName(csvRecord.get("Account Name"));
+            r.setAccountNumber(csvRecord.get("Account Number"));
+            records.add(r);
+        }
+        return records;
     }
 }

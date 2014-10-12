@@ -1,7 +1,10 @@
 package org.paulg.ispend.model;
 
+import java.nio.file.Path;
+import java.util.List;
+
 public interface RecordParser {
 
-    Record parseRecord(String line);
+    List<Record> parseRecords(Path file);
 
 }
