@@ -3,6 +3,8 @@ package org.paulg.ispend.model;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -26,16 +28,20 @@ public class NatWestRecordParser implements RecordParser {
 
         List<Record> records = new ArrayList<>();
         for (CSVRecord csvRecord : parser) {
-            final Record r = new Record();
-            r.setDate(csvRecord.get("Date"));
-            r.setType(csvRecord.get("Type"));
-            r.setDescription(csvRecord.get("Description"));
-            r.setValue(Double.parseDouble(csvRecord.get("Value")));
-            r.setBalance(Double.parseDouble(csvRecord.get("Balance")));
-            r.setAccountName(csvRecord.get("Account Name"));
-            r.setAccountNumber(csvRecord.get("Account Number"));
+            final Record r = new Record(
+                    parseDate(csvRecord.get("Date")),
+                    csvRecord.get("Type"),
+                    csvRecord.get("Description"),
+                    Double.parseDouble(csvRecord.get("Value")),
+                    Double.parseDouble(csvRecord.get("Balance")),
+                    csvRecord.get("Account Name"),
+                    csvRecord.get("Account Number"));
             records.add(r);
         }
         return records;
+    }
+
+    private DateTime parseDate(String date) {
+        return DateTime.parse(date, DateTimeFormat.forPattern("dd/MM/yyyy"));
     }
 }

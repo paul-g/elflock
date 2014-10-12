@@ -1,6 +1,8 @@
 package org.paulg.ispend.model;
 
 import org.jfree.data.time.TimeSeries;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -18,14 +20,18 @@ public class RecordStoreTest {
     private Record r, r1, r2;
     private AggregatedRecord ar1;
 
+    private DateTime pd(String date) {
+        return DateTime.parse(date, DateTimeFormat.forPattern("dd/MM/yyyy"));
+    }
+
     @Before
     public void setUp() {
         store = new RecordStore();
-        r1 = new Record("04/02/2013", "type", "transaction 1", 0., "account", ACC1, 3.75);
+        r1 = new Record(pd("04/02/2013"), "type", "transaction 1", 3.75, 0., "account", ACC1);
         store.addRecord(r1);
-        r2 = new Record("04/02/2013", "type", "transaction 2", 0., "account", ACC1, 5.11);
+        r2 = new Record(pd("04/02/2013"), "type", "transaction 2", 5.11, 0., "account", ACC1);
         store.addRecord(r2);
-        r = new Record("11/02/2013", "type", "trans 2", 0., "account", ACC2, -2.11);
+        r = new Record(pd("11/02/2013"), "type", "trans 2", -2.11, 0., "account", ACC2);
         store.addRecord(r);
         ar1 = new AggregatedRecord("transaction", 0);
         ar1.addRecord(r1);
