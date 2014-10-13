@@ -34,7 +34,6 @@ public class ISpendPane extends Observable {
     final Scene scene;
     public final ObservableMap<String, ObservableList<Record>> flagLists = observableHashMap();
 
-    private final ObservableList<AggregatedRecord> groupData = observableArrayList();
     private final ObservableList<Account> accountsData = observableArrayList();
     private final Stage stage;
     private final PreferencesStore preferencesStore;
@@ -141,17 +140,9 @@ public class ISpendPane extends Observable {
         stage.show();
     }
 
-    public void clearQuery() {
-        groupData.clear();
-    }
-
     void setQuery(final String query) {
-        clearQuery();
-        List<AggregatedRecord> byDescription = recordStore.groupByDescription(query);
-        groupData.addAll(byDescription);
         accountsData.clear();
         accountsData.addAll(recordStore.getAccounts());
-
     }
 
     public void saveQuery(String text) {

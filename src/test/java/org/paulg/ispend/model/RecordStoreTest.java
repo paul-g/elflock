@@ -5,6 +5,7 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.junit.Before;
 import org.junit.Test;
+import org.paulg.ispend.store.AggregatedRecord;
 import org.paulg.ispend.store.InMemoryRecordStore;
 import org.paulg.ispend.store.RecordStore;
 
@@ -81,14 +82,4 @@ public class RecordStoreTest {
         Double average = store.getWeeklyAverageByDescription("trans");
         assertEquals(((r1.getValue() + r2.getValue()) / 2 + r.getValue()) / 2, average, 1e-10);
     }
-
-    @Test
-    public void testGrouping() {
-        List<AggregatedRecord> records = store.groupByDescription("transaction");
-        assertArrayEquals(new AggregatedRecord[]{ar1}, records.toArray());
-        records = store.groupByDescription("non-existent");
-        AggregatedRecord ar = new AggregatedRecord("non-existent", 0);
-        assertArrayEquals(new AggregatedRecord[]{ar}, records.toArray());
-    }
-
 }

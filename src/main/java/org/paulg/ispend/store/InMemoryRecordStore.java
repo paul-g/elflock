@@ -3,7 +3,6 @@ package org.paulg.ispend.store;
 import org.jfree.data.time.*;
 import org.joda.time.DateTime;
 import org.paulg.ispend.model.Account;
-import org.paulg.ispend.model.AggregatedRecord;
 import org.paulg.ispend.model.Record;
 import org.paulg.ispend.utils.Pair;
 import org.paulg.ispend.utils.StringUtils;
@@ -77,7 +76,6 @@ public class InMemoryRecordStore implements RecordStore {
         return allRecords;
     }
 
-    @Override
     public List<AggregatedRecord> groupByDescription(final String query) {
         String[] tags = parseArguments(query);
         final List<AggregatedRecord> tagRecords = new ArrayList<>();
@@ -172,16 +170,6 @@ public class InMemoryRecordStore implements RecordStore {
     }
 
     @Override
-    public TimeSeries getWeeklyBalance() {
-        return getBalance(new Week());
-    }
-
-    @Override
-    public TimeSeries getMonthlyBalance() {
-        return getBalance(new Month());
-    }
-
-    @Override
     public TimeSeries getWeeklyAveragesByDescription(String descriptionQuery) {
         List<Record> filtered = filterAny(getAllRecords(), descriptionQuery);
         return averageByPeriod(filtered, Record::getValue, new Week());
@@ -197,10 +185,6 @@ public class InMemoryRecordStore implements RecordStore {
             rename += it.getValue().doubleValue();
         }
         return rename / ts.getItemCount();
-    }
-
-    private TimeSeries getBalance(RegularTimePeriod period) {
-        return averageByPeriod(getAllRecords(), Record::getBalance, period);
     }
 
     /**
