@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 public class Query {
 
     /** Returns the records matching any of the query atoms. Multiple query atoms
-     *  are separated by comma. */
+     *  are separated by comm2a. */
     public static List<Record> filterAny(List<Record> records, final String query) {
         // XXX this will include duplicates for records matching more than one query atom
         // need to use a set, pending correct equals implementation in Record

@@ -4,9 +4,11 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -48,6 +50,19 @@ public class BudgetView extends HBox implements Observer {
         tc.get(2).setCellValueFactory(cd -> getEntries(BudgetEntry::getMonthly, cd));
         tc.get(3).setCellValueFactory(cd -> getEntries(BudgetEntry::getDaily, cd));
 
+        TableColumn queryCol = tv.getColumns().get(0);
+        queryCol.setCellFactory(TextFieldTableCell.forTableColumn());
+        queryCol.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<BudgetEntry, String>>() {
+            @Override
+            public void handle(TableColumn.CellEditEvent<BudgetEntry, String> event) {
+                String newQuery = event.getNewValue();
+                String oldQuery = event.getOldValue();
+                event.getRowValue().setGroup(newQuery);
+                updateQuery(oldQuery, newQuery);
+            }
+        });
+
+        tv.setEditable(true);
         tv.setItems(budgets);
         tv.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         tv.getSelectionModel().selectedItemProperty().addListener((ov, oldv, newv) -> {
@@ -127,12 +142,20 @@ public class BudgetView extends HBox implements Observer {
         return addEntry;
     }
 
+    private void updateQuery(String oldValue, String newValue) {
+        removeQuery(oldValue);
+        addQuery2(newValue);
+    }
+
     private void removeQuery(int i) {
         String query = queries.get(i);
         queries.remove(i);
         budgets.remove(i);
         pane.saveSearchQueries(queries);
+        removeQuery(query);
+    }
 
+    private void removeQuery(String query) {
         List<Record> rs = filterAny(recordStore.getAllRecords(), query);
         flagLists.remove(query);
         unflagged.addAll(rs);
@@ -142,7 +165,10 @@ public class BudgetView extends HBox implements Observer {
         queries.add(query);
         budgets.add(getBudget(query));
         pane.saveSearchQueries(queries);
+        addQuery2(query);
+    }
 
+    private void addQuery2(String query) {
         List<Record> rs = filterAny(recordStore.getAllRecords(), query);
         flagLists.put(query, observableArrayList(rs));
         unflagged.removeAll(rs);
