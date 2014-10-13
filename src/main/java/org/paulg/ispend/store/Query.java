@@ -22,7 +22,7 @@ public class Query {
         return any;
     }
 
-    private static List<String> splitQuery(String query) {
+    public static List<String> splitQuery(String query) {
         String[] atoms = query.split(",");
         List<String> as = new ArrayList<>();
         for (String s : atoms) {

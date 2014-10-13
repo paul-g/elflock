@@ -59,7 +59,7 @@ public class RecordStoreTest {
     public void testStatistics() {
         double expectedIncome = r1.getValue() + r2.getValue();
         assertEquals(expectedIncome, store.getTotalIncome(), E);
-        double expectedSpent = Math.abs(r.getValue());
+        double expectedSpent = r.getValue();
         assertEquals(expectedSpent, store.getTotalSpent(), E);
     }
 

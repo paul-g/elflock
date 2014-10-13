@@ -5,13 +5,14 @@ import org.joda.time.DateTime;
 import org.paulg.ispend.model.Account;
 import org.paulg.ispend.model.Record;
 import org.paulg.ispend.utils.Pair;
-import org.paulg.ispend.utils.StringUtils;
 
 import java.util.*;
+import java.util.function.DoublePredicate;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static org.paulg.ispend.store.Query.filterAny;
+import static org.paulg.ispend.store.Query.splitQuery;
 
 public class InMemoryRecordStore implements RecordStore {
 
@@ -58,10 +59,6 @@ public class InMemoryRecordStore implements RecordStore {
         throw new RuntimeException("RecordStore#filterAll() not implemented!");
     }
 
-    private String[] parseArguments(final String text) {
-        return text.split(",");
-    }
-
     @Override
     public Collection<Account> getAccounts() {
         return accounts.values();
@@ -76,45 +73,11 @@ public class InMemoryRecordStore implements RecordStore {
         return allRecords;
     }
 
-    public List<AggregatedRecord> groupByDescription(final String query) {
-        String[] tags = parseArguments(query);
-        final List<AggregatedRecord> tagRecords = new ArrayList<>();
-        if (query.isEmpty())
-            return tagRecords;
-
-        if (tags != null && tags.length > 0) {
-
-            for (Account a : accounts.values()) {
-                a.setCovered(0);
-            }
-
-            for (final Record r : getAllRecords()) {
-                r.setCovered(false);
-            }
-
-            for (String tag : tags) {
-                tag = tag.trim();
-                final AggregatedRecord tagRecord = new AggregatedRecord(tag, 0);
-                for (Account a : accounts.values()) {
-                    for (final Record r : a.getRecords()) {
-                        if (StringUtils.containsIgnoreCase(r.getDescription(), tag)) {
-                            tagRecord.addRecord(r);
-                            r.setCovered(true);
-                            a.setCovered(a.getCovered() + 1);
-                        }
-                    }
-                }
-                tagRecords.add(tagRecord);
-            }
-        }
-        return tagRecords;
-    }
-
     @Override
     public Map<String,Double> getIncomePerItem(String query) {
         return getFieldPerRecord(
                 query,
-                AggregatedRecord::getPositive,
+                x -> x > 0,
                 this::getTotalIncome);
     }
 
@@ -122,51 +85,44 @@ public class InMemoryRecordStore implements RecordStore {
     public Map<String, Double> getSpentPerItem(String query) {
         return getFieldPerRecord(
                 query,
-                AggregatedRecord::getNegative,
+                x -> x < 0,
                 this::getTotalSpent);
     }
 
     private Map<String,Double> getFieldPerRecord(
             String query,
-            Function<AggregatedRecord, Double> func,
+            DoublePredicate predicate,
             Supplier<Double> totalFunc) {
-        List<AggregatedRecord> groupData = groupByDescription(query);
-        HashMap<String, Double> spent = new HashMap<>();
-        double total = totalFunc.get();
-        double leftTotal = total;
-        for (AggregatedRecord record : groupData) {
-            Double value = func.apply(record);
-            spent.put(record.getDescription(),
-                    (Math.abs(value) / total) * 100);
-            leftTotal -= value;
+        Map<String, Double> spent = new HashMap<>();
+        double totalSpent = totalFunc.get();
+        double leftSpent = totalSpent;
+        for (String t : splitQuery(query)) {
+            double s = filterAny(getAllRecords(), query).stream().
+                    mapToDouble(Record::getValue).
+                    filter(predicate).
+                    sum();
+            spent.put(t, s / totalSpent * 100.0);
+            leftSpent -= s;
         }
-        spent.put("Other", leftTotal / total * 100);
+        spent.put("Other", leftSpent / totalSpent * 100.0);
         return spent;
     }
 
 
     @Override
     public double getTotalIncome() {
-        double income = 0;
-        for (Account a : accounts.values())
-            income += a.getRecords().stream().
+        return getAllRecords().stream().
                     mapToDouble(Record::getValue).
                     filter(x -> x > 0).
                     sum();
-        return income;
     }
 
     @Override
     public double getTotalSpent() {
-        Double spent = 0.0;
-        for (Account a : accounts.values()) {
-            spent += a.getRecords().stream().
-                    mapToDouble(Record::getValue).
-                    filter(x -> x < 0).
-                    map(Math::abs).
-                    sum();
-        }
-        return spent;
+        return getAllRecords().stream().
+                mapToDouble(Record::getValue).
+                filter(x -> x < 0).
+                sum();
     }
 
     @Override
