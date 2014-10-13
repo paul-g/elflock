@@ -11,12 +11,10 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import org.paulg.ispend.model.Record;
 import org.paulg.ispend.model.RecordStore;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
+import java.util.*;
 import java.util.function.Function;
 
 public class BudgetView extends HBox implements Observer {
@@ -45,9 +43,9 @@ public class BudgetView extends HBox implements Observer {
 
         tv.setItems(budgets);
         tv.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        tv.getSelectionModel().selectedItemProperty().addListener((ov, be, be2) -> {
-            if (be2 != null)
-                setPlotData(be2.getGroup());
+        tv.getSelectionModel().selectedItemProperty().addListener((ov, oldv, newv) -> {
+            if (newv != null)
+                setPlotData(newv.getGroup());
         });
 
         this.tableWidget = new VBox();
@@ -63,6 +61,7 @@ public class BudgetView extends HBox implements Observer {
 
     private void setPlotData(String group) {
         plotWidget.plotHistoricalData(group);
+        getBudget(group);
     }
 
     @Override
@@ -128,6 +127,22 @@ public class BudgetView extends HBox implements Observer {
 
     private BudgetEntry getBudget(String query) {
         double weeklyAvg = recordStore.getWeeklyAverageByDescription(query);
+        Iterator<Record> it = pane.flaggedRecords.iterator();
+        while (it.hasNext()) {
+            Record r = it.next();
+            if (!r.isCovered()) {
+                it.remove();
+                pane.unflaggedRecords.add(r);
+            }
+        }
+        it = pane.unflaggedRecords.iterator();
+        while (it.hasNext()) {
+            Record r = it.next();
+            if (r.isCovered()) {
+                it.remove();
+                pane.flaggedRecords.add(r);
+            }
+        }
         return new BudgetEntry(query, weeklyAvg / 7, weeklyAvg, weeklyAvg * 4);
     }
 

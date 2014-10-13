@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Observable;
 
@@ -24,7 +25,8 @@ import static javafx.collections.FXCollections.observableArrayList;
 public class ISpendPane extends Observable {
 
     final Scene scene;
-    private final ObservableList<Record> data = observableArrayList();
+    public final ObservableList<Record> flaggedRecords = observableArrayList();
+    public final ObservableList<Record> unflaggedRecords = observableArrayList();
     private final ObservableList<AggregatedRecord> groupData = observableArrayList();
     private final ObservableList<Account> accountsData = observableArrayList();
     private final SearchView searchView;
@@ -34,13 +36,15 @@ public class ISpendPane extends Observable {
     private final AccountSummaryView accountsView;
     private final StaticVisualizer staticVisualizer;
     private final BudgetView budgetView;
+    private final SearchView flaggedSearchView;
     private RecordStore recordStore;
 
     public ISpendPane(final Stage stage, final PreferencesStore preferencesStore) {
         this.stage = stage;
         this.preferencesStore = preferencesStore;
         this.staticVisualizer = new StaticVisualizer();
-        this.searchView = new SearchView(data);
+        this.searchView = new SearchView(unflaggedRecords);
+        this.flaggedSearchView = new SearchView(flaggedRecords);
         this.accountsView = new AccountSummaryView(this);
         this.budgetView = new BudgetView(this);
         addObserver(budgetView);
@@ -79,12 +83,19 @@ public class ISpendPane extends Observable {
         TabPane pane = new TabPane();
         pane.getTabs().add(makeDashboardTab());
         pane.getTabs().add(makeDrillDownTab());
+        pane.getTabs().add(makeFlaggedDrillDownTab());
         return pane;
     }
 
     private Tab makeDrillDownTab() {
         Tab tab = new Tab("Drilldown");
         tab.setContent(this.searchView);
+        return tab;
+    }
+
+    private Tab makeFlaggedDrillDownTab() {
+        Tab tab = new Tab("Drilldown Flagged");
+        tab.setContent(this.flaggedSearchView);
         return tab;
     }
 
@@ -113,7 +124,7 @@ public class ISpendPane extends Observable {
 
         searchView.setRecordStore(recordStore);
 
-        data.setAll(recordStore.getAllRecords());
+        unflaggedRecords.setAll(recordStore.getAllRecords());
         accountsData.setAll(recordStore.getAccounts());
         recordStore.printSummary();
 
@@ -160,6 +171,7 @@ public class ISpendPane extends Observable {
         groupData.addAll(byDescription);
         accountsData.clear();
         accountsData.addAll(recordStore.getAccounts());
+
     }
 
     public void saveQuery(String text) {
