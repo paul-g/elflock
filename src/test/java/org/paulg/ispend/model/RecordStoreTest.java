@@ -12,6 +12,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.paulg.ispend.model.Query.filterAny;
 
 public class RecordStoreTest {
 
@@ -52,7 +53,7 @@ public class RecordStoreTest {
 
     @Test
     public void testFilter() {
-        List<Record> records = store.filterAny(testrecords, "transaction");
+        List<Record> records = filterAny(testrecords, "transaction");
         assertArrayEquals(new Record[]{r1, r2}, records.toArray());
     }
 

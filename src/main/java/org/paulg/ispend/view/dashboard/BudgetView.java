@@ -21,6 +21,7 @@ import java.util.*;
 import java.util.function.Function;
 
 import static javafx.collections.FXCollections.observableArrayList;
+import static org.paulg.ispend.model.Query.filterAny;
 
 public class BudgetView extends HBox implements Observer {
 
@@ -133,7 +134,7 @@ public class BudgetView extends HBox implements Observer {
         budgets.remove(i);
         pane.saveSearchQueries(queries);
 
-        List<Record> rs = RecordStore.filterAny(recordStore.getAllRecords(), query);
+        List<Record> rs = filterAny(recordStore.getAllRecords(), query);
         flagLists.remove(query);
         unflagged.addAll(rs);
     }
@@ -143,7 +144,7 @@ public class BudgetView extends HBox implements Observer {
         budgets.add(getBudget(query));
         pane.saveSearchQueries(queries);
 
-        List<Record> rs = RecordStore.filterAny(recordStore.getAllRecords(), query);
+        List<Record> rs = filterAny(recordStore.getAllRecords(), query);
         flagLists.put(query, observableArrayList(rs));
         unflagged.removeAll(rs);
     }
