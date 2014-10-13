@@ -1,5 +1,6 @@
 package org.paulg.ispend.view.drilldown;
 
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -14,51 +15,48 @@ import org.paulg.ispend.model.RecordStore;
 import org.paulg.ispend.view.widgets.CompleteTableView;
 
 import java.util.List;
+import static javafx.collections.FXCollections.observableArrayList;
 
 public class SearchView extends VBox {
 
-
     private final TextField search;
     private final ObservableList<Record> data;
-
+    private final ObservableList<Record> dataView = observableArrayList();
 
     public SearchView(ObservableList<Record> data) {
         this.data = data;
+        dataView.addAll(data);
         search = new TextField();
         search.setPromptText("Search");
         search.setDisable(true);
         search.setPrefWidth(400);
 
-        final TableView<Record> recordView = makeTable(data, Record.class);
+        final TableView<Record> recordView = makeTable(this.dataView, Record.class);
         recordView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
         getChildren().addAll(search, recordView);
         setVgrow(recordView, Priority.ALWAYS);
         setSpacing(10);
         setPadding(new Insets(5, 5, 5, 5));
+
+        search.setOnKeyReleased(t -> {
+            if (t.getCode() == KeyCode.ENTER) {
+                filterData();
+            } else if (t.getCode() == KeyCode.ESCAPE) {
+                search.clear();
+                filterData();
+            }
+        });
+
+        this.data.addListener((ListChangeListener<Record>) c -> filterData());
     }
 
-    public void setRecordStore(RecordStore recordStore) {
-        search.setOnKeyReleased(new EventHandler<KeyEvent>() {
-
-            @Override
-            public void handle(final KeyEvent t) {
-                if (t.getCode() == KeyCode.ENTER) {
-                    filterData(search.getText());
-                } else if (t.getCode() == KeyCode.ESCAPE) {
-                    search.clear();
-                    filterData(search.getText());
-                }
-            }
-
-            private void filterData(final String searchText) {
-                final List<Record> filtered = recordStore.filterAny(searchText);
-                data.clear();
-                data.addAll(filtered);
-            }
-
-        });
-        this.search.setDisable(false);
+    private void filterData() {
+        if (data.size() == 0)
+            return;
+        final List<Record> filtered = RecordStore.filterAny(data, search.getText());
+        dataView.clear();
+        dataView.addAll(filtered);
     }
 
     private <T> TableView<T> makeTable(final ObservableList<T> data,

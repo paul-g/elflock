@@ -50,18 +50,18 @@ public class RecordStore {
 
     /** Returns the records matching any of the query atoms. Multiple query atoms
      *  are separated by comma. */
-    public List<Record> filterAny(final String query) {
+    public static List<Record> filterAny(List<Record> records, final String query) {
         // XXX this will include duplicates for records matching more than one query atom
         // need to use a set, pending correct equals implementation in Record
         List<String> atoms = splitQuery(query);
         List<Record> any = new ArrayList<>();
         for (String atom : atoms) {
-            any.addAll(filterAtom(atom));
+            any.addAll(filterAtom(records, atom));
         }
         return any;
     }
 
-    private List<String> splitQuery(String query) {
+    private static List<String> splitQuery(String query) {
         String[] atoms = query.split(",");
         List<String> as = new ArrayList<>();
         for (String s : atoms) {
@@ -74,8 +74,8 @@ public class RecordStore {
         throw new RuntimeException("RecordStore#filterAll() not implemented!");
     }
 
-    private List<Record> filterAtom(final String text) {
-        return getAllRecords().stream()
+    private static List<Record> filterAtom(List<Record> records, final String text) {
+        return records.stream()
                 .filter(r -> StringUtils.containsIgnoreCase(r.getDescription(), text))
                 .collect(Collectors.toList());
     }
@@ -200,12 +200,12 @@ public class RecordStore {
     }
 
     public TimeSeries getWeeklyAveragesByDescription(String descriptionQuery) {
-        List<Record> filtered = filterAny(descriptionQuery);
+        List<Record> filtered = filterAny(getAllRecords(), descriptionQuery);
         return averageByPeriod(filtered, Record::getValue, new Week());
     }
 
     public double getWeeklyAverageByDescription(String descriptionQuery) {
-        List<Record> filtered = filterAny(descriptionQuery);
+        List<Record> filtered = filterAny(getAllRecords(), descriptionQuery);
         TimeSeries ts = averageByPeriod(filtered, Record::getValue, new Week());
         double rename = 0;
         for (int i = 0; i < ts.getItemCount(); i++) {
@@ -261,12 +261,12 @@ public class RecordStore {
     }
 
     public TimeSeries getAveragesByDescription(String query, RegularTimePeriod period) {
-        List<Record> filtered = filterAny(query);
+        List<Record> filtered = filterAny(getAllRecords(), query);
         return averageByPeriod(filtered, r -> r.getValue(), period);
     }
 
     public TimeSeries getTotalByDescription(String query, RegularTimePeriod period) {
-        List<Record> filtered = filterAny(query);
+        List<Record> filtered = filterAny(getAllRecords(), query);
         return sumByPeriod(filtered, r -> r.getValue(), period);
     }
 

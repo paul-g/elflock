@@ -6,6 +6,8 @@ import org.joda.time.format.DateTimeFormat;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.assertArrayEquals;
@@ -19,6 +21,7 @@ public class RecordStoreTest {
     private RecordStore store;
     private Record r, r1, r2;
     private AggregatedRecord ar1;
+    private final List<Record> testrecords = new ArrayList<>();
 
     private DateTime pd(String date) {
         return DateTime.parse(date, DateTimeFormat.forPattern("dd/MM/yyyy"));
@@ -36,6 +39,7 @@ public class RecordStoreTest {
         ar1 = new AggregatedRecord("transaction", 0);
         ar1.addRecord(r1);
         ar1.addRecord(r2);
+        Collections.addAll(testrecords, r1, r2, r);
     }
 
     @Test
@@ -48,7 +52,7 @@ public class RecordStoreTest {
 
     @Test
     public void testFilter() {
-        List<Record> records = store.filterAny("transaction");
+        List<Record> records = store.filterAny(testrecords, "transaction");
         assertArrayEquals(new Record[]{r1, r2}, records.toArray());
     }
 

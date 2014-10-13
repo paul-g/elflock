@@ -15,6 +15,7 @@ import org.paulg.ispend.model.*;
 import org.paulg.ispend.view.dashboard.AccountSummaryView;
 import org.paulg.ispend.view.dashboard.BudgetView;
 import org.paulg.ispend.view.dashboard.StaticVisualizer;
+import org.paulg.ispend.view.drilldown.DrilldownTab;
 import org.paulg.ispend.view.drilldown.SearchView;
 import org.paulg.ispend.view.utils.UiUtils;
 
@@ -34,22 +35,18 @@ public class ISpendPane extends Observable {
     public final ObservableList<Record> unflaggedRecords = observableArrayList();
     private final ObservableList<AggregatedRecord> groupData = observableArrayList();
     private final ObservableList<Account> accountsData = observableArrayList();
-    private final SearchView searchView;
     private final Stage stage;
     private final PreferencesStore preferencesStore;
 
     private final AccountSummaryView accountsView;
     private final StaticVisualizer staticVisualizer;
     private final BudgetView budgetView;
-    private final SearchView flaggedSearchView;
-    private RecordStore recordStore;
+        private RecordStore recordStore;
 
     public ISpendPane(final Stage stage, final PreferencesStore preferencesStore) {
         this.stage = stage;
         this.preferencesStore = preferencesStore;
         this.staticVisualizer = new StaticVisualizer();
-        this.searchView = new SearchView(unflaggedRecords);
-        this.flaggedSearchView = new SearchView(flaggedRecords);
         this.accountsView = new AccountSummaryView(this);
         this.budgetView = new BudgetView(this);
         addObserver(budgetView);
@@ -87,21 +84,9 @@ public class ISpendPane extends Observable {
     private TabPane makeAppContent() {
         TabPane pane = new TabPane();
         pane.getTabs().add(makeDashboardTab());
-        pane.getTabs().add(makeDrillDownTab("Unflagged", this.unflaggedRecords, this.searchView));
-        pane.getTabs().add(makeDrillDownTab("Flagged", this.flaggedRecords, this.flaggedSearchView));
+        pane.getTabs().add(new DrilldownTab("Unflagged", this.unflaggedRecords));
+        pane.getTabs().add(new DrilldownTab("Flagged", this.flaggedRecords));
         return pane;
-    }
-
-    private Tab makeDrillDownTab(String text, final ObservableList<Record> records, SearchView searchView) {
-        Tab tab = new Tab(text);
-        records.addListener(new ListChangeListener<Record>() {
-            @Override
-            public void onChanged(Change<? extends Record> c) {
-                tab.setText(text + " (" + records.size() + ")");
-            }
-        });
-        tab.setContent(searchView);
-        return tab;
     }
 
     private Tab makeDashboardTab() {
@@ -126,8 +111,6 @@ public class ISpendPane extends Observable {
         recordStore = fileVisitor.getRecordStore();
 
         Files.walkFileTree(Paths.get(path), fileVisitor);
-
-        searchView.setRecordStore(recordStore);
 
         unflaggedRecords.setAll(recordStore.getAllRecords());
         accountsData.setAll(recordStore.getAccounts());
