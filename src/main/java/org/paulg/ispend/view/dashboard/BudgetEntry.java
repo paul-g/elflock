@@ -1,4 +1,4 @@
-package org.paulg.ispend.view;
+package org.paulg.ispend.view.dashboard;
 
 
 import javafx.beans.property.DoubleProperty;

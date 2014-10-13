@@ -1,4 +1,4 @@
-package org.paulg.ispend.view;
+package org.paulg.ispend.view.dashboard;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
@@ -13,6 +13,8 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import org.paulg.ispend.model.Record;
 import org.paulg.ispend.model.RecordStore;
+import org.paulg.ispend.view.widgets.CompleteTableView;
+import org.paulg.ispend.view.ISpendPane;
 
 import java.util.*;
 import java.util.function.Function;

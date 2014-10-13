@@ -1,4 +1,4 @@
-package org.paulg.ispend.view;
+package org.paulg.ispend.view.utils;
 
 import javafx.scene.control.Label;
 import javafx.scene.layout.ColumnConstraints;

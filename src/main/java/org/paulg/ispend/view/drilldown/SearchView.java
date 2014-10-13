@@ -1,4 +1,4 @@
-package org.paulg.ispend.view;
+package org.paulg.ispend.view.drilldown;
 
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
@@ -11,6 +11,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import org.paulg.ispend.model.Record;
 import org.paulg.ispend.model.RecordStore;
+import org.paulg.ispend.view.widgets.CompleteTableView;
 
 import java.util.List;
 

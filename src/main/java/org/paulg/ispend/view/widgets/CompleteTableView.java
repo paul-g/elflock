@@ -1,4 +1,4 @@
-package org.paulg.ispend.view;
+package org.paulg.ispend.view.widgets;
 
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Table view that binds to all fields (public, private and protected) of a provided class.
  */
-class CompleteTableView<T> extends TableView<T> {
+public class CompleteTableView<T> extends TableView<T> {
 
     public CompleteTableView(final Class<T> classToBind) {
         super();

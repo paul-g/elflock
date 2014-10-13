@@ -1,6 +1,6 @@
 package org.paulg.ispend.model;
 
-import org.paulg.ispend.view.IgnoreField;
+import org.paulg.ispend.view.widgets.IgnoreField;
 
 import java.util.ArrayList;
 import java.util.List;

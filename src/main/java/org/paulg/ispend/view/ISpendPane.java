@@ -12,12 +12,16 @@ import javafx.stage.Stage;
 import org.paulg.ispend.controller.OpenHistoryHandler;
 import org.paulg.ispend.main.HistoryFileVisitor;
 import org.paulg.ispend.model.*;
+import org.paulg.ispend.view.dashboard.AccountSummaryView;
+import org.paulg.ispend.view.dashboard.BudgetView;
+import org.paulg.ispend.view.dashboard.StaticVisualizer;
+import org.paulg.ispend.view.drilldown.SearchView;
+import org.paulg.ispend.view.utils.UiUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Observable;
 

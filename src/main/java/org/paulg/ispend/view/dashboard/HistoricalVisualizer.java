@@ -1,4 +1,4 @@
-package org.paulg.ispend.view;
+package org.paulg.ispend.view.dashboard;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -14,6 +14,9 @@ import org.jfree.data.time.RegularTimePeriod;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.Week;
 import org.paulg.ispend.model.RecordStore;
+import org.paulg.ispend.view.ISpendPane;
+import org.paulg.ispend.view.widgets.TimeSeriesChart;
+import org.paulg.ispend.view.utils.UiUtils;
 
 import java.util.Map;
 import java.util.Observable;
@@ -30,13 +33,13 @@ public class HistoricalVisualizer extends TabPane implements Observer {
     private String query;
     private String indicator = "Sum";
 
-    HistoricalVisualizer(ISpendPane iSpendPane) {
+    public HistoricalVisualizer(ISpendPane iSpendPane) {
         this.iSpendPane = iSpendPane;
         getTabs().add(makeHistoricalTab());
         getTabs().add(makeTotalTab());
     }
 
-    void plotHistoricalData(String query) {
+    public void plotHistoricalData(String query) {
         this.query = query;
         TimeSeries ts = indicator.equals("Sum") ?
                 recordStore.getTotalByDescription(query, timePeriod) :

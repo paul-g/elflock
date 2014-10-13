@@ -1,9 +1,10 @@
-package org.paulg.ispend.view;
+package org.paulg.ispend.view.dashboard;
 
 
 import javafx.geometry.Pos;
 import javafx.scene.layout.VBox;
 import org.jfree.data.time.TimeSeries;
+import org.paulg.ispend.view.widgets.BarTimeSeriesChart;
 
 public class StaticVisualizer extends VBox {
 

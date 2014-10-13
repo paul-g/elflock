@@ -1,10 +1,11 @@
-package org.paulg.ispend.view;
+package org.paulg.ispend.view.widgets;
 
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesDataItem;
+import org.paulg.ispend.view.utils.DateConverter;
 
 import java.util.Date;
 

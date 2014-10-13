@@ -1,4 +1,4 @@
-package org.paulg.ispend.view;
+package org.paulg.ispend.view.widgets;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

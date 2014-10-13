@@ -1,4 +1,4 @@
-package org.paulg.ispend.view;
+package org.paulg.ispend.view.dashboard;
 
 import javafx.geometry.Insets;
 import javafx.scene.control.Label;
@@ -7,6 +7,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.converter.NumberStringConverter;
 import org.paulg.ispend.model.Account;
+import org.paulg.ispend.view.ISpendPane;
+import org.paulg.ispend.view.utils.UiUtils;
 
 import java.util.Observable;
 import java.util.Observer;

@@ -1,4 +1,4 @@
-package org.paulg.ispend.view;
+package org.paulg.ispend.view.widgets;
 
 import javafx.scene.chart.*;
 import org.jfree.data.time.TimeSeries;
