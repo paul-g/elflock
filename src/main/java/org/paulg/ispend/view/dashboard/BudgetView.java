@@ -77,13 +77,13 @@ public class BudgetView extends HBox implements Observer {
     public void update(Observable o, Object arg) {
         this.recordStore = pane.getRecordStore();
         List<String> queries = pane.getSavedSearchQueries();
-        queries.forEach(this::addQuery);
-        this.plotWidget.update(o, arg);
         unflagged = observableArrayList(recordStore.getAllRecords());
         flagLists.put(
                 "Unflagged",
                 unflagged
         );
+        queries.forEach(this::addQuery);
+        this.plotWidget.update(o, arg);
     }
 
     private HBox addEntry() {
@@ -138,22 +138,13 @@ public class BudgetView extends HBox implements Observer {
         budgets.add(getBudget(query));
         pane.saveSearchQueries(queries);
 
-        flagLists.put(
-                query,
-                observableArrayList(RecordStore.filterAny(recordStore.getAllRecords(), query))
-                );
+        List<Record> rs = RecordStore.filterAny(recordStore.getAllRecords(), query);
+        flagLists.put(query, observableArrayList(rs));
+
+        unflagged.removeAll(rs);
     }
 
     private BudgetEntry getBudget(String query) {
-        if (unflagged != null) {
-            Iterator<Record> it = unflagged.iterator();
-            while (it.hasNext()) {
-                Record r = it.next();
-                if (r.isCovered()) {
-                    it.remove();
-                }
-            }
-        }
         double weeklyAvg = recordStore.getWeeklyAverageByDescription(query);
         return new BudgetEntry(query, weeklyAvg / 7, weeklyAvg, weeklyAvg * 4);
     }
