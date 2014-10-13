@@ -9,9 +9,11 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
-import org.paulg.ispend.controller.OpenHistoryHandler;
+import org.paulg.ispend.main.OpenHistoryHandler;
 import org.paulg.ispend.main.HistoryFileVisitor;
 import org.paulg.ispend.model.*;
+import org.paulg.ispend.store.PreferencesStore;
+import org.paulg.ispend.store.RecordStore;
 import org.paulg.ispend.view.dashboard.DashboardTab;
 import org.paulg.ispend.view.drilldown.DrilldownTab;
 
@@ -105,7 +107,6 @@ public class ISpendPane extends Observable {
         Files.walkFileTree(Paths.get(path), fileVisitor);
 
         accountsData.setAll(recordStore.getAccounts());
-        recordStore.printSummary();
 
         dashboard.setEndOfMonthBalance(recordStore.getEndOfMonthBalance());
 

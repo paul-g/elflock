@@ -13,7 +13,7 @@ import org.paulg.ispend.view.widgets.CompleteTableView;
 
 import java.util.List;
 import static javafx.collections.FXCollections.observableArrayList;
-import static org.paulg.ispend.model.Query.filterAny;
+import static org.paulg.ispend.store.Query.filterAny;
 
 public class SearchView extends VBox {
 

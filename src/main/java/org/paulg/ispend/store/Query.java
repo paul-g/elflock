@@ -1,5 +1,6 @@
-package org.paulg.ispend.model;
+package org.paulg.ispend.store;
 
+import org.paulg.ispend.model.Record;
 import org.paulg.ispend.utils.StringUtils;
 
 import java.util.ArrayList;

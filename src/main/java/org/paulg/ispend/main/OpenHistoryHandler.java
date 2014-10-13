@@ -1,4 +1,4 @@
-package org.paulg.ispend.controller;
+package org.paulg.ispend.main;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;

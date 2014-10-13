@@ -6,6 +6,7 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import lombok.Data;
 import org.joda.time.DateTime;
 import org.paulg.ispend.view.widgets.IgnoreField;
 
@@ -13,9 +14,9 @@ import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.List;
 
+@Data
 public class Account {
 
-    @IgnoreField
     private final ObservableList<Record> records = FXCollections.observableArrayList();
     private String number;
     private String name;
@@ -25,22 +26,6 @@ public class Account {
 
     public Account(final String number, final String name) {
         this.number = number;
-        this.name = name;
-    }
-
-    public String getNumber() {
-        return number;
-    }
-
-    public void setNumber(final String number) {
-        this.number = number;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(final String name) {
         this.name = name;
     }
 
@@ -75,38 +60,6 @@ public class Account {
         }
         Account a = (Account) o;
         return number.equals(a.getNumber()) && name.equals(a.getName());
-    }
-
-    public void printSummary() {
-        double maxNegative = Double.MAX_VALUE;
-        Record maxNegativeRecord = null;
-        double totalNegative = 0;
-        double totalPositive = 0;
-        int negatives = 0;
-        int positives = 0;
-        for (final Record r : records) {
-            if (r.getValue() < 0) {
-                totalNegative += r.getValue();
-                negatives++;
-
-                if (r.getValue() < maxNegative) {
-                    maxNegative = r.getValue();
-                    maxNegativeRecord = r;
-                }
-
-            } else {
-                totalPositive += r.getValue();
-                positives++;
-            }
-
-        }
-
-        System.out.println("For account number " + name + " name : " + name);
-        System.out.println("\tTotal records: " + records.size());
-        System.out.println("\tTotal negative:" + totalNegative + " avg: " + (totalNegative / negatives));
-        System.out.println("\tTotal positive:" + totalPositive + " avg: " + (totalPositive / positives));
-        System.out.println("\tMaximum negative record: " + maxNegativeRecord);
-        System.out.println("\tFlow: " + (totalPositive + totalNegative));
     }
 
     public void addRecord(final Record r) {

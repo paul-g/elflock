@@ -3,6 +3,7 @@ package org.paulg.ispend.model;
 import static org.junit.Assert.*;
 
 import org.junit.*;
+import org.paulg.ispend.store.PreferencesStore;
 
 public class PreferencesStoreTest {
 

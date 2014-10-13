@@ -1,7 +1,10 @@
-package org.paulg.ispend.model;
+package org.paulg.ispend.store;
 
 import org.jfree.data.time.*;
 import org.joda.time.DateTime;
+import org.paulg.ispend.model.Account;
+import org.paulg.ispend.model.AggregatedRecord;
+import org.paulg.ispend.model.Record;
 import org.paulg.ispend.utils.Pair;
 import org.paulg.ispend.utils.StringUtils;
 
@@ -9,7 +12,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import static org.paulg.ispend.model.Query.filterAny;
+import static org.paulg.ispend.store.Query.filterAny;
 
 public class RecordStore {
 
@@ -59,12 +62,6 @@ public class RecordStore {
 
     public Collection<Account> getAccounts() {
         return accounts.values();
-    }
-
-    public void printSummary() {
-        for (final Account a : accounts.values()) {
-            a.printSummary();
-        }
     }
 
     public List<Record> getAllRecords() {

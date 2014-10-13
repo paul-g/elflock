@@ -2,7 +2,6 @@ package org.paulg.ispend.view.dashboard;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.geometry.Insets;
@@ -13,7 +12,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import org.paulg.ispend.model.Record;
-import org.paulg.ispend.model.RecordStore;
+import org.paulg.ispend.store.RecordStore;
 import org.paulg.ispend.view.widgets.CompleteTableView;
 import org.paulg.ispend.view.ISpendPane;
 
@@ -21,7 +20,7 @@ import java.util.*;
 import java.util.function.Function;
 
 import static javafx.collections.FXCollections.observableArrayList;
-import static org.paulg.ispend.model.Query.filterAny;
+import static org.paulg.ispend.store.Query.filterAny;
 
 public class BudgetView extends HBox implements Observer {
 

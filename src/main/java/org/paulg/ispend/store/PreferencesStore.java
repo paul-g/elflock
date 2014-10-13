@@ -1,4 +1,4 @@
-package org.paulg.ispend.model;
+package org.paulg.ispend.store;
 
 import java.util.ArrayList;
 import java.util.List;

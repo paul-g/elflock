@@ -1,10 +1,12 @@
-package org.paulg.ispend.model;
+package org.paulg.ispend.loader;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
+import org.paulg.ispend.loader.RecordParser;
+import org.paulg.ispend.model.Record;
 
 import java.io.IOException;
 import java.nio.charset.Charset;

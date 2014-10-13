@@ -2,7 +2,7 @@ package org.paulg.ispend.main;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
-import org.paulg.ispend.model.PreferencesStore;
+import org.paulg.ispend.store.PreferencesStore;
 import org.paulg.ispend.view.ISpendPane;
 
 import java.io.IOException;

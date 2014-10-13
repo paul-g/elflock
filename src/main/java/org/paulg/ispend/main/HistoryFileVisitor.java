@@ -1,19 +1,12 @@
 package org.paulg.ispend.main;
 
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
-import org.paulg.ispend.model.NatWestRecordParser;
+import org.paulg.ispend.loader.NatWestRecordParser;
 import org.paulg.ispend.model.Record;
-import org.paulg.ispend.model.RecordParser;
-import org.paulg.ispend.model.RecordStore;
+import org.paulg.ispend.loader.RecordParser;
+import org.paulg.ispend.store.RecordStore;
 
-import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;

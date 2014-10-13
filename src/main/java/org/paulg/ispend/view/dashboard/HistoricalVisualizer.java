@@ -13,7 +13,7 @@ import org.jfree.data.time.Month;
 import org.jfree.data.time.RegularTimePeriod;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.Week;
-import org.paulg.ispend.model.RecordStore;
+import org.paulg.ispend.store.RecordStore;
 import org.paulg.ispend.view.ISpendPane;
 import org.paulg.ispend.view.widgets.TimeSeriesChart;
 import org.paulg.ispend.view.utils.UiUtils;
