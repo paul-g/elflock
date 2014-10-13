@@ -2,7 +2,9 @@ package org.paulg.ispend.view;
 
 import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
+import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableMap;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -16,7 +18,6 @@ import org.paulg.ispend.view.dashboard.AccountSummaryView;
 import org.paulg.ispend.view.dashboard.BudgetView;
 import org.paulg.ispend.view.dashboard.StaticVisualizer;
 import org.paulg.ispend.view.drilldown.DrilldownTab;
-import org.paulg.ispend.view.drilldown.SearchView;
 import org.paulg.ispend.view.utils.UiUtils;
 
 import java.io.File;
@@ -27,12 +28,13 @@ import java.util.List;
 import java.util.Observable;
 
 import static javafx.collections.FXCollections.observableArrayList;
+import static javafx.collections.FXCollections.observableHashMap;
 
 public class ISpendPane extends Observable {
 
     final Scene scene;
-    public final ObservableList<Record> flaggedRecords = observableArrayList();
-    public final ObservableList<Record> unflaggedRecords = observableArrayList();
+    public final ObservableMap<String, ObservableList<Record>> flagLists = observableHashMap();
+
     private final ObservableList<AggregatedRecord> groupData = observableArrayList();
     private final ObservableList<Account> accountsData = observableArrayList();
     private final Stage stage;
@@ -48,14 +50,17 @@ public class ISpendPane extends Observable {
         this.preferencesStore = preferencesStore;
         this.staticVisualizer = new StaticVisualizer();
         this.accountsView = new AccountSummaryView(this);
-        this.budgetView = new BudgetView(this);
+        this.budgetView = new BudgetView(this, flagLists);
         addObserver(budgetView);
         addObserver(accountsView);
 
         stage.setTitle("ISpend");
 
         BorderPane pane = new BorderPane();
-        pane.setCenter(makeAppContent());
+        final TabPane tabPane = new TabPane();
+        pane.setCenter(tabPane);
+        tabPane.getTabs().add(makeDashboardTab());
+
         pane.setId("container");
         pane.setTop(createMenuBar());
 
@@ -65,6 +70,15 @@ public class ISpendPane extends Observable {
         stage.centerOnScreen();
         stage.setResizable(true);
         stage.show();
+
+        flagLists.addListener((MapChangeListener<String, ObservableList<Record>>) change -> {
+            if (change.wasAdded()) {
+                tabPane.getTabs().add(new DrilldownTab(
+                        change.getKey(),
+                        change.getValueAdded()
+                        ));
+            }
+        });
     }
 
     private MenuBar createMenuBar() {
@@ -79,14 +93,6 @@ public class ISpendPane extends Observable {
         menu.getItems().addAll(open, close);
         menuBar.getMenus().addAll(menu);
         return menuBar;
-    }
-
-    private TabPane makeAppContent() {
-        TabPane pane = new TabPane();
-        pane.getTabs().add(makeDashboardTab());
-        pane.getTabs().add(new DrilldownTab("Unflagged", this.unflaggedRecords));
-        pane.getTabs().add(new DrilldownTab("Flagged", this.flaggedRecords));
-        return pane;
     }
 
     private Tab makeDashboardTab() {
@@ -112,7 +118,6 @@ public class ISpendPane extends Observable {
 
         Files.walkFileTree(Paths.get(path), fileVisitor);
 
-        unflaggedRecords.setAll(recordStore.getAllRecords());
         accountsData.setAll(recordStore.getAccounts());
         recordStore.printSummary();
 

@@ -4,6 +4,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableMap;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.*;
@@ -19,13 +20,17 @@ import org.paulg.ispend.view.ISpendPane;
 import java.util.*;
 import java.util.function.Function;
 
+import static javafx.collections.FXCollections.observableArrayList;
+
 public class BudgetView extends HBox implements Observer {
 
-    private final ObservableList<BudgetEntry> budgets = FXCollections.observableArrayList();
+    private final ObservableList<BudgetEntry> budgets = observableArrayList();
     private final ISpendPane pane;
     private final HistoricalVisualizer plotWidget;
     private final CompleteTableView<BudgetEntry> tv;
     private final VBox tableWidget;
+    private final ObservableMap<String, ObservableList<Record>> flagLists;
+    private ObservableList<Record> unflagged;
     private RecordStore recordStore;
     private final List<String> queries = new ArrayList<>();
 
@@ -33,9 +38,9 @@ public class BudgetView extends HBox implements Observer {
         return new SimpleStringProperty(String.format("%.2f", func.apply((BudgetEntry)cd.getValue())));
     }
 
-    public BudgetView(ISpendPane pane) {
+    public BudgetView(ISpendPane pane, ObservableMap<String, ObservableList<Record>> flagLists) {
         this.pane = pane;
-
+        this.flagLists = flagLists;
         plotWidget = new HistoricalVisualizer(pane);
         tv = new CompleteTableView<>(BudgetEntry.class);
         ObservableList<TableColumn<BudgetEntry, ?>> tc = tv.getColumns();
@@ -59,6 +64,8 @@ public class BudgetView extends HBox implements Observer {
         setHgrow(tableWidget, Priority.ALWAYS);
         setHgrow(plotWidget, Priority.ALWAYS);
         getChildren().addAll(tableWidget, plotWidget);
+
+
     }
 
     private void setPlotData(String group) {
@@ -72,6 +79,11 @@ public class BudgetView extends HBox implements Observer {
         List<String> queries = pane.getSavedSearchQueries();
         queries.forEach(this::addQuery);
         this.plotWidget.update(o, arg);
+        unflagged = observableArrayList(recordStore.getAllRecords());
+        flagLists.put(
+                "Unflagged",
+                unflagged
+        );
     }
 
     private HBox addEntry() {
@@ -125,26 +137,24 @@ public class BudgetView extends HBox implements Observer {
         queries.add(query);
         budgets.add(getBudget(query));
         pane.saveSearchQueries(queries);
+
+        flagLists.put(
+                query,
+                observableArrayList(RecordStore.filterAny(recordStore.getAllRecords(), query))
+                );
     }
 
     private BudgetEntry getBudget(String query) {
+        if (unflagged != null) {
+            Iterator<Record> it = unflagged.iterator();
+            while (it.hasNext()) {
+                Record r = it.next();
+                if (r.isCovered()) {
+                    it.remove();
+                }
+            }
+        }
         double weeklyAvg = recordStore.getWeeklyAverageByDescription(query);
-        Iterator<Record> it = pane.flaggedRecords.iterator();
-        while (it.hasNext()) {
-            Record r = it.next();
-            if (!r.isCovered()) {
-                it.remove();
-                pane.unflaggedRecords.add(r);
-            }
-        }
-        it = pane.unflaggedRecords.iterator();
-        while (it.hasNext()) {
-            Record r = it.next();
-            if (r.isCovered()) {
-                it.remove();
-                pane.flaggedRecords.add(r);
-            }
-        }
         return new BudgetEntry(query, weeklyAvg / 7, weeklyAvg, weeklyAvg * 4);
     }
 

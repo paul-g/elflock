@@ -2,12 +2,10 @@ package org.paulg.ispend.view.drilldown;
 
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import org.paulg.ispend.model.Record;
@@ -28,7 +26,6 @@ public class SearchView extends VBox {
         dataView.addAll(data);
         search = new TextField();
         search.setPromptText("Search");
-        search.setDisable(true);
         search.setPrefWidth(400);
 
         final TableView<Record> recordView = makeTable(this.dataView, Record.class);
