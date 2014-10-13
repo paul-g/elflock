@@ -1,11 +1,9 @@
 package org.paulg.ispend.view;
 
 import javafx.application.Platform;
-import javafx.collections.ListChangeListener;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
-import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
@@ -14,11 +12,8 @@ import javafx.stage.Stage;
 import org.paulg.ispend.controller.OpenHistoryHandler;
 import org.paulg.ispend.main.HistoryFileVisitor;
 import org.paulg.ispend.model.*;
-import org.paulg.ispend.view.dashboard.AccountSummaryView;
-import org.paulg.ispend.view.dashboard.BudgetView;
-import org.paulg.ispend.view.dashboard.StaticVisualizer;
+import org.paulg.ispend.view.dashboard.DashboardTab;
 import org.paulg.ispend.view.drilldown.DrilldownTab;
-import org.paulg.ispend.view.utils.UiUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -42,27 +37,24 @@ public class ISpendPane extends Observable {
     private final Stage stage;
     private final PreferencesStore preferencesStore;
 
-    private final AccountSummaryView accountsView;
-    private final StaticVisualizer staticVisualizer;
-    private final BudgetView budgetView;
     private final Map<String, DrilldownTab> indexToTab = new HashMap<>();
+    private final DashboardTab dashboard;
     private RecordStore recordStore;
 
     public ISpendPane(final Stage stage, final PreferencesStore preferencesStore) {
         this.stage = stage;
         this.preferencesStore = preferencesStore;
-        this.staticVisualizer = new StaticVisualizer();
-        this.accountsView = new AccountSummaryView(this);
-        this.budgetView = new BudgetView(this, flagLists);
-        addObserver(budgetView);
-        addObserver(accountsView);
 
         stage.setTitle("ISpend");
 
         BorderPane pane = new BorderPane();
         final TabPane tabPane = new TabPane();
         pane.setCenter(tabPane);
-        tabPane.getTabs().add(makeDashboardTab());
+
+        dashboard = new DashboardTab(this, flagLists);
+        tabPane.getTabs().add(dashboard);
+        addObserver(dashboard.getBudgetView());
+        addObserver(dashboard.getAccountsView());
 
         pane.setId("container");
         pane.setTop(createMenuBar());
@@ -102,19 +94,6 @@ public class ISpendPane extends Observable {
         return menuBar;
     }
 
-    private Tab makeDashboardTab() {
-        Tab tab = new Tab("Dashboard");
-        GridPane pane = new GridPane();
-        pane.addRow(0, accountsView, staticVisualizer);
-        pane.addRow(1, budgetView.getTableWidget(), budgetView.getPlotWidget());
-        UiUtils.setColumnPercentWidths(pane, 40, 60);
-        pane.setHgap(10);
-        pane.setVgap(10);
-        pane.setPadding(new Insets(10, 10, 10, 10));
-        tab.setContent(pane);
-        return tab;
-    }
-
     public RecordStore getRecordStore() {
         return recordStore;
     }
@@ -128,7 +107,7 @@ public class ISpendPane extends Observable {
         accountsData.setAll(recordStore.getAccounts());
         recordStore.printSummary();
 
-        staticVisualizer.setEndOfMonthBalance(recordStore.getEndOfMonthBalance());
+        dashboard.setEndOfMonthBalance(recordStore.getEndOfMonthBalance());
 
         this.setChanged();
         this.notifyObservers();
