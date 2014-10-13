@@ -114,6 +114,10 @@ public class RecordStore {
                 a.setCovered(0);
             }
 
+            for (final Record r : getAllRecords()) {
+                r.setCovered(false);
+            }
+
             for (String tag : tags) {
                 tag = tag.trim();
                 final AggregatedRecord tagRecord = new AggregatedRecord(tag, 0);
@@ -123,8 +127,6 @@ public class RecordStore {
                             tagRecord.addRecord(r);
                             r.setCovered(true);
                             a.setCovered(a.getCovered() + 1);
-                        } else {
-                            r.setCovered(false);
                         }
                     }
                 }

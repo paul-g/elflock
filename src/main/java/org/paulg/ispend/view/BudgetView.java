@@ -69,9 +69,7 @@ public class BudgetView extends HBox implements Observer {
     public void update(Observable o, Object arg) {
         this.recordStore = pane.getRecordStore();
         List<String> queries = pane.getSavedSearchQueries();
-        for (String s : queries) {
-            addQuery(s);
-        }
+        queries.forEach(this::addQuery);
         this.plotWidget.update(o, arg);
     }
 
