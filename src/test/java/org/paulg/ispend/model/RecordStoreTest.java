@@ -5,6 +5,7 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.junit.Before;
 import org.junit.Test;
+import org.paulg.ispend.store.InMemoryRecordStore;
 import org.paulg.ispend.store.RecordStore;
 
 import java.util.ArrayList;
@@ -31,7 +32,7 @@ public class RecordStoreTest {
 
     @Before
     public void setUp() {
-        store = new RecordStore();
+        store = new InMemoryRecordStore();
         r1 = new Record(pd("04/02/2013"), "type", "transaction 1", 3.75, 0., "account", ACC1);
         store.addRecord(r1);
         r2 = new Record(pd("04/02/2013"), "type", "transaction 2", 5.11, 0., "account", ACC1);

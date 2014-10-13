@@ -3,6 +3,7 @@ package org.paulg.ispend.main;
 import org.paulg.ispend.loader.NatWestRecordParser;
 import org.paulg.ispend.model.Record;
 import org.paulg.ispend.loader.RecordParser;
+import org.paulg.ispend.store.InMemoryRecordStore;
 import org.paulg.ispend.store.RecordStore;
 
 import java.io.IOException;
@@ -18,7 +19,7 @@ public final class HistoryFileVisitor extends SimpleFileVisitor<Path> {
     private RecordParser recordParser;
 
     public HistoryFileVisitor() {
-        recordStore = new RecordStore();
+        recordStore = new InMemoryRecordStore();
     }
 
     public RecordStore getRecordStore() {
