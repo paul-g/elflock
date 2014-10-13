@@ -8,7 +8,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import lombok.Data;
 import org.joda.time.DateTime;
-import org.paulg.ispend.view.widgets.IgnoreField;
 
 import java.text.SimpleDateFormat;
 import java.util.Collections;

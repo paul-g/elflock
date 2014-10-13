@@ -5,7 +5,6 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.junit.Before;
 import org.junit.Test;
-import org.paulg.ispend.store.AggregatedRecord;
 import org.paulg.ispend.store.InMemoryRecordStore;
 import org.paulg.ispend.store.RecordStore;
 
@@ -24,7 +23,6 @@ public class RecordStoreTest {
     private static final String ACC2 = "123-445";
     private RecordStore store;
     private Record r, r1, r2;
-    private AggregatedRecord ar1;
     private final List<Record> testrecords = new ArrayList<>();
 
     private DateTime pd(String date) {
@@ -40,9 +38,6 @@ public class RecordStoreTest {
         store.addRecord(r2);
         r = new Record(pd("11/02/2013"), "type", "trans 2", -2.11, 0., "account", ACC2);
         store.addRecord(r);
-        ar1 = new AggregatedRecord("transaction", 0);
-        ar1.addRecord(r1);
-        ar1.addRecord(r2);
         Collections.addAll(testrecords, r1, r2, r);
     }
 

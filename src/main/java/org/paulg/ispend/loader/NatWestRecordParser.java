@@ -19,26 +19,24 @@ public class NatWestRecordParser implements RecordParser {
     @Override
     public List<Record> parseRecords(final Path path) {
 
-        CSVParser parser = null;
+        List<Record> records = new ArrayList<>();
         try {
-            parser = CSVParser.parse(path.toFile(),
+            CSVParser parser = CSVParser.parse(path.toFile(),
                     Charset.defaultCharset(),
                     CSVFormat.DEFAULT.withHeader());
+            for (CSVRecord csvRecord : parser) {
+                final Record r = new Record(
+                        parseDate(csvRecord.get("Date")),
+                        csvRecord.get("Type"),
+                        csvRecord.get("Description"),
+                        Double.parseDouble(csvRecord.get("Value")),
+                        Double.parseDouble(csvRecord.get("Balance")),
+                        csvRecord.get("Account Name"),
+                        csvRecord.get("Account Number"));
+                records.add(r);
+            }
         } catch (IOException e) {
             e.printStackTrace();
-        }
-
-        List<Record> records = new ArrayList<>();
-        for (CSVRecord csvRecord : parser) {
-            final Record r = new Record(
-                    parseDate(csvRecord.get("Date")),
-                    csvRecord.get("Type"),
-                    csvRecord.get("Description"),
-                    Double.parseDouble(csvRecord.get("Value")),
-                    Double.parseDouble(csvRecord.get("Balance")),
-                    csvRecord.get("Account Name"),
-                    csvRecord.get("Account Number"));
-            records.add(r);
         }
         return records;
     }

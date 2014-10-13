@@ -231,13 +231,13 @@ public class InMemoryRecordStore implements RecordStore {
     @Override
     public TimeSeries getAveragesByDescription(String query, RegularTimePeriod period) {
         List<Record> filtered = filterAny(getAllRecords(), query);
-        return averageByPeriod(filtered, r -> r.getValue(), period);
+        return averageByPeriod(filtered, Record::getValue, period);
     }
 
     @Override
     public TimeSeries getTotalByDescription(String query, RegularTimePeriod period) {
         List<Record> filtered = filterAny(getAllRecords(), query);
-        return sumByPeriod(filtered, r -> r.getValue(), period);
+        return sumByPeriod(filtered, Record::getValue, period);
     }
 
     @Override

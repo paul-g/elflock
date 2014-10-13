@@ -133,20 +133,9 @@ public class ISpendPane extends Observable {
                 e.printStackTrace();
             }
         }
-        if (preferencesStore.hasQuery()) {
-            String query = preferencesStore.getQuery();
-            setQuery(query);
-        }
-        stage.show();
-    }
-
-    void setQuery(final String query) {
         accountsData.clear();
         accountsData.addAll(recordStore.getAccounts());
-    }
-
-    public void saveQuery(String text) {
-        preferencesStore.saveQuery(text);
+        stage.show();
     }
 
     public void saveSearchQueries(List<String> queries) {

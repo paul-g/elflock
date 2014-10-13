@@ -36,7 +36,7 @@ public class BarTimeSeriesChart extends BarChart<String, Number> {
     }
 
     public void setTimeSeries(TimeSeries ts, String title) {
-        XYChart.Series series = new XYChart.Series();
+        XYChart.Series<String, Number> series = new XYChart.Series<>();
         series.setName(title);
         SimpleDateFormat sdf = new SimpleDateFormat(format);
         for (int i = 0; i < ts.getItemCount(); i++) {

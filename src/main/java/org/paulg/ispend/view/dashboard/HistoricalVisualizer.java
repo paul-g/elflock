@@ -69,7 +69,7 @@ public class HistoricalVisualizer extends TabPane implements Observer {
                         "Month",
                         "Week"
                 );
-        final ComboBox<String> period = new ComboBox(options);
+        final ComboBox<String> period = new ComboBox<>(options);
         period.getSelectionModel().select(0);
         period.setOnAction(event -> {
             String value = period.getValue();
@@ -86,7 +86,7 @@ public class HistoricalVisualizer extends TabPane implements Observer {
                         "Average"
                 );
 
-        final ComboBox<String> indicatorBox = new ComboBox(indOptions);
+        final ComboBox<String> indicatorBox = new ComboBox<>(indOptions);
         indicatorBox.getSelectionModel().select(0);
         indicatorBox.setOnAction(event -> {
             this.indicator = indicatorBox.getValue();

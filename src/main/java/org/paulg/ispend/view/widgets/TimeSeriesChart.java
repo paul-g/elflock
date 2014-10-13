@@ -30,7 +30,7 @@ public class TimeSeriesChart extends LineChart<Number, Number>  {
     }
 
     public void setTimeSeries(TimeSeries ts, String title) {
-        XYChart.Series series = new XYChart.Series();
+        XYChart.Series<Number, Number> series = new XYChart.Series<>();
         series.setName(title);
 
         for (int i = 0; i < ts.getItemCount(); i++) {
