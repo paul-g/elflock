@@ -9,11 +9,11 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import org.paulg.ispend.model.Record;
-import org.paulg.ispend.model.RecordStore;
 import org.paulg.ispend.view.widgets.CompleteTableView;
 
 import java.util.List;
 import static javafx.collections.FXCollections.observableArrayList;
+import static org.paulg.ispend.model.Query.filterAny;
 
 public class SearchView extends VBox {
 
@@ -51,7 +51,7 @@ public class SearchView extends VBox {
     private void filterData() {
         if (data.size() == 0)
             return;
-        final List<Record> filtered = RecordStore.filterAny(data, search.getText());
+        final List<Record> filtered = filterAny(data, search.getText());
         dataView.clear();
         dataView.addAll(filtered);
     }
