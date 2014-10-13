@@ -1,6 +1,7 @@
 package org.paulg.ispend.view;
 
 import javafx.application.Platform;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -82,20 +83,20 @@ public class ISpendPane extends Observable {
     private TabPane makeAppContent() {
         TabPane pane = new TabPane();
         pane.getTabs().add(makeDashboardTab());
-        pane.getTabs().add(makeDrillDownTab());
-        pane.getTabs().add(makeFlaggedDrillDownTab());
+        pane.getTabs().add(makeDrillDownTab("Unflagged", this.unflaggedRecords, this.searchView));
+        pane.getTabs().add(makeDrillDownTab("Flagged", this.flaggedRecords, this.flaggedSearchView));
         return pane;
     }
 
-    private Tab makeDrillDownTab() {
-        Tab tab = new Tab("Drilldown");
-        tab.setContent(this.searchView);
-        return tab;
-    }
-
-    private Tab makeFlaggedDrillDownTab() {
-        Tab tab = new Tab("Drilldown Flagged");
-        tab.setContent(this.flaggedSearchView);
+    private Tab makeDrillDownTab(String text, final ObservableList<Record> records, SearchView searchView) {
+        Tab tab = new Tab(text);
+        records.addListener(new ListChangeListener<Record>() {
+            @Override
+            public void onChanged(Change<? extends Record> c) {
+                tab.setText(text + " (" + records.size() + ")");
+            }
+        });
+        tab.setContent(searchView);
         return tab;
     }
 
