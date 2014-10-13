@@ -7,10 +7,19 @@ import org.paulg.ispend.model.Record;
 
 public class DrilldownTab extends Tab {
 
+    private final ObservableList<Record> records;
+    private final String text;
+
     public DrilldownTab (String text, final ObservableList<Record> records) {
         super();
-        setText(text);
-        records.addListener((ListChangeListener<Record>) c -> setText(text + " (" + records.size() + ")"));
+        this.records = records;
+        this.text = text;
+        setTabText();
+        records.addListener((ListChangeListener<Record>) c -> setTabText());
         setContent(new SearchView(records));
+    }
+
+    private void setTabText() {
+        setText(text + " (" + records.size() + ")");
     }
 }
