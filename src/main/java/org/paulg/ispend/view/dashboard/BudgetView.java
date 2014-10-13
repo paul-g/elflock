@@ -128,9 +128,14 @@ public class BudgetView extends HBox implements Observer {
     }
 
     private void removeQuery(int i) {
+        String query = queries.get(i);
         queries.remove(i);
         budgets.remove(i);
         pane.saveSearchQueries(queries);
+
+        List<Record> rs = RecordStore.filterAny(recordStore.getAllRecords(), query);
+        flagLists.remove(query);
+        unflagged.addAll(rs);
     }
 
     private void addQuery(String query) {
@@ -140,7 +145,6 @@ public class BudgetView extends HBox implements Observer {
 
         List<Record> rs = RecordStore.filterAny(recordStore.getAllRecords(), query);
         flagLists.put(query, observableArrayList(rs));
-
         unflagged.removeAll(rs);
     }
 

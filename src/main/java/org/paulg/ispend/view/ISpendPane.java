@@ -24,7 +24,9 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Observable;
 
 import static javafx.collections.FXCollections.observableArrayList;
@@ -43,7 +45,8 @@ public class ISpendPane extends Observable {
     private final AccountSummaryView accountsView;
     private final StaticVisualizer staticVisualizer;
     private final BudgetView budgetView;
-        private RecordStore recordStore;
+    private final Map<String, DrilldownTab> indexToTab = new HashMap<>();
+    private RecordStore recordStore;
 
     public ISpendPane(final Stage stage, final PreferencesStore preferencesStore) {
         this.stage = stage;
@@ -73,10 +76,14 @@ public class ISpendPane extends Observable {
 
         flagLists.addListener((MapChangeListener<String, ObservableList<Record>>) change -> {
             if (change.wasAdded()) {
-                tabPane.getTabs().add(new DrilldownTab(
+                DrilldownTab tb = new DrilldownTab(
                         change.getKey(),
                         change.getValueAdded()
-                        ));
+                );
+                tabPane.getTabs().add(tb);
+                indexToTab.put(change.getKey(), tb);
+            } else {
+                tabPane.getTabs().remove(indexToTab.get(change.getKey()));
             }
         });
     }
