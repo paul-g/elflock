@@ -47,8 +47,6 @@ public class BudgetView extends HBox implements Observer {
         tv = new CompleteTableView<>(BudgetEntry.class);
         ObservableList<TableColumn<BudgetEntry, ?>> tc = tv.getColumns();
         tc.get(1).setCellValueFactory(cd -> getEntries(BudgetEntry::getWeekly, cd));
-        tc.get(2).setCellValueFactory(cd -> getEntries(BudgetEntry::getMonthly, cd));
-        tc.get(3).setCellValueFactory(cd -> getEntries(BudgetEntry::getDaily, cd));
 
         TableColumn queryCol = tv.getColumns().get(0);
         queryCol.setCellFactory(TextFieldTableCell.forTableColumn());
@@ -143,6 +141,8 @@ public class BudgetView extends HBox implements Observer {
     }
 
     private void updateQuery(String oldValue, String newValue) {
+        int i = queries.indexOf(oldValue);
+        queries.set(i, newValue);
         removeQuery(oldValue);
         addQuery2(newValue);
     }
@@ -151,11 +151,11 @@ public class BudgetView extends HBox implements Observer {
         String query = queries.get(i);
         queries.remove(i);
         budgets.remove(i);
-        pane.saveSearchQueries(queries);
         removeQuery(query);
     }
 
     private void removeQuery(String query) {
+        pane.saveSearchQueries(queries);
         List<Record> rs = filterAny(recordStore.getAllRecords(), query);
         flagLists.remove(query);
         unflagged.addAll(rs);
@@ -164,11 +164,11 @@ public class BudgetView extends HBox implements Observer {
     private void addQuery(String query) {
         queries.add(query);
         budgets.add(getBudget(query));
-        pane.saveSearchQueries(queries);
         addQuery2(query);
     }
 
     private void addQuery2(String query) {
+        pane.saveSearchQueries(queries);
         List<Record> rs = filterAny(recordStore.getAllRecords(), query);
         flagLists.put(query, observableArrayList(rs));
         unflagged.removeAll(rs);
@@ -176,7 +176,7 @@ public class BudgetView extends HBox implements Observer {
 
     private BudgetEntry getBudget(String query) {
         double weeklyAvg = recordStore.getWeeklyAverageByDescription(query);
-        return new BudgetEntry(query, weeklyAvg / 7, weeklyAvg, weeklyAvg * 4);
+        return new BudgetEntry(query, weeklyAvg);
     }
 
     public Node getTableWidget() {

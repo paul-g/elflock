@@ -9,16 +9,13 @@ import javafx.beans.property.StringProperty;
 public class BudgetEntry {
 
     final private StringProperty group;
-    final private DoubleProperty weekly, monthly, daily;
+    final private DoubleProperty weekly;
 
     public BudgetEntry(final String group,
-                       final double daily,
-                       final double weekly,
-                       final double monthly) {
+                       final double weekly
+                       ) {
         this.group = new SimpleStringProperty(group);
         this.weekly = new SimpleDoubleProperty(weekly);
-        this.monthly = new SimpleDoubleProperty(monthly);
-        this.daily = new SimpleDoubleProperty(daily);
     }
 
     public String getGroup() {
@@ -43,29 +40,5 @@ public class BudgetEntry {
 
     public void setWeekly(final double weekly) {
         this.weekly.set(weekly);
-    }
-
-    public double getMonthly() {
-        return monthly.get();
-    }
-
-    public DoubleProperty monthlyProperty() {
-        return monthly;
-    }
-
-    public void setMonthly(final double monthly) {
-        this.monthly.set(monthly);
-    }
-
-    public double getDaily() {
-        return daily.get();
-    }
-
-    public DoubleProperty dailyProperty() {
-        return daily;
-    }
-
-    public void setDaily(final double daily) {
-        this.daily.set(daily);
     }
 }
