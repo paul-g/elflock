@@ -41,6 +41,7 @@ public class ISpendPane extends Observable {
     private final Map<String, DrilldownTab> indexToTab = new HashMap<>();
     private final DashboardTab dashboard;
     private RecordStore recordStore;
+    private List<String> saveLabels;
 
     public ISpendPane(final Stage stage, final PreferencesStore preferencesStore) {
         this.stage = stage;
@@ -148,5 +149,17 @@ public class ISpendPane extends Observable {
 
     public List<Account> getAccounts() {
         return accountsData;
+    }
+
+    public List<String> getSaveLabels() {
+        return saveLabels;
+    }
+
+    public List<String> getSavedLabels() {
+        return preferencesStore.getSavedLabels();
+    }
+
+    public void saveLabels(List<String> labels) {
+        preferencesStore.saveLabels(labels);
     }
 }

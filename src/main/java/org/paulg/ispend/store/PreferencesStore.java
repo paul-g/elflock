@@ -10,6 +10,7 @@ public class PreferencesStore {
     private static final String LOADED_FILE = "LoadedFile";
     private static final String SAVED_QUERY = "SavedQuery";
     private static final String SAVED_SEARCH_QUERIES = "SavedSearchQueries";
+    private static final String SAVED_LABELS = "SavedLabels";
 
     private final Preferences prefs;
 
@@ -18,18 +19,34 @@ public class PreferencesStore {
     }
 
     public void saveSearchQueries(final List<String> queries) {
+        saveInner(queries, SAVED_SEARCH_QUERIES);
+    }
+
+    public void saveLabels(final List<String> labels) {
+        saveInner(labels, SAVED_LABELS);
+    }
+
+    private void saveInner(List<String> values, String field) {
         String mergedQueries = "";
-        for (String s : queries)
+        for (String s : values)
             mergedQueries += s + ";";
-        prefs.put(SAVED_SEARCH_QUERIES, mergedQueries);
+        prefs.put(field, mergedQueries);
     }
 
     public boolean hasSavedQueries() {
         return prefs.get(SAVED_SEARCH_QUERIES, null) != null;
     }
 
+    public List<String> getSavedLabels() {
+        return getInner(SAVED_LABELS);
+    }
+
     public List<String> getSavedQueries() {
-        String mergedQueries = prefs.get(SAVED_SEARCH_QUERIES, null);
+        return getInner(SAVED_SEARCH_QUERIES);
+    }
+
+    private List<String> getInner(String field) {
+        String mergedQueries = prefs.get(field, null);
         List<String> queries = new ArrayList<>();
         if (mergedQueries == null)
             return queries;

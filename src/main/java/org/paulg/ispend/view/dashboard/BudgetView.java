@@ -35,6 +35,7 @@ public class BudgetView extends HBox implements Observer {
     private ObservableList<Record> unflagged;
     private RecordStore recordStore;
     private final List<String> queries = new ArrayList<>();
+    private List<String> labels = new ArrayList<>();
 
     private ObservableValue getEntries(Function<BudgetEntry, Double> func, TableColumn.CellDataFeatures cd) {
         return new SimpleStringProperty(String.format("%.2f", func.apply((BudgetEntry)cd.getValue())));
@@ -46,7 +47,7 @@ public class BudgetView extends HBox implements Observer {
         plotWidget = new HistoricalVisualizer(pane);
         tv = new CompleteTableView<>(BudgetEntry.class);
         ObservableList<TableColumn<BudgetEntry, ?>> tc = tv.getColumns();
-        tc.get(1).setCellValueFactory(cd -> getEntries(BudgetEntry::getWeekly, cd));
+        tc.get(2).setCellValueFactory(cd -> getEntries(BudgetEntry::getWeekly, cd));
 
         TableColumn queryCol = tv.getColumns().get(0);
         queryCol.setCellFactory(TextFieldTableCell.forTableColumn());
@@ -56,7 +57,20 @@ public class BudgetView extends HBox implements Observer {
                 String newQuery = event.getNewValue();
                 String oldQuery = event.getOldValue();
                 event.getRowValue().setGroup(newQuery);
-                updateQuery(oldQuery, newQuery);
+                updateQuery(oldQuery, newQuery, event.getRowValue().getLabel());
+            }
+        });
+
+        TableColumn budgetCol = tv.getColumns().get(1);
+        budgetCol.setCellFactory(TextFieldTableCell.forTableColumn());
+        budgetCol.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<BudgetEntry, String>>() {
+            @Override
+            public void handle(TableColumn.CellEditEvent<BudgetEntry, String> event) {
+                int i = labels.indexOf(event.getOldValue());
+                labels.set(i, event.getNewValue());
+                event.getRowValue().setLabel(event.getNewValue());
+                String q = event.getRowValue().getGroup();
+                updateQuery(q, q, event.getNewValue());
             }
         });
 
@@ -65,7 +79,7 @@ public class BudgetView extends HBox implements Observer {
         tv.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         tv.getSelectionModel().selectedItemProperty().addListener((ov, oldv, newv) -> {
             if (newv != null)
-                setPlotData(newv.getGroup());
+                setPlotData(newv.getGroup(), newv.getLabel());
         });
 
         this.tableWidget = new VBox();
@@ -81,21 +95,27 @@ public class BudgetView extends HBox implements Observer {
 
     }
 
-    private void setPlotData(String group) {
+    private void setPlotData(String group, String label) {
         plotWidget.plotHistoricalData(group);
-        getBudget(group);
+        getBudget(group, label);
     }
 
     @Override
     public void update(Observable o, Object arg) {
         this.recordStore = pane.getRecordStore();
         List<String> queries = pane.getSavedSearchQueries();
+        labels = pane.getSavedLabels();
+        while (labels.size() < queries.size()) {
+            labels.add("Label");
+        }
         unflagged = observableArrayList(recordStore.getAllRecords());
         flagLists.put(
                 "Unflagged",
                 unflagged
         );
-        queries.forEach(this::addQuery);
+        for (int i = 0; i < queries.size(); i++) {
+            addQuery(queries.get(i), labels.get(i));
+        }
         this.plotWidget.update(o, arg);
     }
 
@@ -106,18 +126,18 @@ public class BudgetView extends HBox implements Observer {
         final Button add = new Button("+");
 
         add.setOnAction(event -> {
-            addQuery(text.getText());
+            addQuery(text.getText(), "Add label...");
             text.clear();
         });
 
         text.setOnKeyReleased(t -> {
             if (t.getCode() == KeyCode.ENTER) {
-                setPlotData(text.getText());
+                setPlotData(text.getText(), text.getText());
             }
         });
 
         final Button search = new Button("S");
-        search.setOnAction(event -> setPlotData(text.getText()));
+        search.setOnAction(event -> setPlotData(text.getText(), text.getText()));
 
         final Button delete = new Button("-");
         delete.setOnAction(event -> {
@@ -140,43 +160,47 @@ public class BudgetView extends HBox implements Observer {
         return addEntry;
     }
 
-    private void updateQuery(String oldValue, String newValue) {
+    private void updateQuery(String oldValue, String newValue, String label) {
         int i = queries.indexOf(oldValue);
         queries.set(i, newValue);
         removeQuery(oldValue);
-        addQuery2(newValue);
+        addQuery2(newValue, label);
     }
 
     private void removeQuery(int i) {
         String query = queries.get(i);
         queries.remove(i);
         budgets.remove(i);
+        labels.remove(i);
         removeQuery(query);
     }
 
     private void removeQuery(String query) {
         pane.saveSearchQueries(queries);
+        pane.saveLabels(labels);
         List<Record> rs = filterAny(recordStore.getAllRecords(), query);
         flagLists.remove(query);
         unflagged.addAll(rs);
     }
 
-    private void addQuery(String query) {
+    private void addQuery(String query, String label) {
         queries.add(query);
-        budgets.add(getBudget(query));
-        addQuery2(query);
+        labels.add(label);
+        budgets.add(getBudget(query, label));
+        addQuery2(query, label);
     }
 
-    private void addQuery2(String query) {
+    private void addQuery2(String query, String label) {
         pane.saveSearchQueries(queries);
+        pane.saveLabels(labels);
         List<Record> rs = filterAny(recordStore.getAllRecords(), query);
-        flagLists.put(query, observableArrayList(rs));
+        flagLists.put(label, observableArrayList(rs));
         unflagged.removeAll(rs);
     }
 
-    private BudgetEntry getBudget(String query) {
+    private BudgetEntry getBudget(String query, String label) {
         double weeklyAvg = recordStore.getWeeklyAverageByDescription(query);
-        return new BudgetEntry(query, weeklyAvg);
+        return new BudgetEntry(query, label, weeklyAvg);
     }
 
     public Node getTableWidget() {
