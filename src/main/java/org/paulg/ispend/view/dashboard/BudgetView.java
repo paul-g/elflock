@@ -52,10 +52,7 @@ public class BudgetView extends HBox implements Observer {
         queryCol.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<BudgetEntry, String>>() {
             @Override
             public void handle(TableColumn.CellEditEvent<BudgetEntry, String> event) {
-                String newQuery = event.getNewValue();
-                String oldQuery = event.getOldValue();
-                event.getRowValue().setGroup(newQuery);
-                updateQuery(oldQuery, newQuery, event.getRowValue().getLabel());
+                event.getRowValue().setGroup(event.getNewValue());
             }
         });
 
@@ -64,9 +61,8 @@ public class BudgetView extends HBox implements Observer {
         budgetCol.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<BudgetEntry, String>>() {
             @Override
             public void handle(TableColumn.CellEditEvent<BudgetEntry, String> event) {
+                updateFlagList(event.getOldValue(), event.getNewValue());
                 event.getRowValue().setLabel(event.getNewValue());
-                String q = event.getRowValue().getGroup();
-                updateQuery(q, q, event.getNewValue());
             }
         });
 
@@ -139,7 +135,7 @@ public class BudgetView extends HBox implements Observer {
             int n = tv.getItems().size() - 1;
             if (i < 0)
                 return;
-            removeQuery(budgets.get(i).getGroup());
+            removeQuery(budgets.get(i));
 
             if (n > 0) {
                 int selNext = ((i - 1) % n + n) % n;
@@ -154,21 +150,22 @@ public class BudgetView extends HBox implements Observer {
         return addEntry;
     }
 
-    private void updateQuery(String oldValue, String newValue, String label) {
-        removeQuery(oldValue);
-        addQuery2(newValue, label);
-    }
-
-    private void removeQuery(String query) {
-        pane.saveBudgetEntries(budgets);
-        List<Record> rs = filterAny(recordStore.getAllRecords(), query);
-        flagLists.remove(query);
+    private void removeQuery(BudgetEntry query) {
+        List<Record> rs = filterAny(recordStore.getAllRecords(), query.getGroup());
+        flagLists.remove(query.getLabel());
         unflagged.addAll(rs);
+        budgets.remove(query);
+        pane.saveBudgetEntries(budgets);
     }
 
     private void addQuery(String query, String label) {
         budgets.add(getBudget(query, label));
         addQuery2(query, label);
+    }
+
+    private void updateFlagList(String oldValue, String newValue) {
+        flagLists.put(newValue, flagLists.get(oldValue));
+        flagLists.remove(oldValue);
     }
 
     private void addQuery2(String query, String label) {

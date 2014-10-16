@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.*;
 
@@ -24,19 +25,16 @@ public class PreferencesStore {
         prefs = Preferences.userRoot().node(Preferences.class.getName());
     }
 
-    private void saveSearchQueries(final List<String> queries) {
+    private void saveSearchQueries(final Stream<String> queries) {
         saveInner(queries, SAVED_SEARCH_QUERIES);
     }
 
-    private void saveLabels(final List<String> labels) {
+    private void saveLabels(final Stream<String> labels) {
         saveInner(labels, SAVED_LABELS);
     }
 
-    private void saveInner(List<String> values, String field) {
-        String mergedQueries = "";
-        for (String s : values)
-            mergedQueries += s + ";";
-        prefs.put(field, mergedQueries);
+    private void saveInner(Stream<String> values, String field) {
+        prefs.put(field, values.collect(Collectors.joining(";")));
     }
 
     public boolean hasSavedQueries() {
@@ -95,13 +93,8 @@ public class PreferencesStore {
         prefs.remove(LOADED_FILE);
     }
 
-    public void saveBudgetEntries(ObservableList<BudgetEntry> budgets) {
-        saveSearchQueries(budgets.stream().
-                map(BudgetEntry::getGroup).
-                collect(toList()));
-
-        saveLabels(budgets.stream().
-                map(BudgetEntry::getLabel).
-                collect(toList()));
+    public void saveBudgetEntries(List<BudgetEntry> budgets) {
+        saveSearchQueries(budgets.stream().map(BudgetEntry::getGroup));
+        saveLabels(budgets.stream().map(BudgetEntry::getLabel));
     }
 }
