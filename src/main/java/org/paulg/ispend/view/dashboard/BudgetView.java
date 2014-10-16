@@ -34,8 +34,6 @@ public class BudgetView extends HBox implements Observer {
     private final ObservableMap<String, ObservableList<Record>> flagLists;
     private ObservableList<Record> unflagged;
     private RecordStore recordStore;
-    private final List<String> queries = new ArrayList<>();
-    private List<String> labels = new ArrayList<>();
 
     private ObservableValue getEntries(Function<BudgetEntry, Double> func, TableColumn.CellDataFeatures cd) {
         return new SimpleStringProperty(String.format("%.2f", func.apply((BudgetEntry)cd.getValue())));
@@ -66,8 +64,6 @@ public class BudgetView extends HBox implements Observer {
         budgetCol.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<BudgetEntry, String>>() {
             @Override
             public void handle(TableColumn.CellEditEvent<BudgetEntry, String> event) {
-                int i = labels.indexOf(event.getOldValue());
-                labels.set(i, event.getNewValue());
                 event.getRowValue().setLabel(event.getNewValue());
                 String q = event.getRowValue().getGroup();
                 updateQuery(q, q, event.getNewValue());
@@ -91,8 +87,6 @@ public class BudgetView extends HBox implements Observer {
         setHgrow(tableWidget, Priority.ALWAYS);
         setHgrow(plotWidget, Priority.ALWAYS);
         getChildren().addAll(tableWidget, plotWidget);
-
-
     }
 
     private void setPlotData(String group, String label) {
@@ -104,7 +98,7 @@ public class BudgetView extends HBox implements Observer {
     public void update(Observable o, Object arg) {
         this.recordStore = pane.getRecordStore();
         List<String> queries = pane.getSavedSearchQueries();
-        labels = pane.getSavedLabels();
+        List<String> labels = pane.getSavedLabels();
         while (labels.size() < queries.size()) {
             labels.add("Label");
         }
@@ -145,7 +139,7 @@ public class BudgetView extends HBox implements Observer {
             int n = tv.getItems().size() - 1;
             if (i < 0)
                 return;
-            removeQuery(i);
+            removeQuery(budgets.get(i).getGroup());
 
             if (n > 0) {
                 int selNext = ((i - 1) % n + n) % n;
@@ -161,38 +155,24 @@ public class BudgetView extends HBox implements Observer {
     }
 
     private void updateQuery(String oldValue, String newValue, String label) {
-        int i = queries.indexOf(oldValue);
-        queries.set(i, newValue);
         removeQuery(oldValue);
         addQuery2(newValue, label);
     }
 
-    private void removeQuery(int i) {
-        String query = queries.get(i);
-        queries.remove(i);
-        budgets.remove(i);
-        labels.remove(i);
-        removeQuery(query);
-    }
-
     private void removeQuery(String query) {
-        pane.saveSearchQueries(queries);
-        pane.saveLabels(labels);
+        pane.saveBudgetEntries(budgets);
         List<Record> rs = filterAny(recordStore.getAllRecords(), query);
         flagLists.remove(query);
         unflagged.addAll(rs);
     }
 
     private void addQuery(String query, String label) {
-        queries.add(query);
-        labels.add(label);
         budgets.add(getBudget(query, label));
         addQuery2(query, label);
     }
 
     private void addQuery2(String query, String label) {
-        pane.saveSearchQueries(queries);
-        pane.saveLabels(labels);
+        pane.saveBudgetEntries(budgets);
         List<Record> rs = filterAny(recordStore.getAllRecords(), query);
         flagLists.put(label, observableArrayList(rs));
         unflagged.removeAll(rs);

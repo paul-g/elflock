@@ -1,8 +1,14 @@
 package org.paulg.ispend.store;
 
+import javafx.collections.ObservableList;
+import org.paulg.ispend.view.dashboard.BudgetEntry;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.prefs.Preferences;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.*;
 
 public class PreferencesStore {
 
@@ -18,11 +24,11 @@ public class PreferencesStore {
         prefs = Preferences.userRoot().node(Preferences.class.getName());
     }
 
-    public void saveSearchQueries(final List<String> queries) {
+    private void saveSearchQueries(final List<String> queries) {
         saveInner(queries, SAVED_SEARCH_QUERIES);
     }
 
-    public void saveLabels(final List<String> labels) {
+    private void saveLabels(final List<String> labels) {
         saveInner(labels, SAVED_LABELS);
     }
 
@@ -87,5 +93,15 @@ public class PreferencesStore {
     public void clearAll() {
         prefs.remove(SAVED_QUERY);
         prefs.remove(LOADED_FILE);
+    }
+
+    public void saveBudgetEntries(ObservableList<BudgetEntry> budgets) {
+        saveSearchQueries(budgets.stream().
+                map(BudgetEntry::getGroup).
+                collect(toList()));
+
+        saveLabels(budgets.stream().
+                map(BudgetEntry::getLabel).
+                collect(toList()));
     }
 }

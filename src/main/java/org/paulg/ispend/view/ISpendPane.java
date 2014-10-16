@@ -14,6 +14,7 @@ import org.paulg.ispend.main.HistoryFileVisitor;
 import org.paulg.ispend.model.*;
 import org.paulg.ispend.store.PreferencesStore;
 import org.paulg.ispend.store.RecordStore;
+import org.paulg.ispend.view.dashboard.BudgetEntry;
 import org.paulg.ispend.view.dashboard.DashboardTab;
 import org.paulg.ispend.view.drilldown.DrilldownTab;
 
@@ -139,10 +140,6 @@ public class ISpendPane extends Observable {
         stage.show();
     }
 
-    public void saveSearchQueries(List<String> queries) {
-        preferencesStore.saveSearchQueries(queries);
-    }
-
     public List<String> getSavedSearchQueries() {
         return preferencesStore.getSavedQueries();
     }
@@ -159,7 +156,7 @@ public class ISpendPane extends Observable {
         return preferencesStore.getSavedLabels();
     }
 
-    public void saveLabels(List<String> labels) {
-        preferencesStore.saveLabels(labels);
+    public void saveBudgetEntries(ObservableList<BudgetEntry> budgets) {
+        preferencesStore.saveBudgetEntries(budgets);
     }
 }
