@@ -1,11 +1,12 @@
 package org.paulg.ispend.store;
 
-import javafx.collections.ObservableList;
 import org.paulg.ispend.view.dashboard.BudgetEntry;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.prefs.Preferences;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -25,16 +26,8 @@ public class PreferencesStore {
         prefs = Preferences.userRoot().node(Preferences.class.getName());
     }
 
-    private void saveSearchQueries(final Stream<String> queries) {
-        saveInner(queries, SAVED_SEARCH_QUERIES);
-    }
-
-    private void saveLabels(final Stream<String> labels) {
-        saveInner(labels, SAVED_LABELS);
-    }
-
-    private void saveInner(Stream<String> values, String field) {
-        prefs.put(field, values.collect(Collectors.joining(";")));
+    private void saveValues(Stream<String> values, String field) {
+        prefs.put(field, values.collect(joining(";")));
     }
 
     public boolean hasSavedQueries() {
@@ -51,15 +44,11 @@ public class PreferencesStore {
 
     private List<String> getInner(String field) {
         String mergedQueries = prefs.get(field, null);
-        List<String> queries = new ArrayList<>();
         if (mergedQueries == null)
-            return queries;
-        String[] qs = mergedQueries.split(";");
-        for (String q : qs) {
-            if (!q.isEmpty())
-                queries.add(q);
-        }
-        return queries;
+            return new ArrayList<>();
+        return Arrays.asList(mergedQueries.split(";")).stream().
+                filter(x -> !x.isEmpty()).
+                collect(toList());
     }
 
     public void saveQuery(final String query) {
@@ -71,8 +60,7 @@ public class PreferencesStore {
     }
 
     public boolean hasLoadedFile() {
-        String file = prefs.get(LOADED_FILE, null);
-        return file != null;
+        return prefs.get(LOADED_FILE, null) != null;
     }
 
     public String getLoadedFile() {
@@ -94,7 +82,7 @@ public class PreferencesStore {
     }
 
     public void saveBudgetEntries(List<BudgetEntry> budgets) {
-        saveSearchQueries(budgets.stream().map(BudgetEntry::getGroup));
-        saveLabels(budgets.stream().map(BudgetEntry::getLabel));
+        saveValues(budgets.stream().map(BudgetEntry::getGroup), SAVED_SEARCH_QUERIES);
+        saveValues(budgets.stream().map(BudgetEntry::getLabel), SAVED_LABELS);
     }
 }
