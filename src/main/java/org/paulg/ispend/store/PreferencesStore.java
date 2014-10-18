@@ -68,8 +68,7 @@ public class PreferencesStore {
     }
 
     public boolean hasQuery() {
-        String query = prefs.get(SAVED_QUERY, null);
-        return query != null;
+        return prefs.get(SAVED_QUERY, null) != null;
     }
 
     public String getQuery() {
