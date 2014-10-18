@@ -61,8 +61,10 @@ public class BudgetView extends HBox implements Observer {
         budgetCol.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<BudgetEntry, String>>() {
             @Override
             public void handle(TableColumn.CellEditEvent<BudgetEntry, String> event) {
-                updateFlagList(event.getOldValue(), event.getNewValue());
-                event.getRowValue().setLabel(event.getNewValue());
+                String oldValue = event.getOldValue();
+                String newValue = event.getNewValue();
+                event.getRowValue().setLabel(newValue);
+                updateFlagList(oldValue, newValue);
             }
         });
 
@@ -160,19 +162,16 @@ public class BudgetView extends HBox implements Observer {
 
     private void addQuery(String query, String label) {
         budgets.add(getBudget(query, label));
-        addQuery2(query, label);
+        pane.saveBudgetEntries(budgets);
+        List<Record> rs = filterAny(recordStore.getAllRecords(), query);
+        flagLists.put(label, observableArrayList(rs));
+        unflagged.removeAll(rs);
     }
 
     private void updateFlagList(String oldValue, String newValue) {
         flagLists.put(newValue, flagLists.get(oldValue));
         flagLists.remove(oldValue);
-    }
-
-    private void addQuery2(String query, String label) {
         pane.saveBudgetEntries(budgets);
-        List<Record> rs = filterAny(recordStore.getAllRecords(), query);
-        flagLists.put(label, observableArrayList(rs));
-        unflagged.removeAll(rs);
     }
 
     private BudgetEntry getBudget(String query, String label) {
