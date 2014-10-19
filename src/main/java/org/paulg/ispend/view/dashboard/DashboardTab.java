@@ -19,15 +19,12 @@ public class DashboardTab extends Tab {
             this.staticVisualizer = new StaticVisualizer();
             this.accountsView = new AccountSummaryView(ipane);
             this.budgetView = new BudgetView(ipane, flagLists);
-
             setText("Dashboard");
             GridPane pane = new GridPane();
+            pane.getStyleClass().add("dashboard-pane");
             pane.addRow(0, accountsView, staticVisualizer);
             pane.addRow(1, budgetView.getTableWidget(), budgetView.getPlotWidget());
             UiUtils.setColumnPercentWidths(pane, 40, 60);
-            pane.setHgap(10);
-            pane.setVgap(10);
-            pane.setPadding(new Insets(10, 10, 10, 10));
             setContent(pane);
         }
 

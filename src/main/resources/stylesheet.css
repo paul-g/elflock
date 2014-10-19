@@ -1,6 +1,8 @@
 .vbox {
     -fx-spacing: 5px;
+    -fx-padding: 30 5 5 5;
 }
+
 
 .section {
     -fx-font-size: 20px;
@@ -61,4 +63,11 @@
 .table-view .column-header .label {
     -fx-text-fill: white;
     -fx-alignment: center-left;
+}
+
+/** Custom CSS classes */
+.pane {
+    -fx-vgap: 10;
+    -fx-hgap: 10;
+    -fx-padding: 10 10 10 10;
 }

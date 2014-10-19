@@ -72,7 +72,6 @@ public class BudgetView extends HBox implements Observer {
         this.tableWidget = new VBox();
         tableWidget.getStyleClass().add("vbox");
         HBox addEntry = addEntry();
-        setPadding(new Insets(30, 5, 5, 5));
         tableWidget.getChildren().addAll(addEntry, tv);
         setHgrow(tableWidget, Priority.ALWAYS);
         setHgrow(plotWidget, Priority.ALWAYS);
