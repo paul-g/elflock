@@ -1,3 +1,7 @@
+.vbox {
+    -fx-spacing: 40px;
+}
+
 .section {
     -fx-font-size: 20px;
     -fx-text-fill: #428bcf;

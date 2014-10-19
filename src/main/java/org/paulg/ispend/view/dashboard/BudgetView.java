@@ -49,23 +49,16 @@ public class BudgetView extends HBox implements Observer {
 
         TableColumn queryCol = tv.getColumns().get(0);
         queryCol.setCellFactory(TextFieldTableCell.forTableColumn());
-        queryCol.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<BudgetEntry, String>>() {
-            @Override
-            public void handle(TableColumn.CellEditEvent<BudgetEntry, String> event) {
-                event.getRowValue().setGroup(event.getNewValue());
-            }
-        });
+        queryCol.setOnEditCommit((EventHandler<TableColumn.CellEditEvent<BudgetEntry, String>>) event ->
+                event.getRowValue().setGroup(event.getNewValue()));
 
         TableColumn budgetCol = tv.getColumns().get(1);
         budgetCol.setCellFactory(TextFieldTableCell.forTableColumn());
-        budgetCol.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<BudgetEntry, String>>() {
-            @Override
-            public void handle(TableColumn.CellEditEvent<BudgetEntry, String> event) {
-                String oldValue = event.getOldValue();
-                String newValue = event.getNewValue();
-                event.getRowValue().setLabel(newValue);
-                updateFlagList(oldValue, newValue);
-            }
+        budgetCol.setOnEditCommit( (EventHandler<TableColumn.CellEditEvent<BudgetEntry, String>>)event -> {
+            String oldValue = event.getOldValue();
+            String newValue = event.getNewValue();
+            event.getRowValue().setLabel(newValue);
+            updateFlagList(oldValue, newValue);
         });
 
         tv.setEditable(true);
@@ -79,9 +72,7 @@ public class BudgetView extends HBox implements Observer {
         this.tableWidget = new VBox();
         HBox addEntry = addEntry();
         setPadding(new Insets(30, 5, 5, 5));
-        setSpacing(5);
         tableWidget.getChildren().addAll(addEntry, tv);
-        tableWidget.setSpacing(5);
         setHgrow(tableWidget, Priority.ALWAYS);
         setHgrow(plotWidget, Priority.ALWAYS);
         getChildren().addAll(tableWidget, plotWidget);
