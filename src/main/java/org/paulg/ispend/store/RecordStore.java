@@ -37,4 +37,6 @@ public interface RecordStore {
     TimeSeries getTotalByDescription(String query, RegularTimePeriod period);
 
     TimeSeries getEndOfMonthBalance();
+
+    TimeSeries getSpentPerMonth();
 }

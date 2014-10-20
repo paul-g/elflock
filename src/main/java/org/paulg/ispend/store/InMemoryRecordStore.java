@@ -217,6 +217,19 @@ public class InMemoryRecordStore implements RecordStore {
         return ts;
     }
 
+    @Override
+    public TimeSeries getSpentPerMonth() {
+        TimeSeries eom = getEndOfMonthBalance();
+        TimeSeries ts = new TimeSeries("Spent Per Month");
+        for (int i = 1; i < eom.getItemCount(); i++) {
+            TimeSeriesDataItem eomItem = eom.getDataItem(i);
+            TimeSeriesDataItem prevEomItem = eom.getDataItem(i - 1);
+            Number value = eomItem.getValue().doubleValue() - prevEomItem.getValue().doubleValue();
+            ts.add(new TimeSeriesDataItem(eomItem.getPeriod(), value));
+        }
+        return ts;
+    }
+
     private DateTime getFirstRecordDate() {
         return yearMonth(Collections.min(getAllRecords()).getDate());
     }

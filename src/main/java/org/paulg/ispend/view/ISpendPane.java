@@ -134,9 +134,9 @@ public class ISpendPane extends Observable {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
+            accountsData.clear();
+            accountsData.addAll(recordStore.getAccounts());
         }
-        accountsData.clear();
-        accountsData.addAll(recordStore.getAccounts());
         stage.show();
     }
 

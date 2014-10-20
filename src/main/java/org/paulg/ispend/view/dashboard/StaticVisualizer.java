@@ -18,7 +18,8 @@ public class StaticVisualizer extends VBox {
         setSpacing(20);
     }
 
-    public void setEndOfMonthBalance(final TimeSeries records) {
-        monthlyBalance.setTimeSeries(records, "End of Month Balance (all accounts)");
+    public void setSeries(final TimeSeries records, String title) {
+        monthlyBalance.setTimeSeries(records, title);
     }
+
 }
