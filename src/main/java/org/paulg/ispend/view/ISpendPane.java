@@ -48,8 +48,6 @@ public class ISpendPane extends Observable {
         this.stage = stage;
         this.preferencesStore = preferencesStore;
 
-        stage.setTitle("ISpend");
-
         BorderPane pane = new BorderPane();
         final TabPane tabPane = new TabPane();
         pane.setCenter(tabPane);
