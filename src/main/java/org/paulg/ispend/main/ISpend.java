@@ -31,27 +31,22 @@ public class ISpend extends Application {
 
     @Override
     public void start(final Stage stage) {
-
-        GridPane gp = new GridPane();
-        gp.setPadding(new Insets(30, 10, 10, 10));
-        gp.setVgap(10);
-        gp.setHgap(10);
         stage.setTitle("elflock");
+
+        GridPane gp = makeGrid();
         Label welcome = UiUtils.label(
                 "elflock stores your session properties" +
                 " and encrypted account data in the workspace");
-        gp.add(welcome, 1, 0);
-        Label l1 = UiUtils.label("Current workspace");
-
-        Button b = new Button("Browse");
-        gp.addRow(1, l1, t);
+        Label lbrowse = UiUtils.label("Current workspace");
+        Button browse = new Button("Browse");
         final Button start = new Button("Start");
         final Button cancel = new Button("Cancel");
-        HBox hbox = new HBox();
-        hbox.setSpacing(10);
-        hbox.getChildren().addAll(b, cancel, start);
-        hbox.setAlignment(Pos.CENTER_RIGHT);
-        gp.addRow(2, new Label(), hbox);
+
+        HBox buttonPane = buttonPane(browse, start, cancel);
+
+        gp.add(welcome, 1, 0);
+        gp.addRow(1, lbrowse, t);
+        gp.addRow(2, new Label(), buttonPane);
 
         // read property file
         String wp = store.getWorkspace();
@@ -62,7 +57,7 @@ public class ISpend extends Application {
             start.setDisable(true);
         }
 
-        b.setOnAction(event -> {
+        browse.setOnAction(event -> {
             workspace = requestWorkspace(stage);
             if (workspace == null)
                 return;
@@ -82,11 +77,23 @@ public class ISpend extends Application {
         Scene scene = new Scene(gp);
         stage.setScene(scene);
         stage.sizeToScene();
-        stage.setFullScreen(false);
-        stage.setResizable(false);
-        stage.sizeToScene();
-        stage.setMaxHeight(100);
         stage.show();
+    }
+
+    private GridPane makeGrid() {
+        GridPane gp = new GridPane();
+        gp.setPadding(new Insets(30, 10, 10, 10));
+        gp.setVgap(10);
+        gp.setHgap(10);
+        return gp;
+    }
+
+    private HBox buttonPane(Button browse, Button start, Button cancel) {
+        HBox hbox = new HBox();
+        hbox.setSpacing(10);
+        hbox.getChildren().addAll(browse, cancel, start);
+        hbox.setAlignment(Pos.CENTER_RIGHT);
+        return hbox;
     }
 
     private File requestWorkspace(final Stage stage) {
