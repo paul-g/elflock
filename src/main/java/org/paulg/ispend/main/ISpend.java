@@ -1,6 +1,7 @@
 package org.paulg.ispend.main;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -26,10 +27,11 @@ public class ISpend extends Application {
 
     private File workspace = null;
     private TextField t = new TextField("None Selected");
+    private final PreferencesStore store = new PreferencesStore();
 
     @Override
     public void start(final Stage stage) {
-        // read property file
+
         GridPane gp = new GridPane();
         gp.setPadding(new Insets(30, 10, 10, 10));
         gp.setVgap(10);
@@ -51,7 +53,15 @@ public class ISpend extends Application {
         hbox.setAlignment(Pos.CENTER_RIGHT);
         gp.addRow(2, new Label(), hbox);
 
-        start.setDisable(true);
+        // read property file
+        String wp = store.getWorkspace();
+        if (wp != null) {
+            workspace = new File(wp);
+            t.setText(wp);
+        } else {
+            start.setDisable(true);
+        }
+
         b.setOnAction(event -> {
             workspace = requestWorkspace(stage);
             if (workspace == null)
@@ -60,11 +70,11 @@ public class ISpend extends Application {
             t.setText(workspace.getAbsolutePath());
         });
 
-        cancel.setOnAction(event -> System.exit(0));
+        cancel.setOnAction(event -> Platform.exit());
 
         start.setOnAction(event -> {
+            store.saveWorkspace(workspace.getAbsolutePath());
             stage.close();
-            PreferencesStore store = new PreferencesStore();
             ISpendPane ipane = new ISpendPane(stage, store);
             ipane.show();
         });
@@ -72,6 +82,10 @@ public class ISpend extends Application {
         Scene scene = new Scene(gp);
         stage.setScene(scene);
         stage.sizeToScene();
+        stage.setFullScreen(false);
+        stage.setResizable(false);
+        stage.sizeToScene();
+        stage.setMaxHeight(100);
         stage.show();
     }
 

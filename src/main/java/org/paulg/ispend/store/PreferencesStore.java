@@ -2,6 +2,7 @@ package org.paulg.ispend.store;
 
 import org.paulg.ispend.view.dashboard.BudgetEntry;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -21,6 +22,7 @@ public class PreferencesStore {
     private static final String SAVED_LABELS = "SavedLabels";
 
     private final Preferences prefs;
+    private File workspace;
 
     public PreferencesStore() {
         prefs = Preferences.userRoot().node(Preferences.class.getName());
@@ -83,5 +85,13 @@ public class PreferencesStore {
     public void saveBudgetEntries(List<BudgetEntry> budgets) {
         saveValues(budgets.stream().map(BudgetEntry::getGroup), SAVED_SEARCH_QUERIES);
         saveValues(budgets.stream().map(BudgetEntry::getLabel), SAVED_LABELS);
+    }
+
+    public String getWorkspace() {
+        return prefs.get("workspace", null);
+    }
+
+    public void saveWorkspace(String absolutePath) {
+        prefs.put("workspace", absolutePath);
     }
 }
