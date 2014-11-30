@@ -30,7 +30,7 @@ public class ISpend extends Application {
     private final PreferencesStore store = new PreferencesStore();
 
     @Override
-    public void start(final Stage stage) {
+    public void start(final Stage stage) throws IOException {
         store.init();
 
         stage.setTitle("elflock");
@@ -70,7 +70,11 @@ public class ISpend extends Application {
         cancel.setOnAction(event -> Platform.exit());
 
         start.setOnAction(event -> {
-            store.saveWorkspace(workspace.getAbsolutePath());
+            try {
+                store.saveWorkspace(workspace.getAbsolutePath());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             stage.close();
             ISpendPane ipane = new ISpendPane(stage, store);
             ipane.show();

@@ -19,34 +19,27 @@ public class PreferencesStore {
     private transient static final String SAVED_QUERY = "SavedQuery";
     private transient static final String SAVED_SEARCH_QUERIES = "SavedSearchQueries";
     private transient static final String SAVED_LABELS = "SavedLabels";
+    private static final String WORKSPACE = "workspace";
 
     private Map<String, List<String>> valuesMap = new HashMap<>();
 
     private transient Preferences prefs;
     private transient String workspace;
 
-    public PreferencesStore() {
-    }
-
     public void init() throws IOException {
         prefs = Preferences.userRoot().node(Preferences.class.getName());
-        this.workspace = prefs.get("workspace", null);
+        this.workspace = prefs.get(WORKSPACE, null);
         if (workspace != null)
             load();
     }
 
     private void saveValues(List<String> values, String field) {
         valuesMap.put(field, values);
-        prefs.put(field, values.stream().collect(joining(";")));
         try {
             save();
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    public boolean hasSavedQueries() {
-        return prefs.get(SAVED_SEARCH_QUERIES, null) != null;
     }
 
     public List<String> getSavedLabels() {
@@ -58,41 +51,11 @@ public class PreferencesStore {
     }
 
     private List<String> getInner(String field) {
-        String mergedQueries = prefs.get(field, null);
-        if (mergedQueries == null)
-            return new ArrayList<>();
-        return Arrays.asList(mergedQueries.split(";")).stream().
-                filter(x -> !x.isEmpty()).
-                collect(toList());
-    }
-
-    public void saveQuery(final String query) {
-        prefs.put(SAVED_QUERY, query);
-    }
-
-    public void saveLoadedFile(final String absolutePath) {
-        prefs.put(LOADED_FILE, absolutePath);
-    }
-
-    public boolean hasLoadedFile() {
-        return prefs.get(LOADED_FILE, null) != null;
-    }
-
-    public String getLoadedFile() {
-        return prefs.get(LOADED_FILE, null);
-    }
-
-    public boolean hasQuery() {
-        return prefs.get(SAVED_QUERY, null) != null;
-    }
-
-    public String getQuery() {
-        return prefs.get(SAVED_QUERY, null);
+        return  valuesMap.getOrDefault(field, null);
     }
 
     public void clearAll() {
-        prefs.remove(SAVED_QUERY);
-        prefs.remove(LOADED_FILE);
+        prefs.remove(WORKSPACE);
     }
 
     public void saveBudgetEntries(List<BudgetEntry> budgets) {
@@ -106,7 +69,7 @@ public class PreferencesStore {
 
     public void saveWorkspace(String absolutePath) throws IOException {
         this.workspace = absolutePath;
-        prefs.put("workspace", absolutePath);
+        prefs.put(WORKSPACE, absolutePath);
         load();
     }
 

@@ -115,26 +115,20 @@ public class ISpendPane extends Observable {
 
     public File showDialog() {
         final DirectoryChooser chooser = new DirectoryChooser();
-        File f = chooser.showDialog(stage);
-
-        if (f != null) {
-            preferencesStore.saveLoadedFile(f.getAbsolutePath());
-        }
-
-        return f;
+        System.out.println("TODO - Change OPEN to IMPORT");
+        return chooser.showDialog(stage);
     }
 
     public void show() {
-        if (preferencesStore.hasLoadedFile()) {
+        String workspace = preferencesStore.getWorkspace();
             try {
-                fileSelected(preferencesStore.getLoadedFile());
+                fileSelected(workspace);
             } catch (IOException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
             accountsData.clear();
             accountsData.addAll(recordStore.getAccounts());
-        }
         stage.show();
     }
 
