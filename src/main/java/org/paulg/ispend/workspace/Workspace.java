@@ -1,6 +1,8 @@
 package org.paulg.ispend.workspace;
 
 import com.google.gson.Gson;
+import org.paulg.ispend.model.Account;
+import org.paulg.ispend.store.RecordStore;
 import org.paulg.ispend.view.dashboard.BudgetEntry;
 
 import java.io.*;
@@ -22,6 +24,9 @@ public class Workspace {
     private Map<String, List<String>> valuesMap = new HashMap<>();
     private transient final Path path;
     private transient final Path config;
+
+    private transient RecordStore recordStore;
+    private Account accounts;
 
     private Workspace(Path p) {
         this.path = p;
@@ -51,7 +56,7 @@ public class Workspace {
         }
     }
 
-    private void load() throws IOException {
+    private void loadConfig() throws IOException {
         List<String> lines = Files.readAllLines(config);
         Gson gson = new Gson();
         Workspace ps = gson.fromJson(lines.stream().collect(joining()), Workspace.class);
@@ -84,14 +89,34 @@ public class Workspace {
         prefs.put(WORKSPACE, path.toString());
     }
 
+    private void loadFiles() throws IOException {
+        final HistoryFileVisitor fileVisitor = new HistoryFileVisitor();
+        Files.walkFileTree(path, fileVisitor);
+        recordStore = fileVisitor.getRecordStore();
+    }
+
     public static Workspace open(Path path) throws IOException {
         Workspace wp = new Workspace(path);
         if (Files.exists(wp.config)) {
-            wp.load();
+            wp.loadConfig();
+            System.out.println("Loading config");
+            wp.loadFiles();
         } else {
             wp.save();
         }
         setWorkspace(path);
         return wp;
+    }
+
+    public Collection<Account> getAccounts() {
+        return recordStore.getAccounts();
+    }
+
+    public RecordStore getRecordStore() {
+        return recordStore;
+    }
+
+    public void importFiles(Path path) {
+        throw new UnsupportedOperationException("Import files into workspace not implemented!");
     }
 }

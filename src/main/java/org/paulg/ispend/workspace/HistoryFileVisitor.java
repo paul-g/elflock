@@ -1,4 +1,4 @@
-package org.paulg.ispend.main;
+package org.paulg.ispend.workspace;
 
 import org.paulg.ispend.loader.NatWestRecordParser;
 import org.paulg.ispend.model.Record;
@@ -13,7 +13,7 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
 
-public final class HistoryFileVisitor extends SimpleFileVisitor<Path> {
+final class HistoryFileVisitor extends SimpleFileVisitor<Path> {
 
     private final RecordStore recordStore;
     private RecordParser recordParser;

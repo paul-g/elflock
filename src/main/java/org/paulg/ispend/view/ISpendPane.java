@@ -9,8 +9,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
-import org.paulg.ispend.main.OpenHistoryHandler;
-import org.paulg.ispend.main.HistoryFileVisitor;
+import org.paulg.ispend.workspace.ImportHandler;
 import org.paulg.ispend.model.*;
 import org.paulg.ispend.workspace.Workspace;
 import org.paulg.ispend.store.RecordStore;
@@ -19,9 +18,6 @@ import org.paulg.ispend.view.dashboard.DashboardTab;
 import org.paulg.ispend.view.drilldown.DrilldownTab;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,8 +37,6 @@ public class ISpendPane extends Observable {
 
     private final Map<String, DrilldownTab> indexToTab = new HashMap<>();
     private final DashboardTab dashboard;
-    private RecordStore recordStore;
-    private List<String> saveLabels;
 
     public ISpendPane(final Stage stage, final Workspace preferencesStore) {
         this.stage = stage;
@@ -85,7 +79,7 @@ public class ISpendPane extends Observable {
         MenuBar menuBar = new MenuBar();
         Menu menu = new Menu("File");
         MenuItem open = new MenuItem("Open");
-        open.setOnAction(new OpenHistoryHandler(this));
+        open.setOnAction(new ImportHandler(preferencesStore, this));
 
         MenuItem close = new MenuItem("Close");
         close.setOnAction(e -> Platform.exit());
@@ -96,22 +90,15 @@ public class ISpendPane extends Observable {
     }
 
     public RecordStore getRecordStore() {
-        return recordStore;
+        return preferencesStore.getRecordStore();
     }
 
-    public void fileSelected(final String path) throws IOException {
-        final HistoryFileVisitor fileVisitor = new HistoryFileVisitor();
-        recordStore = fileVisitor.getRecordStore();
-
-        Files.walkFileTree(Paths.get(path), fileVisitor);
-
-        accountsData.setAll(recordStore.getAccounts());
-
-        dashboard.setEndOfMonthBalance(recordStore.getEndOfMonthBalance());
-
-        this.setChanged();
-        this.notifyObservers();
-    }
+//    public void fileSelected(final String path) throws IOException {
+//        accountsData.setAll(recordStore.getAccounts());
+//        dashboard.setEndOfMonthBalance(recordStore.getEndOfMonthBalance());
+//        this.setChanged();
+//        this.notifyObservers();
+//    }
 
     public File showDialog() {
         final DirectoryChooser chooser = new DirectoryChooser();
@@ -120,15 +107,10 @@ public class ISpendPane extends Observable {
     }
 
     public void show() {
-        String workspace = preferencesStore.getWorkspace();
-            try {
-                fileSelected(workspace);
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-            accountsData.clear();
-            accountsData.addAll(recordStore.getAccounts());
+        accountsData.clear();
+        accountsData.addAll(preferencesStore.getAccounts());
+        this.setChanged();
+        this.notifyObservers();
         stage.show();
     }
 
@@ -138,10 +120,6 @@ public class ISpendPane extends Observable {
 
     public List<Account> getAccounts() {
         return accountsData;
-    }
-
-    public List<String> getSaveLabels() {
-        return saveLabels;
     }
 
     public List<String> getSavedLabels() {
