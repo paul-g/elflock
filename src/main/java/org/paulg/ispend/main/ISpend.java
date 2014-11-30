@@ -31,6 +31,8 @@ public class ISpend extends Application {
 
     @Override
     public void start(final Stage stage) {
+        store.init();
+
         stage.setTitle("elflock");
 
         GridPane gp = makeGrid();
@@ -73,7 +75,7 @@ public class ISpend extends Application {
             ISpendPane ipane = new ISpendPane(stage, store);
             ipane.show();
         });
-
+        gp.add(new Label(store.pettyPrint()), 0, 3, 3, 1);
         Scene scene = new Scene(gp);
         stage.setScene(scene);
         stage.sizeToScene();

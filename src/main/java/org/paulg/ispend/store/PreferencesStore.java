@@ -3,37 +3,36 @@ package org.paulg.ispend.store;
 import com.google.gson.Gson;
 import org.paulg.ispend.view.dashboard.BudgetEntry;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.prefs.Preferences;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.*;
 
 public class PreferencesStore {
 
-    private static final String LOADED_FILE = "LoadedFile";
-    private static final String SAVED_QUERY = "SavedQuery";
-    private static final String SAVED_SEARCH_QUERIES = "SavedSearchQueries";
-    private static final String SAVED_LABELS = "SavedLabels";
+    private transient static final String LOADED_FILE = "LoadedFile";
+    private transient static final String SAVED_QUERY = "SavedQuery";
+    private transient static final String SAVED_SEARCH_QUERIES = "SavedSearchQueries";
+    private transient static final String SAVED_LABELS = "SavedLabels";
 
     private Map<String, List<String>> valuesMap = new HashMap<>();
 
-    private transient final Preferences prefs;
+    private transient Preferences prefs;
     private transient String workspace;
 
     public PreferencesStore() {
+    }
+
+    public void init() throws IOException {
         prefs = Preferences.userRoot().node(Preferences.class.getName());
         this.workspace = prefs.get("workspace", null);
+        if (workspace != null)
+            load();
     }
 
     private void saveValues(List<String> values, String field) {
@@ -105,16 +104,28 @@ public class PreferencesStore {
         return workspace;
     }
 
-    public void saveWorkspace(String absolutePath) {
+    public void saveWorkspace(String absolutePath) throws IOException {
         this.workspace = absolutePath;
         prefs.put("workspace", absolutePath);
+        load();
     }
 
-    void save() throws IOException {
+    private void load() throws IOException {
+        List<String> lines = Files.readAllLines(Paths.get(workspace, "config.json"));
+        Gson gson = new Gson();
+        PreferencesStore ps = gson.fromJson(lines.stream().collect(joining()), PreferencesStore.class);
+        this.valuesMap = ps.valuesMap;
+    }
+
+    private void save() throws IOException {
         Gson gson = new Gson();
         Path p = Paths.get(workspace, "config.json");
         BufferedWriter br = Files.newBufferedWriter(p, Charset.defaultCharset());
         br.write(gson.toJson(this));
         br.close();
+    }
+
+    public String pettyPrint() {
+        return valuesMap.toString();
     }
 }
