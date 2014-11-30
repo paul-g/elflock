@@ -78,7 +78,7 @@ public class ISpendPane extends Observable {
     private MenuBar createMenuBar() {
         MenuBar menuBar = new MenuBar();
         Menu menu = new Menu("File");
-        MenuItem open = new MenuItem("Open");
+        MenuItem open = new MenuItem("Import");
         open.setOnAction(new ImportHandler(preferencesStore, this));
 
         MenuItem close = new MenuItem("Close");
@@ -102,8 +102,8 @@ public class ISpendPane extends Observable {
 
     public File showDialog() {
         final DirectoryChooser chooser = new DirectoryChooser();
-        System.out.println("TODO - Change OPEN to IMPORT");
-        return chooser.showDialog(stage);
+        throw new UnsupportedOperationException("Import into workspace not supported");
+//        return chooser.showDialog(stage);
     }
 
     public void show() {
