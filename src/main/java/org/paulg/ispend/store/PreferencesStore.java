@@ -15,8 +15,6 @@ import static java.util.stream.Collectors.*;
 
 public class PreferencesStore {
 
-    private transient static final String LOADED_FILE = "LoadedFile";
-    private transient static final String SAVED_QUERY = "SavedQuery";
     private transient static final String SAVED_SEARCH_QUERIES = "SavedSearchQueries";
     private transient static final String SAVED_LABELS = "SavedLabels";
     private static final String WORKSPACE = "workspace";
@@ -33,29 +31,17 @@ public class PreferencesStore {
             load();
     }
 
-    private void saveValues(List<String> values, String field) {
-        valuesMap.put(field, values);
-        try {
-            save();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     public List<String> getSavedLabels() {
-        return getInner(SAVED_LABELS);
+        return  valuesMap.getOrDefault(SAVED_LABELS, null);
     }
 
     public List<String> getSavedQueries() {
-        return getInner(SAVED_SEARCH_QUERIES);
-    }
-
-    private List<String> getInner(String field) {
-        return  valuesMap.getOrDefault(field, null);
+        return  valuesMap.getOrDefault(SAVED_SEARCH_QUERIES, null);
     }
 
     public void clearAll() {
         prefs.remove(WORKSPACE);
+        workspace = null;
     }
 
     public void saveBudgetEntries(List<BudgetEntry> budgets) {
@@ -71,6 +57,15 @@ public class PreferencesStore {
         this.workspace = absolutePath;
         prefs.put(WORKSPACE, absolutePath);
         load();
+    }
+
+    private void saveValues(List<String> values, String field) {
+        valuesMap.put(field, values);
+        try {
+            save();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void load() throws IOException {
