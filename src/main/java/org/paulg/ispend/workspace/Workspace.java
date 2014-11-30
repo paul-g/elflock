@@ -1,4 +1,4 @@
-package org.paulg.ispend.store;
+package org.paulg.ispend.workspace;
 
 import com.google.gson.Gson;
 import org.paulg.ispend.view.dashboard.BudgetEntry;
@@ -13,7 +13,7 @@ import java.util.prefs.Preferences;
 
 import static java.util.stream.Collectors.*;
 
-public class PreferencesStore {
+public class Workspace {
 
     private transient static final String SAVED_SEARCH_QUERIES = "SavedSearchQueries";
     private transient static final String SAVED_LABELS = "SavedLabels";
@@ -61,6 +61,7 @@ public class PreferencesStore {
 
     private void saveValues(List<String> values, String field) {
         valuesMap.put(field, values);
+
         try {
             save();
         } catch (IOException e) {
@@ -71,7 +72,7 @@ public class PreferencesStore {
     private void load() throws IOException {
         List<String> lines = Files.readAllLines(Paths.get(workspace, "config.json"));
         Gson gson = new Gson();
-        PreferencesStore ps = gson.fromJson(lines.stream().collect(joining()), PreferencesStore.class);
+        Workspace ps = gson.fromJson(lines.stream().collect(joining()), Workspace.class);
         this.valuesMap = ps.valuesMap;
     }
 

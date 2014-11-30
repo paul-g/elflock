@@ -12,7 +12,7 @@ import javafx.stage.Stage;
 import org.paulg.ispend.main.OpenHistoryHandler;
 import org.paulg.ispend.main.HistoryFileVisitor;
 import org.paulg.ispend.model.*;
-import org.paulg.ispend.store.PreferencesStore;
+import org.paulg.ispend.workspace.Workspace;
 import org.paulg.ispend.store.RecordStore;
 import org.paulg.ispend.view.dashboard.BudgetEntry;
 import org.paulg.ispend.view.dashboard.DashboardTab;
@@ -37,14 +37,14 @@ public class ISpendPane extends Observable {
 
     private final ObservableList<Account> accountsData = observableArrayList();
     private final Stage stage;
-    private final PreferencesStore preferencesStore;
+    private final Workspace preferencesStore;
 
     private final Map<String, DrilldownTab> indexToTab = new HashMap<>();
     private final DashboardTab dashboard;
     private RecordStore recordStore;
     private List<String> saveLabels;
 
-    public ISpendPane(final Stage stage, final PreferencesStore preferencesStore) {
+    public ISpendPane(final Stage stage, final Workspace preferencesStore) {
         this.stage = stage;
         this.preferencesStore = preferencesStore;
 

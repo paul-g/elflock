@@ -1,17 +1,15 @@
 package org.paulg.ispend.model;
 
-import static org.junit.Assert.*;
-
 import org.junit.*;
-import org.paulg.ispend.store.PreferencesStore;
+import org.paulg.ispend.workspace.Workspace;
 
 public class PreferencesStoreTest {
 
-	private PreferencesStore store;
+	private Workspace store;
 
 	@Before
 	public void setUp() {
-		store = new PreferencesStore();
+		store = new Workspace();
 		store.clearAll();
 	}
 
