@@ -17,46 +17,28 @@ public class Workspace {
 
     private transient static final String SAVED_SEARCH_QUERIES = "SavedSearchQueries";
     private transient static final String SAVED_LABELS = "SavedLabels";
-    private static final String WORKSPACE = "workspace";
+    private transient static final String WORKSPACE = "workspace";
 
     private Map<String, List<String>> valuesMap = new HashMap<>();
+    private transient final Path path;
+    private transient final Path config;
 
-    private transient Preferences prefs;
-    private transient String workspace;
-
-    public void init() throws IOException {
-        prefs = Preferences.userRoot().node(Preferences.class.getName());
-        this.workspace = prefs.get(WORKSPACE, null);
-        if (workspace != null)
-            load();
+    private Workspace(Path p) {
+        this.path = p;
+        this.config = path.resolve("config.json");
     }
 
     public List<String> getSavedLabels() {
-        return  valuesMap.getOrDefault(SAVED_LABELS, null);
+        return  valuesMap.getOrDefault(SAVED_LABELS, new ArrayList<>());
     }
 
     public List<String> getSavedQueries() {
-        return  valuesMap.getOrDefault(SAVED_SEARCH_QUERIES, null);
-    }
-
-    public void clearAll() {
-        prefs.remove(WORKSPACE);
-        workspace = null;
+        return  valuesMap.getOrDefault(SAVED_SEARCH_QUERIES, new ArrayList<>());
     }
 
     public void saveBudgetEntries(List<BudgetEntry> budgets) {
         saveValues(budgets.stream().map(BudgetEntry::getGroup).collect(toList()), SAVED_SEARCH_QUERIES);
         saveValues(budgets.stream().map(BudgetEntry::getLabel).collect(toList()), SAVED_LABELS);
-    }
-
-    public String getWorkspace() {
-        return workspace;
-    }
-
-    public void saveWorkspace(String absolutePath) throws IOException {
-        this.workspace = absolutePath;
-        prefs.put(WORKSPACE, absolutePath);
-        load();
     }
 
     private void saveValues(List<String> values, String field) {
@@ -70,7 +52,7 @@ public class Workspace {
     }
 
     private void load() throws IOException {
-        List<String> lines = Files.readAllLines(Paths.get(workspace, "config.json"));
+        List<String> lines = Files.readAllLines(config);
         Gson gson = new Gson();
         Workspace ps = gson.fromJson(lines.stream().collect(joining()), Workspace.class);
         this.valuesMap = ps.valuesMap;
@@ -78,13 +60,38 @@ public class Workspace {
 
     private void save() throws IOException {
         Gson gson = new Gson();
-        Path p = Paths.get(workspace, "config.json");
-        BufferedWriter br = Files.newBufferedWriter(p, Charset.defaultCharset());
+        BufferedWriter br = Files.newBufferedWriter(config, Charset.defaultCharset());
         br.write(gson.toJson(this));
         br.close();
     }
 
     public String pettyPrint() {
         return valuesMap.toString();
+    }
+
+    public static Path getSavedWorkspace() {
+        String path = getWorkspace();
+        return path == null ? null : Paths.get(path);
+    }
+
+    public static String getWorkspace() {
+        Preferences prefs = Preferences.userRoot().node(Preferences.class.getName());
+        return prefs.get(WORKSPACE, null);
+    }
+
+    private static void setWorkspace(Path path) {
+        Preferences prefs = Preferences.userRoot().node(Preferences.class.getName());
+        prefs.put(WORKSPACE, path.toString());
+    }
+
+    public static Workspace open(Path path) throws IOException {
+        Workspace wp = new Workspace(path);
+        if (Files.exists(wp.config)) {
+            wp.load();
+        } else {
+            wp.save();
+        }
+        setWorkspace(path);
+        return wp;
     }
 }

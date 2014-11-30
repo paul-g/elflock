@@ -18,6 +18,7 @@ import org.paulg.ispend.view.utils.UiUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 
 public class ISpend extends Application {
 
@@ -25,22 +26,41 @@ public class ISpend extends Application {
         launch(args);
     }
 
-    private File workspace = null;
     private TextField t = new TextField("None Selected");
-    private final Workspace store = new Workspace();
+    private Path workspacePath;
+    private Stage stage;
 
     @Override
     public void start(final Stage stage) throws IOException {
-        store.init();
+        this.workspacePath = Workspace.getSavedWorkspace();
+        this.stage = stage;
 
-        Scene scene = makeGui(stage);
+        Scene scene = makeGui();
 
         stage.setScene(scene);
         stage.sizeToScene();
         stage.show();
     }
 
-    private Scene makeGui(Stage stage) {
+    private void loadPane() {
+        try {
+            Workspace workspace = Workspace.open(workspacePath);
+            stage.close();
+            ISpendPane ipane = new ISpendPane(stage, workspace);
+            ipane.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void setNewWorkspace() {
+        workspacePath = requestWorkspace(stage).toPath();
+        if (workspacePath == null)
+            return;
+        t.setText(workspacePath.toString());
+    }
+
+    private Scene makeGui() {
         stage.setTitle("elflock");
 
         GridPane gp = makeGrid();
@@ -58,36 +78,20 @@ public class ISpend extends Application {
         gp.addRow(1, lbrowse, t);
         gp.addRow(2, new Label(), buttonPane);
 
-        // read property file
-        String wp = store.getWorkspace();
-        if (wp != null) {
-            workspace = new File(wp);
-            t.setText(wp);
-        } else {
+        if (workspacePath == null) {
             start.setDisable(true);
+        } else {
+            t.setText(workspacePath.toString());
         }
 
         browse.setOnAction(event -> {
-            workspace = requestWorkspace(stage);
-            if (workspace == null)
-                return;
+            setNewWorkspace();
             start.setDisable(false);
-            t.setText(workspace.getAbsolutePath());
         });
-
         cancel.setOnAction(event -> Platform.exit());
+        start.setOnAction(event -> loadPane());
 
-        start.setOnAction(event -> {
-            try {
-                store.saveWorkspace(workspace.getAbsolutePath());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            stage.close();
-            ISpendPane ipane = new ISpendPane(stage, store);
-            ipane.show();
-        });
-        gp.add(new Label(store.pettyPrint()), 0, 3, 3, 1);
+        //gp.add(new Label(store.pettyPrint()), 0, 3, 3, 1);
         return new Scene(gp);
     }
 
